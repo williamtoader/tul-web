@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TulWM - Pure JS Windowing Toolkit</title>
-    
+
     <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    
+
     <!-- Core Toolkit CSS -->
     <link rel="stylesheet" href="tulwm.css">
-    
+
     <!-- App Specific Demo CSS -->
     <style>
         body {
@@ -34,6 +35,20 @@
             -webkit-backdrop-filter: blur(var(--tulwm-blur));
             box-shadow: 0 0 40px var(--tulwm-shadow-color);
             transition: background 0.3s, border-color 0.3s;
+            overflow-y: auto;
+        }
+
+        .app-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .app-sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .app-sidebar::-webkit-scrollbar-thumb {
+            background: var(--tulwm-border);
+            border-radius: 4px;
         }
 
         .app-sidebar h1 {
@@ -43,7 +58,7 @@
             font-weight: 500;
             letter-spacing: -0.5px;
         }
-        
+
         .app-sidebar h2 {
             font-size: 11px;
             color: var(--tulwm-text-secondary);
@@ -97,12 +112,13 @@
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 4px 12px var(--tulwm-shadow-glow);
         }
-        .btn:hover { 
-            background: var(--tulwm-accent-hover); 
+
+        .btn:hover {
+            background: var(--tulwm-accent-hover);
             transform: translateY(-2px);
             box-shadow: 0 8px 20px var(--tulwm-shadow-glow);
         }
-        
+
         .btn-outline {
             background: transparent;
             border: 1px solid var(--tulwm-border);
@@ -110,15 +126,25 @@
             font-weight: 500;
             box-shadow: none;
         }
-        .btn-outline:hover { 
-            background: var(--tulwm-bg-tab-active); 
+
+        .btn-outline:hover {
+            background: var(--tulwm-bg-tab-active);
             border-color: var(--tulwm-border);
             color: var(--tulwm-text-primary);
             transform: translateY(-1px);
             box-shadow: 0 4px 12px var(--tulwm-shadow-color);
         }
 
+        .btn-small {
+            padding: 8px;
+            font-size: 12px;
+            flex-grow: 1;
+        }
 
+        .btn-group {
+            display: flex;
+            gap: 8px;
+        }
 
         /* Container for Layout Manager */
         #layout-container {
@@ -131,6 +157,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- Sidebar with Drag Sources -->
@@ -140,20 +167,48 @@
             <h2 style="margin-bottom: 0;">Windowing Toolkit</h2>
             <p style="color: var(--tulwm-text-secondary); font-size: 12px; margin-top: 4px;">Drag & Drop into layout</p>
         </div>
-        
+
         <div>
             <h2>Components</h2>
             <div style="display: flex; flex-direction: column; gap: 8px;">
                 <div class="sidebar-item" data-type="editor">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
                     Code Editor
                 </div>
                 <div class="sidebar-item" data-type="console">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="4 17 10 11 4 5"></polyline>
+                        <line x1="12" y1="19" x2="20" y2="19"></line>
+                    </svg>
                     Terminal Console
                 </div>
+                <div class="sidebar-item" data-type="datagrid">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                        <line x1="9" y1="21" x2="9" y2="9"></line>
+                    </svg>
+                    Data Grid
+                </div>
+                <div class="sidebar-item" data-type="image">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    Image Viewer
+                </div>
                 <div class="sidebar-item" data-type="generic">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
                     Generic Panel
                 </div>
             </div>
@@ -177,10 +232,28 @@
             </div>
         </div>
 
+        <div>
+            <h2>Presets</h2>
+            <div class="btn-group">
+                <button id="btn-layout-ide" class="btn btn-outline btn-small">IDE</button>
+                <button id="btn-layout-dash" class="btn btn-outline btn-small">Dash</button>
+                <button id="btn-layout-grid" class="btn btn-outline btn-small">Grid</button>
+            </div>
+        </div>
+
+        <div>
+            <h2>Actions API</h2>
+            <button id="btn-add-tab" class="btn btn-outline"
+                style="width: 100%; text-align: left; padding: 10px; font-size: 13px;">+ Add Tab via API</button>
+        </div>
+
         <div class="actions">
-            <button id="btn-save" class="btn">Save Layout</button>
-            <button id="btn-load" class="btn btn-outline">Load Layout</button>
-            <button id="btn-reset" class="btn btn-outline">Reset Default</button>
+            <h2>State</h2>
+            <div class="btn-group">
+                <button id="btn-save" class="btn btn-small">Save</button>
+                <button id="btn-load" class="btn btn-outline btn-small">Load</button>
+            </div>
+            <button id="btn-reset" class="btn btn-outline" style="font-size: 12px; padding: 8px;">Reset Default</button>
         </div>
     </div>
 
@@ -191,4 +264,5 @@
     <script src="tulwm.js"></script>
     <script src="app.js"></script>
 </body>
+
 </html>

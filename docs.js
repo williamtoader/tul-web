@@ -202,6 +202,66 @@ layout.createDragSource(btn, config);</pre>
                 </ul>
             </div>
         `
+    },
+    reactAngular: {
+        title: "React & Angular Integration",
+        content: `
+            <div class="markdown-body">
+                <h1>React & Angular Integration</h1>
+                <p>Since TulWM exposes a pure JavaScript, programmatic component API, integrating it with frameworks like React and Angular is straightforward. You essentially use TulWM to manage the layout, and the frameworks to render inside the panels.</p>
+                
+                <h2>React Integration</h2>
+                <p>To use React components inside TulWM, wrap your <code>React.createRoot</code> or <code>ReactDOM.render</code> calls inside a TulWM component factory.</p>
+                <div class="code-block">
+<pre><span class="keyword">import</span> { createRoot } <span class="keyword">from</span> <span class="string">'react-dom/client'</span>;
+<span class="keyword">import</span> MyReactApp <span class="keyword">from</span> <span class="string">'./MyReactApp'</span>;
+
+<span class="keyword">function</span> ReactPanelFactory(state = {}, container) {
+    <span class="keyword">const</span> el = document.createElement(<span class="string">'div'</span>);
+    el.style.height = <span class="string">'100%'</span>;
+    
+    <span class="keyword">const</span> root = createRoot(el);
+    root.render(&lt;MyReactApp state={state} /&gt;);
+    
+    container.on(<span class="string">'destroy'</span>, () =&gt; {
+        root.unmount();
+    });
+    
+    <span class="keyword">return</span> el;
+}
+
+layout.registerComponent(<span class="string">'reactPanel'</span>, ReactPanelFactory);</pre>
+                </div>
+
+                <h2>Angular Integration</h2>
+                <p>For Angular, you can dynamically create and mount components using Custom Elements (Angular Elements), which provides a seamless wrapper.</p>
+                <div class="code-block">
+<pre><span class="comment">// 1. Build an Angular Element</span>
+<span class="keyword">import</span> { createCustomElement } <span class="keyword">from</span> <span class="string">'@angular/elements'</span>;
+
+<span class="keyword">export</span> <span class="keyword">class</span> AppModule {
+  <span class="keyword">constructor</span>(injector) {
+    <span class="keyword">const</span> el = createCustomElement(MyAngularComponent, { injector });
+    customElements.define(<span class="string">'my-angular-component'</span>, el);
+  }
+}
+
+<span class="comment">// 2. TulWM Factory</span>
+<span class="keyword">function</span> AngularPanelFactory(state = {}, container) {
+    <span class="keyword">const</span> el = document.createElement(<span class="string">'my-angular-component'</span>);
+    
+    <span class="comment">// Pass state if the element supports it via properties</span>
+    if (state.taskId) {
+        el.taskId = state.taskId;
+    }
+    
+    <span class="keyword">return</span> el;
+}
+
+layout.registerComponent(<span class="string">'angularPanel'</span>, AngularPanelFactory);</pre>
+                </div>
+            </div>
+        `
     }
 };
 
@@ -386,6 +446,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             size: 50,
                             content: [
                                 { type: 'component', componentName: 'docViewer', title: docsTopics.theming.title, componentState: { topic: 'theming' } },
+                                { type: 'component', componentName: 'docViewer', title: docsTopics.reactAngular.title, componentState: { topic: 'reactAngular' } },
                                 { type: 'component', componentName: 'docViewer', title: docsTopics.dnd.title, componentState: { topic: 'dnd' } },
                                 { type: 'component', componentName: 'docViewer', title: docsTopics.events.title, componentState: { topic: 'events' } }
                             ]
