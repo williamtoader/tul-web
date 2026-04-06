@@ -454,6 +454,22 @@ body.theme-cyber .tulwm-tab.active {
   opacity: 1;
 }
 
+/* Tab Drop Indicator */
+.tulwm-tab-drop-indicator {
+  position: absolute;
+  z-index: 1000;
+  width: 2px;
+  background-color: var(--tulwm-accent);
+  pointer-events: none;
+  transition: opacity 0.15s ease-out, left 0.1s ease-out, top 0.1s ease-out;
+  opacity: 0;
+  box-shadow: 0 0 8px var(--tulwm-accent);
+}
+
+.tulwm-tab-drop-indicator.visible {
+  opacity: 1;
+}
+
 /* Drag Sources */
 .tulwm-drag-source {
   cursor: grab;

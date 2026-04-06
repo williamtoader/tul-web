@@ -52,6 +52,10 @@ const TulWM = (function() {
             // Create indicator element
             this.indicator = Utils.createElement('div', 'tulwm-drop-indicator', document.body);
             this.indicator.style.display = 'none';
+
+            // Create tab drop indicator element
+            this.tabIndicator = Utils.createElement('div', 'tulwm-tab-drop-indicator', document.body);
+            this.tabIndicator.style.display = 'none';
         },
 
         pendDrag(evt, itemConfig, type, sourceStack, title) {
@@ -132,6 +136,11 @@ const TulWM = (function() {
                 this.indicator.style.display = 'none';
                 this.indicator.classList.remove('visible');
             }
+
+            if (this.tabIndicator) {
+                this.tabIndicator.style.display = 'none';
+                this.tabIndicator.classList.remove('visible');
+            }
             
             if (this.currentDropZone) {
                 this.executeDrop();
@@ -181,7 +190,62 @@ const TulWM = (function() {
             if (targetItem instanceof StackItem) {
                  const isHeader = targetItem.headerEl.contains(el);
                  if (isHeader) {
-                     edge = 'center';
+                     edge = 'tab_insert';
+                     
+                     const tabs = Array.from(targetItem.tabsEl.querySelectorAll('.tulwm-tab'));
+                     let dropIdx = tabs.length;
+                     let dropLeft = 0;
+                     let dropTop = 0;
+                     let dropHeight = 0;
+                     
+                     if (tabs.length > 0) {
+                         for (let i = 0; i < tabs.length; i++) {
+                             const tab = tabs[i];
+                             const rect = tab.getBoundingClientRect();
+                             if (tab.style.display === 'none') continue;
+                             
+                             if (evt.clientX < rect.left + rect.width / 2) {
+                                 dropIdx = i;
+                                 dropLeft = rect.left;
+                                 dropTop = rect.top;
+                                 dropHeight = rect.height;
+                                 break;
+                             }
+                         }
+                         
+                         if (dropIdx === tabs.length) {
+                             let lastVisible = null;
+                             for (let i = tabs.length - 1; i >= 0; i--) {
+                                 if (tabs[i].style.display !== 'none') {
+                                     lastVisible = tabs[i];
+                                     dropIdx = i + 1;
+                                     break;
+                                 }
+                             }
+                             if (lastVisible) {
+                                 const rect = lastVisible.getBoundingClientRect();
+                                 dropLeft = rect.right;
+                                 dropTop = rect.top;
+                                 dropHeight = rect.height;
+                             } else {
+                                 // Fallback if all hidden
+                                 const rect = targetItem.headerEl.getBoundingClientRect();
+                                 dropLeft = rect.left + 8;
+                                 dropTop = rect.top + 4;
+                                 dropHeight = rect.height - 8;
+                             }
+                         }
+                     } else {
+                         const rect = targetItem.headerEl.getBoundingClientRect();
+                         dropLeft = rect.left + 8;
+                         dropTop = rect.top + 4;
+                         dropHeight = rect.height - 8;
+                     }
+                     
+                     this.currentDropZone = { target: targetItem, edge: edge, insertIndex: dropIdx };
+                     this.showTabIndicator(dropLeft, dropTop, dropHeight);
+                     return;
+
                  } else {
                      // Check center 25% box for stacking
                      const cx = pos.w / 2;
@@ -207,7 +271,24 @@ const TulWM = (function() {
             this.showIndicator(targetItem.element, edge);
         },
 
+        showTabIndicator(l, t, h) {
+             this.indicator.style.display = 'none';
+             this.indicator.classList.remove('visible');
+             
+             this.tabIndicator.style.top = t + 'px';
+             this.tabIndicator.style.left = l + 'px';
+             this.tabIndicator.style.height = h + 'px';
+             this.tabIndicator.style.display = 'block';
+             
+             setTimeout(() => this.tabIndicator.classList.add('visible'), 10);
+        },
+
         showIndicator(element, edge) {
+             if (this.tabIndicator) {
+                 this.tabIndicator.style.display = 'none';
+                 this.tabIndicator.classList.remove('visible');
+             }
+
              const rect = element.getBoundingClientRect();
              let t = rect.top, l = rect.left, w = rect.width, h = rect.height;
 
@@ -229,6 +310,10 @@ const TulWM = (function() {
         hideIndicator() {
             this.indicator.style.display = 'none';
             this.indicator.classList.remove('visible');
+            if (this.tabIndicator) {
+                this.tabIndicator.style.display = 'none';
+                this.tabIndicator.classList.remove('visible');
+            }
             this.currentDropZone = null;
         },
 
@@ -236,10 +321,15 @@ const TulWM = (function() {
             const { target, edge } = this.currentDropZone;
             let newItemConfig = this.dragItem;
 
+            let adjustIndex = false;
             // If it's a dragged tab, we need to remove it from the old stack first
             if (this.sourceType === 'tab') {
                 const oldComp = this.sourceStack.children.find(c => c.config === newItemConfig);
                 if (oldComp) {
+                    const oldIndex = this.sourceStack.children.indexOf(oldComp);
+                    if (this.sourceStack === target && edge === 'tab_insert' && oldIndex < this.currentDropZone.insertIndex) {
+                        adjustIndex = true;
+                    }
                     this.sourceStack.removeChild(oldComp);
                     // If source stack is empty, it needs to be cleaned up
                     if (this.sourceStack.children.length === 0) {
@@ -256,6 +346,11 @@ const TulWM = (function() {
                 // Add tab to existing stack
                 const newComp = new ComponentItem(newItemConfig, this.layoutManager);
                 target.addChild(newComp);
+            } else if (edge === 'tab_insert') {
+                const newComp = new ComponentItem(newItemConfig, this.layoutManager);
+                let idx = this.currentDropZone.insertIndex;
+                if (adjustIndex) idx--;
+                target.addChild(newComp, idx);
             } else {
                 // Split
                 const isHoriz = (edge === 'left' || edge === 'right');
@@ -616,10 +711,10 @@ const TulWM = (function() {
             }
         }
 
-        _appendDOMChild(child) {
+        _appendDOMChild(child, index) {
             this.contentAreaEl.appendChild(child.element);
             child.renderAppContent(); // Lazy render when added
-            this.activeChildIndex = this.children.length - 1; // Activate new
+            this.activeChildIndex = typeof index === 'number' ? index : this.children.length - 1; // Activate new
         }
 
         _removeDOMChild(child) {
