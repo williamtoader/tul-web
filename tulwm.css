@@ -8,7 +8,7 @@ body.theme-nordic {
   --tulwm-bg-header: rgba(16, 18, 22, 0.7);
   --tulwm-border: rgba(255, 255, 255, 0.08);
   --tulwm-text-primary: #e6e8ec;
-  --tulwm-text-secondary: #8c939d;
+  --tulwm-text-secondary: #9ca3af;
   --tulwm-accent: #0cbaba; /* Glowing Teal */
   --tulwm-accent-hover: #15f0f0;
   --tulwm-drop-zone: rgba(12, 186, 186, 0.2);
@@ -41,7 +41,7 @@ body.theme-cyber {
   --tulwm-bg-header: rgba(5, 5, 5, 0.9);
   --tulwm-border: rgba(245, 158, 11, 0.3);
   --tulwm-text-primary: #fcd34d;
-  --tulwm-text-secondary: #b45309;
+  --tulwm-text-secondary: #d97706;
   --tulwm-accent: #f59e0b; /* Amber Glow */
   --tulwm-accent-hover: #fbbf24;
   --tulwm-drop-zone: rgba(245, 158, 11, 0.25);
@@ -73,7 +73,7 @@ body.theme-light {
   --tulwm-bg-header: rgba(255, 255, 255, 0.8);
   --tulwm-border: rgba(15, 23, 42, 0.06);
   --tulwm-text-primary: #0f172a;
-  --tulwm-text-secondary: #64748b;
+  --tulwm-text-secondary: #475569;
   --tulwm-accent: #2563eb; /* Apple Blue */
   --tulwm-accent-hover: #1d4ed8;
   --tulwm-drop-zone: rgba(37, 99, 235, 0.15);
@@ -624,4 +624,64 @@ body.theme-cyber .tulwm-tab.active {
 .tulwm-dropdown-item:hover {
   background: rgba(255, 255, 255, 0.1);
   color: var(--tulwm-accent);
+}
+
+/* Theme Selector Radio List */
+.theme-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.theme-label {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--tulwm-bg-tab);
+  border: 1px solid var(--tulwm-border);
+  border-radius: var(--tulwm-radius-inner);
+  color: var(--tulwm-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.theme-label:hover {
+  background: var(--tulwm-bg-tab-active);
+  color: var(--tulwm-text-primary);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.theme-radio {
+  display: none;
+}
+
+.theme-label:has(.theme-radio:checked) {
+  background: var(--tulwm-bg-tab-active);
+  color: var(--tulwm-text-primary);
+  border-color: var(--tulwm-accent);
+  box-shadow: 0 4px 12px var(--tulwm-shadow-color), inset 0 0 0 1px var(--tulwm-accent);
+}
+
+.theme-name {
+  display: flex;
+  align-items: center;
+}
+
+.theme-name::before {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--tulwm-text-secondary);
+  margin-right: 12px;
+  transition: all 0.2s;
+}
+
+.theme-label:has(.theme-radio:checked) .theme-name::before {
+  border-color: var(--tulwm-accent);
+  background: var(--tulwm-accent);
+  box-shadow: 0 0 8px var(--tulwm-accent);
 }

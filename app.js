@@ -195,15 +195,16 @@ document.addEventListener("DOMContentLoaded", function () {
   // Switch Theme Dynamically
   const themeSelector = document.getElementById("theme-selector");
   if (themeSelector) {
-      // Ensure initial correct state
-      document.body.className = themeSelector.value;
+      const checkedRadio = themeSelector.querySelector('input[name="theme"]:checked');
+      if (checkedRadio) document.body.className = checkedRadio.value;
       
       const updateTheme = (e) => {
-           document.body.className = e.target.value;
+           if (e.target.name === 'theme') {
+               document.body.className = e.target.value;
+           }
       };
       
       themeSelector.addEventListener("change", updateTheme);
-      themeSelector.addEventListener("input", updateTheme);
   }
 
 });

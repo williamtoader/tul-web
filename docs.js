@@ -270,7 +270,7 @@ document.addEventListener("DOMContentLoaded", function () {
             font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
             font-size: 14px;
             line-height: 1.5;
-            color: var(--tulwm-text-editor, #e2e8f0);
+            color: var(--tulwm-text-console, #e2e8f0);
         }
         .markdown-body .code-block code {
             background: transparent;
@@ -427,9 +427,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // Theme selector handler
     const themeSelector = document.getElementById("theme-selector");
     if (themeSelector) {
-        document.body.className = themeSelector.value;
+        const checkedRadio = themeSelector.querySelector('input[name="theme"]:checked');
+        if (checkedRadio) document.body.className = checkedRadio.value;
         themeSelector.addEventListener("change", (e) => {
-            document.body.className = e.target.value;
+            if (e.target.name === 'theme') {
+                document.body.className = e.target.value;
+            }
         });
     }
 });

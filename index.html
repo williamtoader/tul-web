@@ -161,11 +161,20 @@
 
         <div>
             <h2>Theme</h2>
-            <select id="theme-selector" style="width: 100%; padding: 8px; background: var(--tulwm-bg-tab); color: var(--tulwm-text-primary); border: 1px solid var(--tulwm-border); border-radius: var(--tulwm-radius-inner); font-family: inherit; outline: none; cursor: pointer; transition: all 0.2s;">
-                <option value="theme-nordic">Industrial Graphite</option>
-                <option value="theme-cyber">Phosphor Terminal</option>
-                <option value="theme-light">Pro Light</option>
-            </select>
+            <div id="theme-selector" class="theme-selector">
+                <label class="theme-label">
+                    <input type="radio" name="theme" class="theme-radio" value="theme-nordic" checked>
+                    <span class="theme-name">Industrial Graphite</span>
+                </label>
+                <label class="theme-label">
+                    <input type="radio" name="theme" class="theme-radio" value="theme-cyber">
+                    <span class="theme-name">Phosphor Terminal</span>
+                </label>
+                <label class="theme-label">
+                    <input type="radio" name="theme" class="theme-radio" value="theme-light">
+                    <span class="theme-name">Pro Light</span>
+                </label>
+            </div>
         </div>
 
         <div class="actions">
