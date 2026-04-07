@@ -662,7 +662,7 @@ const TulWEB = (function () {
 
         updateFlex() {
             if (this.size && this.element) {
-                this.element.style.flex = `0 1 ${this.size}%`;
+                this.element.style.flex = `${this.size} 1 0%`;
             } else if (this.element) {
                 this.element.style.flex = '1 1 auto';
             }
@@ -752,6 +752,7 @@ const TulWEB = (function () {
             super(config, layoutManager);
             this.activeChildIndex = 0;
             this.isMaximized = false;
+            this.isMinimized = false;
             this.hiddenTabs = [];
         }
 
@@ -771,6 +772,15 @@ const TulWEB = (function () {
             this.tabsEl = Utils.createElement('div', 'tulweb-tabs', this.headerEl);
             this.controlsEl = Utils.createElement('div', 'tulweb-header-controls', this.headerEl);
 
+            if (this.layoutManager.settings.enableMinimize !== false) {
+                this.minBtn = Utils.createElement('div', 'tulweb-control', this.controlsEl);
+                this.minBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h12v2H6z"/></svg>';
+                this.minBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggleMinimize();
+                });
+            }
+
             // Maximize button
             this.maxBtn = Utils.createElement('div', 'tulweb-control', this.controlsEl);
             this.maxBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6z"/></svg>';
@@ -786,6 +796,15 @@ const TulWEB = (function () {
             });
 
             this.contentAreaEl = Utils.createElement('div', 'tulweb-content-area', this.element);
+
+            if (this.layoutManager.settings.enablePreview) {
+                this.element.addEventListener('mouseenter', () => {
+                    if (this.isMinimized) this.element.classList.add('previewing');
+                });
+                this.element.addEventListener('mouseleave', () => {
+                    if (this.isMinimized) this.element.classList.remove('previewing');
+                });
+            }
 
             if (window.ResizeObserver) {
                 this.resizeObserver = new ResizeObserver(() => {
@@ -936,8 +955,12 @@ const TulWEB = (function () {
 
         setActive(index) {
             this.activeChildIndex = index;
-            this.renderTabs();
-            this.showActiveChild();
+            if (this.isMinimized) {
+                this.toggleMinimize();
+            } else {
+                this.renderTabs();
+                this.showActiveChild();
+            }
         }
 
         showActiveChild() {
@@ -973,7 +996,23 @@ const TulWEB = (function () {
         }
 
         updateFlex() {
-            super.updateFlex();
+            if (this.isMinimized) {
+                this.element.style.flex = '0 0 auto';
+                const isVertical = this.tabPosition === 'left' || this.tabPosition === 'right';
+                if (isVertical) {
+                    this.element.style.width = 'calc(var(--tulweb-tab-height) + 2px)';
+                    this.element.style.height = '100%';
+                } else {
+                    this.element.style.height = 'calc(var(--tulweb-tab-height) + 2px)';
+                    this.element.style.width = '100%';
+                }
+            } else {
+                // Clear any manual width/height set during minimize
+                this.element.style.width = '';
+                this.element.style.height = '';
+                super.updateFlex();
+            }
+
             const onlyActive = this.layoutManager.settings && this.layoutManager.settings.onlyResizeActiveTabs;
 
             // Propagate resize events to the leaf components so they can react to dimensions
@@ -981,6 +1020,18 @@ const TulWEB = (function () {
                 if (onlyActive && index !== this.activeChildIndex) return;
                 child.emit('resize');
             });
+        }
+
+        toggleMinimize() {
+            this.isMinimized = !this.isMinimized;
+            if (this.isMinimized) {
+                this.element.classList.add('minimized');
+            } else {
+                this.element.classList.remove('minimized');
+                this.element.classList.remove('previewing');
+            }
+            this.updateFlex();
+            if (this.parent) this.parent.updateLayout();
         }
 
         toggleMaximize() {
@@ -1098,7 +1149,9 @@ const TulWEB = (function () {
             this.componentFactories = {};
             this.root = null;
             this.settings = Object.assign({
-                onlyResizeActiveTabs: true
+                onlyResizeActiveTabs: true,
+                enableMinimize: true,
+                enablePreview: false
             }, config && config.settings ? config.settings : {}, options);
 
             // Create root DOM element
