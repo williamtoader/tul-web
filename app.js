@@ -139,15 +139,42 @@ document.addEventListener("DOMContentLoaded", function () {
        const el = document.createElement("div");
        el.style.padding = "20px";
        el.style.color = "var(--tulwm-text-secondary)";
-       el.innerHTML = `<h3 style="color:var(--tulwm-text-primary); margin-top:0;">${state.name || 'Panel'}</h3><p>Use the toolbar to drag new components into the layout.</p>`;
+       
+       const content = document.createElement("div");
+       content.innerHTML = `<h3 style="color:var(--tulwm-text-primary); margin-top:0;">${state.name || 'Panel'}</h3><p>Use the toolbar to drag new components into the layout.</p>`;
+       el.appendChild(content);
+
+       const dimensionsEl = document.createElement("div");
+       dimensionsEl.style.marginTop = "15px";
+       dimensionsEl.style.marginBottom = "15px";
+       dimensionsEl.style.fontFamily = "monospace";
+       dimensionsEl.style.color = "var(--tulwm-accent)";
+       el.appendChild(dimensionsEl);
+
        if (container) {
-           el.innerHTML += `<button id="btn-close-self" style="background:var(--tulwm-bg-tab); color:var(--tulwm-text-primary); border:1px solid var(--tulwm-border); padding:8px 12px; border-radius:var(--tulwm-radius-inner); cursor:pointer;">Programmatic Close</button>`;
+           const btn = document.createElement("button");
+           btn.style.background = "var(--tulwm-bg-tab)";
+           btn.style.color = "var(--tulwm-text-primary)";
+           btn.style.border = "1px solid var(--tulwm-border)";
+           btn.style.padding = "8px 12px";
+           btn.style.borderRadius = "var(--tulwm-radius-inner)";
+           btn.style.cursor = "pointer";
+           btn.textContent = "Programmatic Close";
+           
            container.on('init', () => {
-               const btn = el.querySelector('#btn-close-self');
-               if (btn) btn.addEventListener('click', () => {
+               btn.addEventListener('click', () => {
                     container.destroy();
                });
+               // Force an initial size update after mounting
+               container.emit('resize'); 
            });
+           
+           container.on('resize', () => {
+               const rect = container.element.getBoundingClientRect();
+               dimensionsEl.innerText = `Dimensions: ${rect.width.toFixed(0)}w x ${rect.height.toFixed(0)}h`;
+           });
+           
+           el.appendChild(btn);
        }
        return el;
   }
@@ -280,6 +307,8 @@ document.addEventListener("DOMContentLoaded", function () {
       comp.on('inactive', () => layout.showToast(`${getName()} Inactive`));
       comp.on('focus', () => layout.showToast(`${getName()} Focused`));
       comp.on('defocus', () => layout.showToast(`${getName()} Unfocused`));
+      comp.on('move', () => layout.showToast(`${getName()} Moved`, 'info'));
+      comp.on('resize', () => console.log(`${getName()} Resized`));
   });
 
   // 2. Register Components
@@ -341,13 +370,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const btnAddTab = document.getElementById("btn-add-tab");
   if (btnAddTab) {
       btnAddTab.addEventListener("click", () => {
-          // Add to the active stack, or failing that, anywhere if possible
-          // Currently, TulWM doesn't have a direct "add to default" if no active stack,
-          // so let's log and see. 
           if(layout.activeStack) {
-            layout.activeStack.addChild(new window.TulWM.LayoutManager.ComponentItem({
+            const newComp = layout._buildObjectTree({
               type: 'component', componentName: 'generic', title: 'New API Tab', componentState: { name: 'API Generated' }
-            }, layout));
+            });
+            layout.activeStack.addChild(newComp);
             layout.showToast("Tab added to active stack");
           } else {
             layout.showToast("Click a tab stack to focus it first", "error");

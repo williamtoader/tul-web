@@ -31,11 +31,13 @@ Simply include the CSS and JS files in your project:
 
 ### 1. Initialize the Layout Manager
 
-Create a container in your HTML and initialize the `LayoutManager`.
+Create a container in your HTML and initialize the `LayoutManager`. You can pass an optional settings object to govern behavior.
 
 ```javascript
 const container = document.getElementById("layout-container");
-const layout = new TulWM.LayoutManager(null, container);
+const layout = new TulWM.LayoutManager(null, container, {
+    onlyResizeActiveTabs: true // (Default) Only dynamically visible tabs process resize geometry
+});
 ```
 
 ### 2. Register Your Components
@@ -86,6 +88,19 @@ const config = { type: 'component', componentName: 'editor', title: 'New Documen
 
 layout.createDragSource(myButton, config);
 ```
+
+## Component Lifecycle Events
+
+TulWM uses an internal `EventEmitter` system that allows you to hook directly into layout state changes. You can bind to these events directly on the `container` instance passed to your component factories:
+
+- `init`: Fired once the factory binds the DOM and mounts the component.
+- `active`: Fired when an inactive component becomes the visible tab in its stack.
+- `inactive`: Fired when a component is hidden behind a newly selected active tab.
+- `focus`: Fired when the component is the active tab **and** its parent stack receives user focus.
+- `defocus`: Fired when the component loses focus (either by becoming inactive, or the focus shifting to another stack).
+- `move`: Fired right after a component acts as a dragged tab and successfully drops into a new layout position.
+- `resize`: Fired when a splitter is dragged, parent container changes size, or browser window resizes.
+- `destroy`: Fired immediately before garbage collection.
 
 ## Themes
 

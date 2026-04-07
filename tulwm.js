@@ -2,7 +2,7 @@
  * TulWM - Pure JS Windowing Toolkit
  */
 
-const TulWM = (function() {
+const TulWM = (function () {
 
     // --- Utility Functions ---
     const Utils = {
@@ -48,7 +48,7 @@ const TulWM = (function() {
             this.handleMouseUp = this.handleMouseUp.bind(this);
             this.handlePendingMove = this.handlePendingMove.bind(this);
             this.handlePendingUp = this.handlePendingUp.bind(this);
-            
+
             // Create indicator element
             this.indicator = Utils.createElement('div', 'tulwm-drop-indicator', document.body);
             this.indicator.style.display = 'none';
@@ -62,7 +62,7 @@ const TulWM = (function() {
             this.isPendingDrag = true;
             this.pendingStartPos = { x: evt.clientX, y: evt.clientY };
             this.pendingArgs = { itemConfig, type, sourceStack, title };
-            
+
             document.addEventListener('mousemove', this.handlePendingMove);
             document.addEventListener('mouseup', this.handlePendingUp);
         },
@@ -91,7 +91,7 @@ const TulWM = (function() {
             this.dragItem = itemConfig;
             this.sourceType = type;
             this.sourceStack = sourceStack;
-            
+
             // Create UI proxy
             this.proxy = Utils.createElement('div', 'tulwm-drag-proxy', document.body);
             this.proxy.textContent = title || itemConfig.title || 'Component';
@@ -99,7 +99,7 @@ const TulWM = (function() {
 
             document.addEventListener('mousemove', this.handleMouseMove);
             document.addEventListener('mouseup', this.handleMouseUp);
-            
+
             // If dragging from a stack, make it look active but keep it in the DOM until drop
             if (sourceStack) {
                 // Visual feedback only for now
@@ -119,19 +119,19 @@ const TulWM = (function() {
             this.updateProxyPos(evt);
             this.findDropZone(evt);
         },
-        
+
         handleMouseUp(evt) {
             if (!this.isDragging) return;
             this.isDragging = false;
-            
+
             document.removeEventListener('mousemove', this.handleMouseMove);
             document.removeEventListener('mouseup', this.handleMouseUp);
-            
+
             if (this.proxy) {
                 document.body.removeChild(this.proxy);
                 this.proxy = null;
             }
-            
+
             if (this.indicator) {
                 this.indicator.style.display = 'none';
                 this.indicator.classList.remove('visible');
@@ -141,13 +141,13 @@ const TulWM = (function() {
                 this.tabIndicator.style.display = 'none';
                 this.tabIndicator.classList.remove('visible');
             }
-            
+
             if (this.currentDropZone) {
                 this.executeDrop();
             } else if (this.sourceType === 'tab' && this.sourceStack && this.dragItem) {
-               // Dragged outside, maybe remove or just cancel? Currently cancel.
+                // Dragged outside, maybe remove or just cancel? Currently cancel.
             }
-            
+
             this.currentDropZone = null;
             this.dragItem = null;
             this.sourceStack = null;
@@ -172,7 +172,7 @@ const TulWM = (function() {
             }
 
             if (!targetItem) return this.hideIndicator();
-            
+
             // If hovering over a component inside a stack, we want to target the stack
             if (targetItem instanceof ComponentItem && targetItem.parent instanceof StackItem) {
                 targetItem = targetItem.parent;
@@ -185,84 +185,84 @@ const TulWM = (function() {
 
             // Determine zone
             const pos = Utils.getRelativePos(evt, targetItem.element);
-            
+
             let edge = 'center';
             if (targetItem instanceof StackItem) {
-                 const isHeader = targetItem.headerEl.contains(el);
-                 if (isHeader) {
-                     edge = 'tab_insert';
-                     
-                     const tabs = Array.from(targetItem.tabsEl.querySelectorAll('.tulwm-tab'));
-                     let dropIdx = tabs.length;
-                     let dropLeft = 0;
-                     let dropTop = 0;
-                     let dropHeight = 0;
-                     
-                     if (tabs.length > 0) {
-                         for (let i = 0; i < tabs.length; i++) {
-                             const tab = tabs[i];
-                             const rect = tab.getBoundingClientRect();
-                             if (tab.style.display === 'none') continue;
-                             
-                             if (evt.clientX < rect.left + rect.width / 2) {
-                                 dropIdx = i;
-                                 dropLeft = rect.left;
-                                 dropTop = rect.top;
-                                 dropHeight = rect.height;
-                                 break;
-                             }
-                         }
-                         
-                         if (dropIdx === tabs.length) {
-                             let lastVisible = null;
-                             for (let i = tabs.length - 1; i >= 0; i--) {
-                                 if (tabs[i].style.display !== 'none') {
-                                     lastVisible = tabs[i];
-                                     dropIdx = i + 1;
-                                     break;
-                                 }
-                             }
-                             if (lastVisible) {
-                                 const rect = lastVisible.getBoundingClientRect();
-                                 dropLeft = rect.right;
-                                 dropTop = rect.top;
-                                 dropHeight = rect.height;
-                             } else {
-                                 // Fallback if all hidden
-                                 const rect = targetItem.headerEl.getBoundingClientRect();
-                                 dropLeft = rect.left + 8;
-                                 dropTop = rect.top + 4;
-                                 dropHeight = rect.height - 8;
-                             }
-                         }
-                     } else {
-                         const rect = targetItem.headerEl.getBoundingClientRect();
-                         dropLeft = rect.left + 8;
-                         dropTop = rect.top + 4;
-                         dropHeight = rect.height - 8;
-                     }
-                     
-                     this.currentDropZone = { target: targetItem, edge: edge, insertIndex: dropIdx };
-                     this.showTabIndicator(dropLeft, dropTop, dropHeight);
-                     return;
+                const isHeader = targetItem.headerEl.contains(el);
+                if (isHeader) {
+                    edge = 'tab_insert';
 
-                 } else {
-                     // Check center 25% box for stacking
-                     const cx = pos.w / 2;
-                     const cy = pos.h / 2;
-                     if (Math.abs(pos.x - cx) < pos.w * 0.25 && Math.abs(pos.y - cy) < pos.h * 0.25) {
-                         edge = 'center';
-                     } else {
-                         // Quadrants
-                         const y1 = pos.x * (pos.h / pos.w);
-                         const y2 = pos.h - pos.x * (pos.h / pos.w);
+                    const tabs = Array.from(targetItem.tabsEl.querySelectorAll('.tulwm-tab'));
+                    let dropIdx = tabs.length;
+                    let dropLeft = 0;
+                    let dropTop = 0;
+                    let dropHeight = 0;
 
-                         if (pos.y < y1 && pos.y < y2) edge = 'top';
-                         else if (pos.y > y1 && pos.y > y2) edge = 'bottom';
-                         else if (pos.y > y1 && pos.y < y2) edge = 'left';
-                         else if (pos.y < y1 && pos.y > y2) edge = 'right';
-                     }
-                 }
+                    if (tabs.length > 0) {
+                        for (let i = 0; i < tabs.length; i++) {
+                            const tab = tabs[i];
+                            const rect = tab.getBoundingClientRect();
+                            if (tab.style.display === 'none') continue;
+
+                            if (evt.clientX < rect.left + rect.width / 2) {
+                                dropIdx = i;
+                                dropLeft = rect.left;
+                                dropTop = rect.top;
+                                dropHeight = rect.height;
+                                break;
+                            }
+                        }
+
+                        if (dropIdx === tabs.length) {
+                            let lastVisible = null;
+                            for (let i = tabs.length - 1; i >= 0; i--) {
+                                if (tabs[i].style.display !== 'none') {
+                                    lastVisible = tabs[i];
+                                    dropIdx = i + 1;
+                                    break;
+                                }
+                            }
+                            if (lastVisible) {
+                                const rect = lastVisible.getBoundingClientRect();
+                                dropLeft = rect.right;
+                                dropTop = rect.top;
+                                dropHeight = rect.height;
+                            } else {
+                                // Fallback if all hidden
+                                const rect = targetItem.headerEl.getBoundingClientRect();
+                                dropLeft = rect.left + 8;
+                                dropTop = rect.top + 4;
+                                dropHeight = rect.height - 8;
+                            }
+                        }
+                    } else {
+                        const rect = targetItem.headerEl.getBoundingClientRect();
+                        dropLeft = rect.left + 8;
+                        dropTop = rect.top + 4;
+                        dropHeight = rect.height - 8;
+                    }
+
+                    this.currentDropZone = { target: targetItem, edge: edge, insertIndex: dropIdx };
+                    this.showTabIndicator(dropLeft, dropTop, dropHeight);
+                    return;
+
+                } else {
+                    // Check center 25% box for stacking
+                    const cx = pos.w / 2;
+                    const cy = pos.h / 2;
+                    if (Math.abs(pos.x - cx) < pos.w * 0.25 && Math.abs(pos.y - cy) < pos.h * 0.25) {
+                        edge = 'center';
+                    } else {
+                        // Quadrants
+                        const y1 = pos.x * (pos.h / pos.w);
+                        const y2 = pos.h - pos.x * (pos.h / pos.w);
+
+                        if (pos.y < y1 && pos.y < y2) edge = 'top';
+                        else if (pos.y > y1 && pos.y > y2) edge = 'bottom';
+                        else if (pos.y > y1 && pos.y < y2) edge = 'left';
+                        else if (pos.y < y1 && pos.y > y2) edge = 'right';
+                    }
+                }
             } else {
                 return this.hideIndicator();
             }
@@ -272,39 +272,39 @@ const TulWM = (function() {
         },
 
         showTabIndicator(l, t, h) {
-             this.indicator.style.display = 'none';
-             this.indicator.classList.remove('visible');
-             
-             this.tabIndicator.style.top = t + 'px';
-             this.tabIndicator.style.left = l + 'px';
-             this.tabIndicator.style.height = h + 'px';
-             this.tabIndicator.style.display = 'block';
-             
-             setTimeout(() => this.tabIndicator.classList.add('visible'), 10);
+            this.indicator.style.display = 'none';
+            this.indicator.classList.remove('visible');
+
+            this.tabIndicator.style.top = t + 'px';
+            this.tabIndicator.style.left = l + 'px';
+            this.tabIndicator.style.height = h + 'px';
+            this.tabIndicator.style.display = 'block';
+
+            setTimeout(() => this.tabIndicator.classList.add('visible'), 10);
         },
 
         showIndicator(element, edge) {
-             if (this.tabIndicator) {
-                 this.tabIndicator.style.display = 'none';
-                 this.tabIndicator.classList.remove('visible');
-             }
+            if (this.tabIndicator) {
+                this.tabIndicator.style.display = 'none';
+                this.tabIndicator.classList.remove('visible');
+            }
 
-             const rect = element.getBoundingClientRect();
-             let t = rect.top, l = rect.left, w = rect.width, h = rect.height;
+            const rect = element.getBoundingClientRect();
+            let t = rect.top, l = rect.left, w = rect.width, h = rect.height;
 
-             if (edge === 'top') h = h / 2;
-             if (edge === 'bottom') { t = rect.bottom - (h / 2); h = h / 2; }
-             if (edge === 'left') w = w / 2;
-             if (edge === 'right') { l = rect.right - (w / 2); w = w / 2; }
+            if (edge === 'top') h = h / 2;
+            if (edge === 'bottom') { t = rect.bottom - (h / 2); h = h / 2; }
+            if (edge === 'left') w = w / 2;
+            if (edge === 'right') { l = rect.right - (w / 2); w = w / 2; }
 
-             this.indicator.style.top = t + 'px';
-             this.indicator.style.left = l + 'px';
-             this.indicator.style.width = w + 'px';
-             this.indicator.style.height = h + 'px';
-             this.indicator.style.display = 'block';
-             
-             // Small delay for CSS transition
-             setTimeout(() => this.indicator.classList.add('visible'), 10);
+            this.indicator.style.top = t + 'px';
+            this.indicator.style.left = l + 'px';
+            this.indicator.style.width = w + 'px';
+            this.indicator.style.height = h + 'px';
+            this.indicator.style.display = 'block';
+
+            // Small delay for CSS transition
+            setTimeout(() => this.indicator.classList.add('visible'), 10);
         },
 
         hideIndicator() {
@@ -342,12 +342,14 @@ const TulWM = (function() {
                 // Deep copy if needed, but assuming unique factory calls
             }
 
+            let newComp;
+
             if (edge === 'center') {
                 // Add tab to existing stack
-                const newComp = new ComponentItem(newItemConfig, this.layoutManager);
+                newComp = new ComponentItem(newItemConfig, this.layoutManager);
                 target.addChild(newComp);
             } else if (edge === 'tab_insert') {
-                const newComp = new ComponentItem(newItemConfig, this.layoutManager);
+                newComp = new ComponentItem(newItemConfig, this.layoutManager);
                 let idx = this.currentDropZone.insertIndex;
                 if (adjustIndex) idx--;
                 target.addChild(newComp, idx);
@@ -360,7 +362,7 @@ const TulWM = (function() {
                 // For simplicity: target is a Stack. Its parent is Row or Col.
                 const parent = target.parent;
                 const newStack = new StackItem({ type: 'stack' }, this.layoutManager);
-                const newComp = new ComponentItem(newItemConfig, this.layoutManager);
+                newComp = new ComponentItem(newItemConfig, this.layoutManager);
                 newStack.addChild(newComp);
 
                 if (parent instanceof RowItem && isHoriz) {
@@ -371,7 +373,7 @@ const TulWM = (function() {
                     target.size = targetSize / 2;
                     newStack.size = targetSize / 2;
                     parent.addChild(newStack, isFirst ? index : index + 1);
-                } 
+                }
                 else if (parent instanceof ColumnItem && !isHoriz) {
                     // Split column
                     const index = parent.children.indexOf(target);
@@ -384,7 +386,7 @@ const TulWM = (function() {
                     // Need to wrap target in a new Row/Col
                     const wrapperType = isHoriz ? RowItem : ColumnItem;
                     const wrapper = new wrapperType({ type: isHoriz ? 'row' : 'column' }, this.layoutManager);
-                    
+
                     const pIndex = parent.children.indexOf(target);
                     wrapper.size = target.size;
                     target.size = 50;
@@ -392,13 +394,17 @@ const TulWM = (function() {
 
                     // Swap target with wrapper in parent
                     parent.replaceChild(target, wrapper, pIndex);
-                    
+
                     wrapper.addChild(isFirst ? newStack : target);
                     wrapper.addChild(isFirst ? target : newStack);
                 }
-                
+
                 // Triggers resize
                 this.layoutManager.updateLayout();
+            }
+
+            if (this.sourceType === 'tab' && newComp) {
+                newComp.emit('move');
             }
         }
     };
@@ -411,7 +417,7 @@ const TulWM = (function() {
             this.itemConfig = itemConfig;
             this.layoutManager = layoutManager;
             this.element.classList.add('tulwm-drag-source');
-            
+
             this.element.addEventListener('mousedown', (e) => {
                 e.preventDefault(); // Prevent text selection
                 // Clone config so we don't mutate original
@@ -429,15 +435,15 @@ const TulWM = (function() {
             this.prevItem = prevItem;
             this.nextItem = nextItem;
             this.parentContainer = parentContainer;
-            
+
             this.element = Utils.createElement('div', 'tulwm-splitter', parentContainer);
-            
+
             this.isDragging = false;
             this._onMouseDown = this._onMouseDown.bind(this);
             this._onMouseMove = this._onMouseMove.bind(this);
             this._onMouseUp = this._onMouseUp.bind(this);
             this._onDblClick = this._onDblClick.bind(this);
-            
+
             this.element.addEventListener('mousedown', this._onMouseDown);
             this.element.addEventListener('dblclick', this._onDblClick);
         }
@@ -455,13 +461,13 @@ const TulWM = (function() {
             e.preventDefault();
             this.isDragging = true;
             this.element.classList.add('active');
-            
+
             // Calculate base metrics
             this.startPos = this.isVertical ? e.clientX : e.clientY;
             this.startPrevSize = this.prevItem.size || 50;
             this.startNextSize = this.nextItem.size || 50;
             this.totalSize = this.startPrevSize + this.startNextSize;
-            
+
             // Get pixels to percentage ratio
             const parentRect = this.parentContainer.getBoundingClientRect();
             this.pixelsPerPercent = (this.isVertical ? parentRect.width : parentRect.height) / 100;
@@ -491,7 +497,7 @@ const TulWM = (function() {
 
             this.prevItem.size = newPrevSize;
             this.nextItem.size = newNextSize;
-            
+
             // Re-render
             this.prevItem.updateFlex();
             this.nextItem.updateFlex();
@@ -505,12 +511,12 @@ const TulWM = (function() {
                 document.removeEventListener('mouseup', this._onMouseUp);
             }
         }
-        
+
         destroy() {
-             this.element.removeEventListener('mousedown', this._onMouseDown);
-             if (this.element.parentElement) {
-                 this.element.parentElement.removeChild(this.element);
-             }
+            this.element.removeEventListener('mousedown', this._onMouseDown);
+            if (this.element.parentElement) {
+                this.element.parentElement.removeChild(this.element);
+            }
         }
     }
 
@@ -544,12 +550,12 @@ const TulWM = (function() {
             this.parent = null;
             this.children = [];
             this.element = null;
-            this.size = this.config.size || null; 
+            this.size = this.config.size || null;
             this.id = Utils.generateId();
-            
+
             this._isActive = false;
             this._isFocused = false;
-            
+
             this.createDOM();
             if (this.element) {
                 this.element.tulwmItem = this; // Link back from DOM
@@ -594,12 +600,12 @@ const TulWM = (function() {
         _replaceDOMChild(oldChild, newChild) { /* Override */ }
 
         updateLayout() { /* Override */ }
-        
+
         updateFlex() {
             if (this.size && this.element) {
                 this.element.style.flex = `0 1 ${this.size}%`;
             } else if (this.element) {
-                 this.element.style.flex = '1 1 auto';
+                this.element.style.flex = '1 1 auto';
             }
             this.emit('resize');
         }
@@ -616,7 +622,7 @@ const TulWM = (function() {
             this.emit('destroy');
             const kids = [...this.children];
             kids.forEach(c => c.destroy());
-            
+
             if (this.parent) {
                 this.parent.removeChild(this);
                 if (this.parent.children.length === 0 && this.parent.layoutManager) {
@@ -644,7 +650,7 @@ const TulWM = (function() {
         constructor(config, layoutManager) {
             super(config, layoutManager);
         }
-        
+
         createDOM() {
             this.element = document.createElement('div');
             this.element.className = 'tulwm-component';
@@ -693,29 +699,29 @@ const TulWM = (function() {
         createDOM() {
             this.element = document.createElement('div');
             this.element.className = 'tulwm-stack';
-            
+
             this.element.addEventListener('mousedown', () => {
                 this.layoutManager.setActiveStack(this);
             });
-            
+
             this.headerEl = Utils.createElement('div', 'tulwm-header', this.element);
             this.tabsEl = Utils.createElement('div', 'tulwm-tabs', this.headerEl);
             this.controlsEl = Utils.createElement('div', 'tulwm-header-controls', this.headerEl);
-            
+
             // Maximize button
             this.maxBtn = Utils.createElement('div', 'tulwm-control', this.controlsEl);
             this.maxBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6z"/></svg>';
             this.maxBtn.addEventListener('click', () => this.toggleMaximize());
-            
+
             // Close Stack Button
             this.closeBtn = Utils.createElement('div', 'tulwm-control', this.controlsEl);
             this.closeBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>';
             this.closeBtn.addEventListener('click', () => {
-                 this.closeAll();
+                this.closeAll();
             });
-            
+
             this.contentAreaEl = Utils.createElement('div', 'tulwm-content-area', this.element);
-            
+
             if (window.ResizeObserver) {
                 this.resizeObserver = new ResizeObserver(() => {
                     if (this.children && this.children.length > 0) this.updateOverflow();
@@ -731,12 +737,12 @@ const TulWM = (function() {
         }
 
         _removeDOMChild(child) {
-             if (child.element && child.element.parentElement === this.contentAreaEl) {
-                 this.contentAreaEl.removeChild(child.element);
-             }
-             if (this.activeChildIndex >= this.children.length) {
-                 this.activeChildIndex = Math.max(0, this.children.length - 1);
-             }
+            if (child.element && child.element.parentElement === this.contentAreaEl) {
+                this.contentAreaEl.removeChild(child.element);
+            }
+            if (this.activeChildIndex >= this.children.length) {
+                this.activeChildIndex = Math.max(0, this.children.length - 1);
+            }
         }
 
         updateLayout() {
@@ -750,10 +756,10 @@ const TulWM = (function() {
             this.children.forEach((child, index) => {
                 const tab = Utils.createElement('div', 'tulwm-tab', this.tabsEl);
                 if (index === this.activeChildIndex) tab.classList.add('active');
-                
+
                 const title = Utils.createElement('div', 'tulwm-tab-title', tab);
                 title.textContent = child.config.title || child.config.componentName || 'Tab';
-                
+
                 const close = Utils.createElement('div', 'tulwm-tab-close', tab);
                 close.textContent = '×';
                 close.addEventListener('click', (e) => {
@@ -766,23 +772,23 @@ const TulWM = (function() {
 
                 // Tab click
                 tab.addEventListener('mousedown', (e) => {
-                     if (e.target !== close && e.button === 0) {
+                    if (e.target !== close && e.button === 0) {
                         this.setActive(index);
-                     }
+                    }
                 });
-                
+
                 // Tab double click (maximize)
                 tab.addEventListener('dblclick', (e) => {
-                     if (e.target !== close) {
-                         this.toggleMaximize();
-                     }
+                    if (e.target !== close) {
+                        this.toggleMaximize();
+                    }
                 });
-                
+
                 // Tab right click context menu
                 tab.addEventListener('contextmenu', (e) => {
-                     e.preventDefault();
-                     this.setActive(index);
-                     this.layoutManager.showContextMenu(e, this, child, index);
+                    e.preventDefault();
+                    this.setActive(index);
+                    this.layoutManager.showContextMenu(e, this, child, index);
                 });
 
                 // Tab drag
@@ -798,8 +804,8 @@ const TulWM = (function() {
 
         updateOverflow() {
             let tabs = Array.from(this.tabsEl.querySelectorAll('.tulwm-tab'));
-            tabs.forEach(t => t.style.display = ''); 
-            
+            tabs.forEach(t => t.style.display = '');
+
             if (this.overflowBtn) this.overflowBtn.style.display = 'none';
             if (this.dropdownEl) this.dropdownEl.style.display = 'none';
 
@@ -811,96 +817,112 @@ const TulWM = (function() {
 
             if (!this.overflowBtn) {
                 this.overflowBtn = Utils.createElement('div', 'tulwm-tab-overflow', this.headerEl);
-                this.overflowBtn.innerHTML = '‹›'; 
+                this.overflowBtn.innerHTML = '‹›';
                 this.headerEl.insertBefore(this.overflowBtn, this.controlsEl);
-                
+
                 this.dropdownEl = Utils.createElement('div', 'tulwm-dropdown', this.element);
                 this.dropdownEl.style.display = 'none';
-                
+
                 this.overflowBtn.addEventListener('click', (e) => {
-                     e.stopPropagation();
-                     const show = this.dropdownEl.style.display === 'none';
-                     this.dropdownEl.style.display = show ? 'block' : 'none';
-                     if (show) this.renderDropdown();
+                    e.stopPropagation();
+                    const show = this.dropdownEl.style.display === 'none';
+                    this.dropdownEl.style.display = show ? 'block' : 'none';
+                    if (show) this.renderDropdown();
                 });
-                
+
                 document.addEventListener('mousedown', (e) => {
-                     if (this.dropdownEl && !this.dropdownEl.contains(e.target) && e.target !== this.overflowBtn) {
-                          this.dropdownEl.style.display = 'none';
-                     }
+                    if (this.dropdownEl && !this.dropdownEl.contains(e.target) && e.target !== this.overflowBtn) {
+                        this.dropdownEl.style.display = 'none';
+                    }
                 });
             }
-            
+
             this.overflowBtn.style.display = 'flex';
             this.hiddenTabs = [];
-            
+
             const maxW = this.tabsEl.clientWidth - 30; // space for btn
             for (let i = tabs.length - 1; i >= 0; i--) {
                 if (totalWidth <= maxW) break;
                 if (i === this.activeChildIndex) continue;
-                
+
                 tabs[i].style.display = 'none';
                 totalWidth -= (tabs[i].offsetWidth + 2);
                 this.hiddenTabs.push(this.children[i]);
             }
             this.hiddenTabs.reverse();
         }
-        
+
         renderDropdown() {
-             this.dropdownEl.innerHTML = '';
-             this.hiddenTabs.forEach(child => {
-                  const item = Utils.createElement('div', 'tulwm-dropdown-item', this.dropdownEl);
-                  item.textContent = child.config.title || child.config.componentName || 'Tab';
-                  item.addEventListener('click', () => {
-                       const index = this.children.indexOf(child);
-                       this.setActive(index);
-                       this.dropdownEl.style.display = 'none';
-                  });
-             });
+            this.dropdownEl.innerHTML = '';
+            this.hiddenTabs.forEach(child => {
+                const item = Utils.createElement('div', 'tulwm-dropdown-item', this.dropdownEl);
+                item.textContent = child.config.title || child.config.componentName || 'Tab';
+                item.addEventListener('click', () => {
+                    const index = this.children.indexOf(child);
+                    this.setActive(index);
+                    this.dropdownEl.style.display = 'none';
+                });
+            });
         }
 
         setActive(index) {
-             this.activeChildIndex = index;
-             this.renderTabs();
-             this.showActiveChild();
+            this.activeChildIndex = index;
+            this.renderTabs();
+            this.showActiveChild();
         }
 
         showActiveChild() {
-             const isStackFocused = this.layoutManager.activeStack === this;
-             
-             this.children.forEach((child, index) => {
-                 const shouldBeActive = index === this.activeChildIndex;
-                 const shouldBeFocused = shouldBeActive && isStackFocused;
+            const isStackFocused = this.layoutManager.activeStack === this;
 
-                 if (shouldBeActive) {
-                     child.element.style.display = 'block';
-                 } else {
-                     child.element.style.display = 'none';
-                 }
-                 
-                 if (shouldBeActive !== child._isActive) {
-                     child._isActive = shouldBeActive;
-                     if (shouldBeActive) child.emit('active');
-                     else child.emit('inactive');
-                 }
+            this.children.forEach((child, index) => {
+                const shouldBeActive = index === this.activeChildIndex;
+                const shouldBeFocused = shouldBeActive && isStackFocused;
 
-                 if (shouldBeFocused !== child._isFocused) {
-                     child._isFocused = shouldBeFocused;
-                     if (shouldBeFocused) child.emit('focus');
-                     else child.emit('defocus');
-                 }
-             });
+                if (shouldBeActive) {
+                    child.element.style.display = 'block';
+                } else {
+                    child.element.style.display = 'none';
+                }
+
+                if (shouldBeActive !== child._isActive) {
+                    child._isActive = shouldBeActive;
+                    if (shouldBeActive) {
+                        child.emit('active');
+                        if (this.layoutManager.settings && this.layoutManager.settings.onlyResizeActiveTabs) {
+                            child.emit('resize');
+                        }
+                    }
+                    else child.emit('inactive');
+                }
+
+                if (shouldBeFocused !== child._isFocused) {
+                    child._isFocused = shouldBeFocused;
+                    if (shouldBeFocused) child.emit('focus');
+                    else child.emit('defocus');
+                }
+            });
+        }
+
+        updateFlex() {
+            super.updateFlex();
+            const onlyActive = this.layoutManager.settings && this.layoutManager.settings.onlyResizeActiveTabs;
+            
+            // Propagate resize events to the leaf components so they can react to dimensions
+            this.children.forEach((child, index) => {
+                if (onlyActive && index !== this.activeChildIndex) return;
+                child.emit('resize');
+            });
         }
 
         toggleMaximize() {
-             this.isMaximized = !this.isMaximized;
-             if (this.isMaximized) {
-                 this.element.classList.add('maximized');
-                 this.maxBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 4h4v2H6v4H4V4zm16 0h-4v2h2v4h2V4zM4 20h4v-2H6v-4H4v6zm16 0h-4v-2h2v-4h2v6z"/></svg>';
-             } else {
-                 this.element.classList.remove('maximized');
-                 this.maxBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6z"/></svg>';
-             }
+            this.isMaximized = !this.isMaximized;
+            if (this.isMaximized) {
+                this.element.classList.add('maximized');
+                this.maxBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 4h4v2H6v4H4V4zm16 0h-4v2h2v4h2V4zM4 20h4v-2H6v-4H4v6zm16 0h-4v-2h2v-4h2v6z"/></svg>';
+            } else {
+                this.element.classList.remove('maximized');
+                this.maxBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6z"/></svg>';
+            }
         }
 
         closeAll() {
@@ -914,6 +936,15 @@ const TulWM = (function() {
         constructor(config, layoutManager) {
             super(config, layoutManager);
             this.splitters = [];
+        }
+
+        updateFlex() {
+            super.updateFlex();
+            this.children.forEach(child => {
+                if (child.updateFlex) {
+                    child.updateFlex();
+                }
+            });
         }
 
         createDOM() {
@@ -931,7 +962,7 @@ const TulWM = (function() {
         }
 
         _replaceDOMChild(oldc, newc) {
-             // Handled in updateLayout
+            // Handled in updateLayout
         }
 
         updateLayout() {
@@ -939,12 +970,12 @@ const TulWM = (function() {
             if (this.children.length > 0) {
                 let totalSize = this.children.reduce((sum, c) => sum + (c.size || 0), 0);
                 if (totalSize === 0) {
-                     // Distribute equally
-                     const p = 100 / this.children.length;
-                     this.children.forEach(c => c.size = p);
+                    // Distribute equally
+                    const p = 100 / this.children.length;
+                    this.children.forEach(c => c.size = p);
                 } else if (Math.abs(totalSize - 100) > 1) {
-                     // Normalize
-                     this.children.forEach(c => c.size = (c.size / totalSize) * 100);
+                    // Normalize
+                    this.children.forEach(c => c.size = (c.size / totalSize) * 100);
                 }
             }
 
@@ -958,10 +989,10 @@ const TulWM = (function() {
             this.children.forEach((child, index) => {
                 this.element.appendChild(child.element);
                 child.updateLayout();
-                
+
                 if (index < this.children.length - 1) {
-                     const splitter = new Splitter(isVertical, child, this.children[index+1], this.element);
-                     this.splitters.push(splitter);
+                    const splitter = new Splitter(isVertical, child, this.children[index + 1], this.element);
+                    this.splitters.push(splitter);
                 }
             });
 
@@ -969,38 +1000,41 @@ const TulWM = (function() {
         }
     }
 
-    class RowItem extends ContainerItem {}
-    class ColumnItem extends ContainerItem {}
+    class RowItem extends ContainerItem { }
+    class ColumnItem extends ContainerItem { }
 
 
     // --- Public Layout Manager ---
-    
+
     class LayoutManager extends EventEmitter {
-        constructor(config, container) {
+        constructor(config, container, options = {}) {
             super();
             this.container = container;
             this.componentFactories = {};
             this.root = null;
-            
+            this.settings = Object.assign({
+                onlyResizeActiveTabs: true
+            }, config && config.settings ? config.settings : {}, options);
+
             // Create root DOM element
             this.rootElement = Utils.createElement('div', 'tulwm-root', container);
-            
+
             // Add toast container
             this.toastContainer = Utils.createElement('div', 'tulwm-toast-container', document.body);
-            
+
             this.activeStack = null;
-            
+
             DragManager.init(this);
-            
+
             if (config) {
                 this.loadLayout(config);
             }
 
             // Handle window resize
             window.addEventListener('resize', () => {
-                 this.updateLayout();
+                this.updateLayout();
             });
-            
+
             this.initShortcuts();
         }
 
@@ -1014,12 +1048,15 @@ const TulWM = (function() {
 
         loadLayout(config) {
             this.rootElement.innerHTML = '';
+            if (config && config.settings) {
+                this.settings = Object.assign(this.settings, config.settings);
+            }
             if (!config || !config.content || config.content.length === 0) {
                 this.root = null;
                 this.renderEmptyState();
                 return;
             }
-            
+
             // Config usually wraps in Row or Column.
             this.root = this._buildObjectTree(config.content[0]);
             this.rootElement.appendChild(this.root.element);
@@ -1049,13 +1086,13 @@ const TulWM = (function() {
             const menu = Utils.createElement('div', 'tulwm-context-menu', document.body);
             menu.style.left = evt.clientX + 'px';
             menu.style.top = evt.clientY + 'px';
-            
+
             const addOption = (text, onClick) => {
                 const item = Utils.createElement('div', 'tulwm-context-item', menu);
                 item.textContent = text;
                 item.addEventListener('click', () => { onClick(); closeMenu(); });
             };
-            
+
             addOption('Close Tab', () => {
                 child.destroy();
             });
@@ -1066,7 +1103,7 @@ const TulWM = (function() {
             addOption('Close All Tabs', () => {
                 stack.closeAll();
             });
-            
+
             this.contextMenu = menu;
             const closeMenu = () => {
                 if (this.contextMenu) {
@@ -1090,8 +1127,8 @@ const TulWM = (function() {
                         let active = this.activeStack;
                         if (!active) {
                             const stacks = Array.from(this.rootElement.querySelectorAll('.tulwm-stack'))
-                               .map(el => el.tulwmItem)
-                               .filter(s => s && s instanceof StackItem && s.children.length > 0);
+                                .map(el => el.tulwmItem)
+                                .filter(s => s && s instanceof StackItem && s.children.length > 0);
                             if (stacks.length > 0) active = stacks[0];
                         }
                         if (active && active.children.length > 0) {
@@ -1104,50 +1141,50 @@ const TulWM = (function() {
                 }
                 if (e.altKey) {
                     if (['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
-                         e.preventDefault();
-                         this.navigateFocus(e.key);
+                        e.preventDefault();
+                        this.navigateFocus(e.key);
                     }
                 }
             });
         }
-        
+
         navigateFocus(key) {
-             if (!this.activeStack || !this.activeStack.element) return;
-             const stacks = Array.from(this.rootElement.querySelectorAll('.tulwm-stack'))
-                  .map(el => el.tulwmItem)
-                  .filter(s => s && s instanceof StackItem);
-                  
-             const currentRect = this.activeStack.element.getBoundingClientRect();
-             const cx = currentRect.left + currentRect.width / 2;
-             const cy = currentRect.top + currentRect.height / 2;
-             
-             let bestStack = null;
-             let bestDist = Infinity;
-             
-             stacks.forEach(s => {
-                  if (s === this.activeStack) return;
-                  const r = s.element.getBoundingClientRect();
-                  const tx = r.left + r.width / 2;
-                  const ty = r.top + r.height / 2;
-                  
-                  let valid = false;
-                  if (key === 'ArrowRight' && tx > cx) valid = true;
-                  if (key === 'ArrowLeft' && tx < cx) valid = true;
-                  if (key === 'ArrowDown' && ty > cy) valid = true;
-                  if (key === 'ArrowUp' && ty < cy) valid = true;
-                  
-                  if (valid) {
-                      const dist = Math.pow(tx - cx, 2) + Math.pow(ty - cy, 2);
-                      if (dist < bestDist) {
-                          bestDist = dist;
-                          bestStack = s;
-                      }
-                  }
-             });
-             
-             if (bestStack) {
-                  this.setActiveStack(bestStack);
-             }
+            if (!this.activeStack || !this.activeStack.element) return;
+            const stacks = Array.from(this.rootElement.querySelectorAll('.tulwm-stack'))
+                .map(el => el.tulwmItem)
+                .filter(s => s && s instanceof StackItem);
+
+            const currentRect = this.activeStack.element.getBoundingClientRect();
+            const cx = currentRect.left + currentRect.width / 2;
+            const cy = currentRect.top + currentRect.height / 2;
+
+            let bestStack = null;
+            let bestDist = Infinity;
+
+            stacks.forEach(s => {
+                if (s === this.activeStack) return;
+                const r = s.element.getBoundingClientRect();
+                const tx = r.left + r.width / 2;
+                const ty = r.top + r.height / 2;
+
+                let valid = false;
+                if (key === 'ArrowRight' && tx > cx) valid = true;
+                if (key === 'ArrowLeft' && tx < cx) valid = true;
+                if (key === 'ArrowDown' && ty > cy) valid = true;
+                if (key === 'ArrowUp' && ty < cy) valid = true;
+
+                if (valid) {
+                    const dist = Math.pow(tx - cx, 2) + Math.pow(ty - cy, 2);
+                    if (dist < bestDist) {
+                        bestDist = dist;
+                        bestStack = s;
+                    }
+                }
+            });
+
+            if (bestStack) {
+                this.setActiveStack(bestStack);
+            }
         }
 
         updateLayout() {
@@ -1172,56 +1209,56 @@ const TulWM = (function() {
             if (this.activeStack === stackItem) {
                 this.setActiveStack(null);
             }
-            
+
             const parent = stackItem.parent;
             if (!parent) {
                 // It's the root. If it's a stack and empty, clear root
-                 if (stackItem.children.length === 0) {
-                     this.rootElement.innerHTML = '';
-                     this.root = null;
-                     this.renderEmptyState();
-                 }
-                 return;
+                if (stackItem.children.length === 0) {
+                    this.rootElement.innerHTML = '';
+                    this.root = null;
+                    this.renderEmptyState();
+                }
+                return;
             }
-            
+
             // Remove stack from parent
             parent.removeChild(stackItem);
 
             // If parent is now empty, clean it up recursively
             if (parent.children.length === 0) {
-                 this._cleanupEmptyStack(parent);
-            } 
+                this._cleanupEmptyStack(parent);
+            }
             // If parent is Row/Col and has only 1 child, simplify tree
             else if (parent.children.length === 1 && parent !== this.root) {
-                 const singleChild = parent.children[0];
-                 const grandParent = parent.parent;
-                 
-                 if (grandParent) {
-                     const pIndex = grandParent.children.indexOf(parent);
-                     singleChild.size = parent.size;
-                     grandParent.replaceChild(parent, singleChild, pIndex);
-                 } else {
-                     // Parent is root, replace root
-                     this.root = singleChild;
-                     this.root.parent = null;
-                     this.rootElement.innerHTML = '';
-                     this.rootElement.appendChild(this.root.element);
-                     this.root.updateLayout();
-                 }
+                const singleChild = parent.children[0];
+                const grandParent = parent.parent;
+
+                if (grandParent) {
+                    const pIndex = grandParent.children.indexOf(parent);
+                    singleChild.size = parent.size;
+                    grandParent.replaceChild(parent, singleChild, pIndex);
+                } else {
+                    // Parent is root, replace root
+                    this.root = singleChild;
+                    this.root.parent = null;
+                    this.rootElement.innerHTML = '';
+                    this.rootElement.appendChild(this.root.element);
+                    this.root.updateLayout();
+                }
             }
         }
 
         showToast(message, type = 'info') {
             const toast = Utils.createElement('div', 'tulwm-toast', this.toastContainer);
             if (type === 'error') toast.classList.add('error');
-            
+
             // Icon
-            const icon = type === 'error' ? 
-                '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>' : 
+            const icon = type === 'error' ?
+                '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>' :
                 '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
-                
+
             toast.innerHTML = icon + '<span>' + message + '</span>';
-            
+
             setTimeout(() => {
                 toast.classList.add('hiding');
                 setTimeout(() => {
@@ -1248,7 +1285,7 @@ const TulWM = (function() {
 
         setActiveStack(stack) {
             if (this.activeStack === stack) return;
-            
+
             if (this.activeStack && this.activeStack.element) {
                 this.activeStack.element.classList.remove('active-stack');
                 if (this.activeStack.children) {
@@ -1259,9 +1296,9 @@ const TulWM = (function() {
                     }
                 }
             }
-            
+
             this.activeStack = stack;
-            
+
             if (this.activeStack && this.activeStack.element && this.activeStack.children) {
                 this.activeStack.element.classList.add('active-stack');
                 const newActive = this.activeStack.children[this.activeStack.activeChildIndex];

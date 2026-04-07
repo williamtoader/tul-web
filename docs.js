@@ -50,8 +50,14 @@ const docsTopics = {
                 
                 <h2>Constructor</h2>
                 <div class="code-block">
-<pre><code>const layout = new TulWM.LayoutManager(initialConfig, containerElement);</code></pre>
+<pre><code>const layout = new TulWM.LayoutManager(initialConfig, containerElement, options);</code></pre>
                 </div>
+                
+                <h2>Configurations / Options</h2>
+                <p>Pass an optional third <code>options</code> argument (or nest inside a <code>settings</code> property on a layout JSON object) to customize engine behavior:</p>
+                <ul>
+                    <li><code>onlyResizeActiveTabs</code> (default: <code>true</code>): When enabled, resize events cascade strictly to the visible tab in a stack, saving performance. Background tabs skip geometry processing until they are clicked, at which point an artificial resize event is fired to synchronize them.</li>
+                </ul>
                 
                 <h2>Public Methods</h2>
                 <table class="api-table">
@@ -161,6 +167,19 @@ layout.createDragSource(btn, config);</pre>
                 <ul>
                     <li><code>stateChanged</code>: Fired whenever tabs are rearranged or sizes change.</li>
                     <li><code>componentCreated</code>: Fired right when a new <code>ComponentItem</code> instantiates, before its factory runs.</li>
+                </ul>
+
+                <h2>Component Lifecycle Events</h2>
+                <p>Bind directly to the <code>ComponentItem</code> instance (passed as 'container' to your factory) to react to visibility and focus state changes:</p>
+                <ul>
+                    <li><code>init</code>: Fired immediately after the factory logic completes and the DOM is initially rendered.</li>
+                    <li><code>active</code>: Fired when the component becomes the current visible tab in its stack.</li>
+                    <li><code>inactive</code>: Fired when the component is hidden because another tab in the same stack became active.</li>
+                    <li><code>focus</code>: Fired when the component is active AND its parent stack becomes focused by the user.</li>
+                    <li><code>defocus</code>: Fired when the component loses user focus (either because it became inactive, or a different stack received focus).</li>
+                    <li><code>move</code>: Fired when the component is dragged and dropped to a relocated position in the layout.</li>
+                    <li><code>resize</code>: Fired whenever the layout dimensions change for this component.</li>
+                    <li><code>destroy</code>: Fired just before the component is removed from the DOM.</li>
                 </ul>
 
                 <h2>Keyboard Shortcuts</h2>
