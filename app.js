@@ -1,3 +1,5 @@
+import { LayoutManager } from './tulweb.js';
+
 document.addEventListener("DOMContentLoaded", function () {
 
     // Custom Factory Components for the Demo
@@ -527,7 +529,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 1. Initialize Layout Manager
     const containerWrapper = document.getElementById("layout-container");
-    const layout = new TulWEB.LayoutManager(null, containerWrapper);
+    const layout = new LayoutManager(null, containerWrapper);
 
     // Make layout globally accessible for the demo buttons
     window.layout = layout;

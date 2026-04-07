@@ -12,7 +12,15 @@ const docsTopics = {
                 <p>Installation is straightforward. Simply drop the core CSS and JS files into your project head:</p>
                 <div class="code-block">
 <pre><code>&lt;link rel="stylesheet" href="tulweb.css"&gt;
-&lt;script src="tulweb.js"&gt;&lt;/script&gt;</code></pre>
+&lt;script type="module"&gt;
+  import { LayoutManager } from './tulweb.js';
+  const layout = new LayoutManager(null, document.body);
+&lt;/script&gt;</code></pre>
+                </div>
+                
+                <p>Alternatively, if you are using a build system or Node.js:</p>
+                <div class="code-block">
+<pre><code>npm install tulweb</code></pre>
                 </div>
                 
                 <div class="alert info">
@@ -50,7 +58,7 @@ const docsTopics = {
                 
                 <h2>Constructor</h2>
                 <div class="code-block">
-<pre><code>const layout = new TulWEB.LayoutManager(initialConfig, containerElement, options);</code></pre>
+<pre><code>const layout = new LayoutManager(initialConfig, containerElement, options);</code></pre>
                 </div>
                 
                 <h2>Configurations / Options</h2>
@@ -65,8 +73,8 @@ const docsTopics = {
                     <thead><tr><th>Method</th><th>Description</th></tr></thead>
                     <tbody>
                         <tr>
-                            <td><code>registerComponent(name, factoryFn)</code></td>
-                            <td>Maps a raw string name to a function returning a DOM element. Essential for rendering panel internals.</td>
+                            <td><code>registerComponent(name, method)</code></td>
+                            <td>Maps a raw string name to a <strong>Factory Function</strong> or <strong>ES6 Class</strong>. Provides maximum flexibility for building panel internals.</td>
                         </tr>
                         <tr>
                             <td><code>loadLayout(config)</code></td>
@@ -114,35 +122,52 @@ const docsTopics = {
         title: "Components",
         content: `
             <div class="markdown-body">
-                <h1>Component Factories</h1>
-                <p>Instead of passing rigid HTML strings, TulWEB embraces a programmatic component lifecycle. A factory function is called whenever the layout calculates that a specific panel needs to mount.</p>
+                <h1>Component Registration</h1>
+                <p>Instead of passing rigid HTML strings, TulWEB embraces a programmatic component lifecycle. Components can be registered as either traditional <strong>Factory Functions</strong> or modern <strong>ES6 Classes</strong>.</p>
                 
-                <h2>Building a Factory</h2>
+                <h2>1. Factory Functions</h2>
+                <p>A factory function is called whenever the layout mounts a specific panel. It must return a DOM node.</p>
                 <div class="code-block">
 <pre><span class="keyword">function</span> MyWidgetFactory(state = {}, container) {
     <span class="keyword">const</span> el = document.createElement(<span class="string">'div'</span>);
-    el.innerHTML = <span class="string">'&lt;h3&gt;My Panel&lt;/h3&gt;'</span>;
+    el.innerHTML = <span class="string">'&lt;h1&gt;Factory Component&lt;/h1&gt;'</span>;
     
-    <span class="comment">// 1. Read saved initialization state</span>
-    if (state.username) {
-        el.innerHTML += <span class="string">'&lt;p&gt;Hello '</span> + state.username + <span class="string">'&lt;/p&gt;'</span>;
-    }
+    <span class="comment">// Access saved state</span>
+    if (state.name) el.innerHTML += <span class="string">'&lt;p&gt;'</span> + state.name + <span class="string">'&lt;/p&gt;'</span>;
 
-    <span class="comment">// 2. Bind to container lifecycle</span>
-    container.on(<span class="string">'resize'</span>, () =&gt; {
-        console.log(<span class="string">'Panel resized'</span>);
-    });
-
-    container.on(<span class="string">'destroy'</span>, () =&gt; {
-        <span class="comment">// Cleanup timers, WebSockets, etc</span>
-    });
+    <span class="comment">// Hooks</span>
+    container.on(<span class="string">'resize'</span>, () =&gt; console.log(<span class="string">'Resized'</span>));
 
     <span class="keyword">return</span> el;
-}</pre>
+}
+layout.registerComponent(<span class="string">'myWidget'</span>, MyWidgetFactory);</pre>
+                </div>
+
+                <h2>2. ES6 Classes</h2>
+                <p>For more complex state management, you can define your components as classes. The constructor receives <code>(state, container)</code>. The instance should either be a DOM node itself or provide an <code>.element</code> property.</p>
+                <div class="code-block">
+<pre><span class="keyword">class</span> MyModernWidget {
+    <span class="keyword">constructor</span>(state, container) {
+        this.<span class="property">state</span> = state;
+        this.<span class="property">container</span> = container;
+        
+        <span class="comment">// Create root element</span>
+        this.<span class="property">element</span> = document.createElement(<span class="string">'div'</span>);
+        this.<span class="property">element</span>.innerHTML = <span class="string">'&lt;h1&gt;Class Component&lt;/h1&gt;'</span>;
+
+        <span class="comment">// Listen to events</span>
+        container.on(<span class="string">'active'</span>, () =&gt; this.onActivate());
+    }
+
+    onActivate() {
+        console.log(<span class="string">'Component became active'</span>);
+    }
+}
+layout.registerComponent(<span class="string">'modernWidget'</span>, MyModernWidget);</pre>
                 </div>
 
                 <div class="alert warning">
-                    <strong>Important:</strong> You must <code>return</code> a valid DOM node from your factory. Returning undefined will throw layout rendering errors.
+                    <strong>Important:</strong> You must <code>return</code> a valid DOM node from your factory, or provide a valid <code>.element</code> (or be a DOM node) in your class instance. Returning undefined will throw layout rendering errors.
                 </div>
             </div>
         `
@@ -306,6 +331,8 @@ layout.registerComponent(<span class="string">'angularPanel'</span>, AngularPane
         `
     }
 };
+
+import { LayoutManager } from './tulweb.js';
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -673,7 +700,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     const containerWrapper = document.getElementById("layout-container");
-    const layout = new TulWEB.LayoutManager(null, containerWrapper);
+    const layout = new LayoutManager(null, containerWrapper);
 
     // Register the documentation viewer component
     layout.registerComponent('sidebar', SidebarFactory);

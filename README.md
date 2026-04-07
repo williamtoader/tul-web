@@ -19,16 +19,43 @@ TulWEB is a lightweight, zero-dependency windowing toolkit designed for building
 - **Resizable Splitters**: Intuitive resizing with splitter constraints.
 - **Premium Themes**: Built-in themes including Industrial Graphite, Phosphor Terminal, Pro Light, and Retro 90s.
 - **State Management**: Save and restored entire layout configurations with a simple JSON format.
-- **Developer-Friendly API**: Event-based system for lifecycle management.
+- **Developer-Friendly API**: Event-based system for lifecycle management with support for both factory functions and ES6 classes.
+- **Internal OO Refactor**: Library internals now fully utilize ES6 classes for better maintainability and extensibility.
 
 ## Installation
 
 Simply include the CSS and JS files in your project:
 
 ```html
+<!-- Option 1: Direct File Usage -->
 <link rel="stylesheet" href="tulweb.css">
-<script src="tulweb.js"></script>
+<script type="module">
+  import { LayoutManager } from './tulweb.js';
+  const layout = new LayoutManager(null, document.body);
+</script>
+
+<!-- Option 2: NPM Installation -->
+<!-- npm install tulweb -->
 ```
+
+## Local Development
+
+To run the documentation and demo locally, use the following commands:
+
+```bash
+npm install
+npm start
+```
+
+### Static Build
+
+To generate a single, self-contained HTML file of the documentation (inlining all CSS and JS), run:
+
+```bash
+npm run bundle-docs
+```
+
+This will create `docs-bundle.html` in the root directory.
 
 ## Quick Start
 
@@ -37,8 +64,10 @@ Simply include the CSS and JS files in your project:
 Create a container in your HTML and initialize the `LayoutManager`. You can pass an optional settings object to govern behavior.
 
 ```javascript
+import { LayoutManager } from './tulweb.js';
+
 const container = document.getElementById("layout-container");
-const layout = new TulWEB.LayoutManager(null, container, {
+const layout = new LayoutManager(null, container, {
     onlyResizeActiveTabs: true // (Default) Only dynamically visible tabs process resize geometry
 });
 ```
@@ -53,6 +82,15 @@ layout.registerComponent('editor', (state, container) => {
     el.value = state.text || "// Hello World";
     return el;
 });
+
+// OR use a Class
+class MyComponent {
+    constructor(state, container) {
+        this.element = document.createElement("div");
+        this.element.textContent = "Class-based Component";
+    }
+}
+layout.registerComponent('my-comp', MyComponent);
 ```
 
 ### 3. Load a Layout

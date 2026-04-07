@@ -5,7 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.0] - 2026-04-07
+### Changed
+- Migrated core library to ES6 modules (removed `TulWEB` global).
+- Improved documentation with modern import syntax.
+
+### Added
+- Packaged as a Node module with `package.json`.
+- Added `npm start` command for local development server (using `http-server`).
+- Added `npm run bundle-docs` to generate a single-file static documentation bundle.
+
+## [1.1.0] - 2026-04-07
 ### Added
 - Added vertical and bottom tab groups.
 ## [1.0.0] - 2026-04-07
