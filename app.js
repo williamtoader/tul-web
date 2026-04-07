@@ -33,6 +33,16 @@ document.addEventListener("DOMContentLoaded", function () {
         return wrapper
     }
 
+    const activeConsoles = new Set();
+    window.tulWebLogger = (msg, color = null) => {
+        const style = color ? ` style="color:${color}"` : '';
+        const line = `<div${style}>> ${msg}</div>`;
+        activeConsoles.forEach(el => {
+            el.innerHTML += line;
+            el.scrollTop = el.scrollHeight;
+        });
+    };
+
     function ConsoleFactory(state = {}, container = null) {
         const el = document.createElement("div")
         el.style.height = "100%"
@@ -51,23 +61,17 @@ document.addEventListener("DOMContentLoaded", function () {
         ];
 
         el.innerHTML = lines.map(l => `<div>> ${l}</div>`).join("");
+        activeConsoles.add(el);
 
         if (container) {
+            container.on('destroy', () => activeConsoles.delete(el));
             container.on('resize', () => {
                 const rect = el.getBoundingClientRect();
-                el.innerHTML += `<div style="color: var(--tulweb-text-secondary)">> Pane resized to ${rect.width.toFixed(0)}x${rect.height.toFixed(0)}</div>`;
-                el.scrollTop = el.scrollHeight;
+                window.tulWebLogger(`Pane resized to ${rect.width.toFixed(0)}x${rect.height.toFixed(0)}`, 'var(--tulweb-text-secondary)');
             });
             container.on('init', () => {
-                el.innerHTML += `<div style="color: var(--tulweb-text-primary)">> Component Lifecycle: init() fired</div>`;
-                el.scrollTop = el.scrollHeight;
+                window.tulWebLogger('Component Lifecycle: init() fired', '#50fa7b');
             });
-
-            // Expose a global logger so other parts can log to the terminal
-            window.tulWebLogger = (msg, color = 'var(--tulweb-text-secondary)') => {
-                el.innerHTML += `<div style="color: ${color}">> ${msg}</div>`;
-                el.scrollTop = el.scrollHeight;
-            };
         }
 
         return el;
@@ -333,22 +337,22 @@ document.addEventListener("DOMContentLoaded", function () {
             el.querySelector("#btn-save").addEventListener("click", () => {
                 const config = layout.toConfig();
                 localStorage.setItem('tulweb_saved_state_v2', JSON.stringify(config));
-                layout.showToast("Layout saved to workspace");
+                window.tulWebLogger("Layout saved to workspace", "#50fa7b");
             });
 
             el.querySelector("#btn-load").addEventListener("click", () => {
                 const saved = localStorage.getItem('tulweb_saved_state_v2');
                 if (saved) {
                     layout.loadLayout(JSON.parse(saved));
-                    layout.showToast("Layout loaded successfully");
+                    window.tulWebLogger("Layout loaded successfully", "#50fa7b");
                 } else {
-                    layout.showToast("No saved layout found", "error");
+                    window.tulWebLogger("No saved layout found", "#ff5555");
                 }
             });
 
             el.querySelector("#btn-reset").addEventListener("click", () => {
                 layout.loadLayout(window.tulwebLayouts.ide);
-                layout.showToast("Layout reset to IDE Default");
+                window.tulWebLogger("Layout reset to IDE Default", "#f1fa8c");
             });
 
             el.querySelector("#btn-layout-ide").addEventListener("click", () => layout.loadLayout(window.tulwebLayouts.ide));
@@ -361,9 +365,9 @@ document.addEventListener("DOMContentLoaded", function () {
                         type: 'component', componentName: 'generic', title: 'New API Tab', componentState: { name: 'API Generated' }
                     });
                     layout.activeStack.addChild(newComp);
-                    layout.showToast("Tab added to active stack");
+                    window.tulWebLogger("Tab added to active stack", "#50fa7b");
                 } else {
-                    layout.showToast("Click a tab stack to focus it first", "error");
+                    window.tulWebLogger("Click a tab stack to focus it first", "#ff5555");
                 }
             });
 
@@ -403,6 +407,9 @@ document.addEventListener("DOMContentLoaded", function () {
                             {
                                 type: 'stack',
                                 size: 70,
+                                preventEmptyClosure: true,
+                                displayCloseButton: false,
+                                displayMinimizeButton: false,
                                 content: [
                                     { type: 'component', componentName: 'editor', title: 'main.js', componentState: { text: "console.log('IDE Mode');" } },
                                     { type: 'component', componentName: 'editor', title: 'index.html' }
@@ -552,12 +559,12 @@ document.addEventListener("DOMContentLoaded", function () {
         if (window.tulWebLogger) window.tulWebLogger('Event: componentCreated', '#50fa7b');
 
         const getName = () => comp.config.title || comp.config.componentName || 'Component';
-        comp.on('active', () => layout.showToast(`${getName()} Active`));
-        comp.on('inactive', () => layout.showToast(`${getName()} Inactive`));
-        comp.on('focus', () => layout.showToast(`${getName()} Focused`));
-        comp.on('defocus', () => layout.showToast(`${getName()} Unfocused`));
-        comp.on('move', () => layout.showToast(`${getName()} Moved`, 'info'));
-        comp.on('resize', () => console.log(`${getName()} Resized`));
+        comp.on('active', () => window.tulWebLogger(`${getName()} Active`, '#bd93f9'));
+        comp.on('inactive', () => window.tulWebLogger(`${getName()} Inactive`, '#ff79c6'));
+        comp.on('focus', () => window.tulWebLogger(`${getName()} Focused`, '#f1fa8c'));
+        comp.on('defocus', () => window.tulWebLogger(`${getName()} Unfocused`, '#6272a4'));
+        comp.on('move', () => window.tulWebLogger(`${getName()} Moved`, '#8be9fd'));
+        comp.on('resize', () => window.tulWebLogger(`${getName()} Resized`, 'var(--tulweb-text-secondary)'));
     });
 
     // 2. Register Components

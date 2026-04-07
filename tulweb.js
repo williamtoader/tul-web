@@ -1295,6 +1295,9 @@ class StackItem extends ContentItem {
     }
 
     toggleMinimize() {
+        if (this.isMaximized) {
+            this.toggleMaximize()
+        }
         this.isMinimized = !this.isMinimized
         if (this.isMinimized) {
             this.element.classList.add('minimized')
