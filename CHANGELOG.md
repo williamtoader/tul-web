@@ -6,21 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [0.6.0] - 2026-04-07
+### Fixed
+- Fixed context menu actions for tab stacks not triggering.
+
+### Added
+- New "90's Workstation" (IRIX/CDE style) theme.
 
 ## [0.5.0] - 2026-04-07
 ### Added
 - Granular lifecycle notification system for components (init, active, inactive, focus, defocus, move, resize, destroy).
 - Enhanced "Empty Workspace" state with modern SVG visualization and interaction cues.
 - Integrated `EventEmitter` for robust component interaction within the layout tree.
-- Full "90's Workstation" (IRIX/CDE style) theme support with cross-application option integration.
-- Updated documentation engine to reflect new theming capabilities.
 
 ### Fixed
 - Improved focus management when switching between complex nested layouts.
 
 ## [0.4.0] - 2026-04-07
 ### Added
-- New "Retro Early 90's Workstation" theme for a classic computing aesthetic.
 - "Kitchen Sink" configuration to `index.html` for testing all layout capabilities in one place.
 - Tab reorder indicator providing visual feedback during drag-and-drop operations.
 
@@ -55,7 +58,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UI dropdown accessibility issues with keyboard navigation.
 - Logic errors in tab stack decluttering when handling tab overflows.
 
-[Unreleased]: https://github.com/williamtoader/tul-web/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/williamtoader/tul-web/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/williamtoader/tul-web/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/williamtoader/tul-web/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/williamtoader/tul-web/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/williamtoader/tul-web/compare/v0.2.0...v0.3.0

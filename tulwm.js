@@ -622,12 +622,11 @@ const TulWM = (function () {
             this.emit('destroy');
             const kids = [...this.children];
             kids.forEach(c => c.destroy());
-
             if (this.parent) {
-                this.parent.removeChild(this);
                 if (this.parent.children.length === 0 && this.parent.layoutManager) {
                     this.parent.layoutManager._cleanupEmptyStack(this.parent);
                 }
+                this.parent.removeChild(this);
             } else if (this.element && this.element.parentElement) {
                 this.element.parentElement.removeChild(this.element);
             }
@@ -906,7 +905,7 @@ const TulWM = (function () {
         updateFlex() {
             super.updateFlex();
             const onlyActive = this.layoutManager.settings && this.layoutManager.settings.onlyResizeActiveTabs;
-            
+
             // Propagate resize events to the leaf components so they can react to dimensions
             this.children.forEach((child, index) => {
                 if (onlyActive && index !== this.activeChildIndex) return;
@@ -926,8 +925,8 @@ const TulWM = (function () {
         }
 
         closeAll() {
-            this.children = [];
-            this.layoutManager._cleanupEmptyStack(this);
+            const kids = [...this.children];
+            kids.forEach(child => child.destroy());
         }
     }
 
@@ -1090,14 +1089,21 @@ const TulWM = (function () {
             const addOption = (text, onClick) => {
                 const item = Utils.createElement('div', 'tulwm-context-item', menu);
                 item.textContent = text;
-                item.addEventListener('click', () => { onClick(); closeMenu(); });
+                item.addEventListener('mousedown', (e) => {
+                    e.stopPropagation();
+                });
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    onClick();
+                    closeMenu();
+                });
             };
 
             addOption('Close Tab', () => {
                 child.destroy();
             });
             addOption('Close Other Tabs', () => {
-                const toClose = stack.children.filter(c => c !== child);
+                const toClose = stack.children.filter(c => c.id !== child.id);
                 toClose.forEach(c => c.destroy());
             });
             addOption('Close All Tabs', () => {
