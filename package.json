@@ -1,0 +1,20 @@
+{
+  "name": "tulweb",
+  "version": "2.0.0",
+  "description": "Pure JS Windowing Toolkit",
+  "main": "tulweb.js",
+  "type": "module",
+  "scripts": {
+    "start": "npx -y http-server ./",
+    "bundle-docs": "node bundle-docs.js"
+  },
+  "keywords": [
+    "windowing",
+    "toolkit",
+    "layout",
+    "tabs",
+    "stacks"
+  ],
+  "author": "williamtoader",
+  "license": "MIT"
+}
