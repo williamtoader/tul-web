@@ -96,6 +96,38 @@ body.theme-light {
   --tulwm-blur: 32px;
 }
 
+body.theme-retro {
+  /* 90's Workstation / CDE Inspired */
+  --tulwm-bg-base: #a0a0a0;
+  --tulwm-bg-panel: #c0c0c0;
+  --tulwm-bg-tab: #b0b0b0;
+  --tulwm-bg-tab-active: #d0d0d0;
+  --tulwm-bg-header: #808080;
+  --tulwm-border: #404040;
+  --tulwm-text-primary: #000000;
+  --tulwm-text-secondary: #333333;
+  --tulwm-accent: #000080; /* Classic Win95/CDE Navy Blue */
+  --tulwm-accent-hover: #0000ff;
+  --tulwm-drop-zone: rgba(0, 0, 128, 0.2);
+  --tulwm-close-hover: #ff0000;
+  
+  --tulwm-bg-editor: #ffffff;
+  --tulwm-text-editor: #000000;
+  --tulwm-bg-console: #000000;
+  --tulwm-text-console: #00ff00;
+
+  --tulwm-shadow-color: rgba(0, 0, 0, 0.5);
+  --tulwm-shadow-glow: transparent;
+
+  --tulwm-tab-height: 32px;
+  --tulwm-splitter-size: 8px;
+  --tulwm-radius-panel: 0px;
+  --tulwm-radius-inner: 0px;
+
+  --tulwm-font-family: 'Courier New', Courier, monospace;
+  --tulwm-blur: 0px;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -127,6 +159,16 @@ body.theme-light {
   background-image: 
     radial-gradient(circle at top left, rgba(255,255,255,0.8), transparent 40%),
     radial-gradient(circle at bottom right, rgba(226, 232, 240, 0.8), transparent 40%);
+}
+
+body.theme-retro {
+  background-image: 
+    linear-gradient(45deg, #a0a0a0 25%, transparent 25%), 
+    linear-gradient(-45deg, #a0a0a0 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #a0a0a0 75%), 
+    linear-gradient(-45deg, transparent 75%, #a0a0a0 75%);
+  background-size: 4px 4px;
+  background-color: #909090;
 }
 
 /* Base Layout Element */
@@ -312,6 +354,42 @@ body.theme-cyber .tulwm-tab.active {
   color: var(--tulwm-accent);
   text-shadow: 0 0 8px var(--tulwm-accent);
   box-shadow: inset 0 2px 0 var(--tulwm-accent), inset 0 6px 12px var(--tulwm-shadow-glow);
+}
+
+body.theme-retro .tulwm-tab.active {
+  background-color: var(--tulwm-bg-tab-active);
+  color: var(--tulwm-text-primary);
+  border: 1px solid var(--tulwm-border);
+  border-bottom: none;
+  box-shadow: inset 2px 2px 0 #ffffff, inset -1px 0 0 #404040;
+}
+
+body.theme-retro .tulwm-stack {
+  border: 2px solid #ffffff;
+  border-right-color: #404040;
+  border-bottom-color: #404040;
+  box-shadow: 2px 2px 0 #000000;
+}
+
+body.theme-retro .tulwm-header {
+  background: var(--tulwm-accent);
+  color: #ffffff;
+  font-weight: bold;
+}
+
+body.theme-retro .tulwm-tab {
+  border: 1px solid #ffffff;
+  border-right-color: #404040;
+  border-bottom: none;
+  margin-top: 2px;
+  background: #c0c0c0;
+  color: #000000;
+}
+
+body.theme-retro .tulwm-tab.active {
+  background: #d0d0d0;
+  margin-top: 0;
+  height: calc(var(--tulwm-tab-height) + 2px);
 }
 
 .tulwm-tab-title {

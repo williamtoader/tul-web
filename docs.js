@@ -218,6 +218,7 @@ layout.createDragSource(btn, config);</pre>
                     <li><code>theme-nordic</code>: The default sleek, dark bluish-grey.</li>
                     <li><code>theme-cyber</code>: A retro crt-terminal vibe with amber phosphors.</li>
                     <li><code>theme-light</code>: Maximum contrast for well-lit environments and data density.</li>
+                    <li><code>theme-retro</code>: A 90's workstation OS (IRIX/CDE) theme with bevels and high-contrast navy.</li>
                 </ul>
             </div>
         `

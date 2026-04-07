@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Granular lifecycle notification system for components (init, active, inactive, focus, defocus, move, resize, destroy).
 - Enhanced "Empty Workspace" state with modern SVG visualization and interaction cues.
 - Integrated `EventEmitter` for robust component interaction within the layout tree.
+- Full "90's Workstation" (IRIX/CDE style) theme support with cross-application option integration.
+- Updated documentation engine to reflect new theming capabilities.
 
 ### Fixed
 - Improved focus management when switching between complex nested layouts.
