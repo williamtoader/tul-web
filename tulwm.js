@@ -514,6 +514,7 @@ const TulWM = (function () {
 
         destroy() {
             this.element.removeEventListener('mousedown', this._onMouseDown);
+            this.element.removeEventListener('dblclick', this._onDblClick);
             if (this.element.parentElement) {
                 this.element.parentElement.removeChild(this.element);
             }
@@ -622,6 +623,7 @@ const TulWM = (function () {
             this.emit('destroy');
             const kids = [...this.children];
             kids.forEach(c => c.destroy());
+
             if (this.parent) {
                 if (this.parent.children.length === 0 && this.parent.layoutManager) {
                     this.parent.layoutManager._cleanupEmptyStack(this.parent);
@@ -716,6 +718,7 @@ const TulWM = (function () {
             this.closeBtn = Utils.createElement('div', 'tulwm-control', this.controlsEl);
             this.closeBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>';
             this.closeBtn.addEventListener('click', () => {
+                console.log(this)
                 this.closeAll();
                 this.destroy();
             });
@@ -928,6 +931,7 @@ const TulWM = (function () {
         closeAll() {
             const kids = [...this.children];
             kids.forEach(child => child.destroy());
+            this.layoutManager._cleanupEmptyStack(this)
         }
     }
 
@@ -936,6 +940,13 @@ const TulWM = (function () {
         constructor(config, layoutManager) {
             super(config, layoutManager);
             this.splitters = [];
+        }
+
+        destroy() {
+            this.splitters.forEach(s => s.destroy());
+            this.splitters = [];
+            super.destroy();
+
         }
 
         updateFlex() {
