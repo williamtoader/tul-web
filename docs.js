@@ -31,8 +31,8 @@ const docsTopics = {
                 <h2>Core Entities</h2>
                 <ul>
                     <li><code>LayoutManager</code>: The root controller and event bus.</li>
-                    <li><code>RowItem / ColumnItem</code>: Flexbox containers splitting space either horizontally or vertically using draggble splitters.</li>
-                    <li><code>StackItem</code>: A tabbed container window that acts as the immediate parent for actual application panels. Features docking, maximize state, and overflow logic.</li>
+                    <li><code>RowItem / ColumnItem</code>: Flexbox containers splitting space either horizontally or vertically using draggable splitters.</li>
+                    <li><code>StackItem</code>: A tabbed container window that acts as the immediate parent for actual application panels. Features docking, maximize state, <strong>minimization/preview</strong>, and <strong>configurable tab orientation</strong>.</li>
                     <li><code>ComponentItem</code>: A lightweight wrapper around your custom JavaScript DOM logic.</li>
                 </ul>
 
@@ -57,6 +57,7 @@ const docsTopics = {
                 <p>Pass an optional third <code>options</code> argument (or nest inside a <code>settings</code> property on a layout JSON object) to customize engine behavior:</p>
                 <ul>
                     <li><code>onlyResizeActiveTabs</code> (default: <code>true</code>): When enabled, resize events cascade strictly to the visible tab in a stack, saving performance. Background tabs skip geometry processing until they are clicked, at which point an artificial resize event is fired to synchronize them.</li>
+                    <li><code>tabPosition</code> (default: <code>'top'</code>): Sets global tab position for all stacks if not overridden in item config. Supports <code>'top'</code>, <code>'bottom'</code>, <code>'left'</code>, <code>'right'</code>.</li>
                 </ul>
                 
                 <h2>Public Methods</h2>
@@ -83,6 +84,27 @@ const docsTopics = {
                             <td><code>showToast(msg, type)</code></td>
                             <td>Fires an integrated toast notification to the screen overlay.</td>
                         </tr>
+                        <tr>
+                            <td><code>maximizeStack(stack)</code></td>
+                            <td>Forces a stack to occupy the full layout container dimensions.</td>
+                        </tr>
+                        <tr>
+                            <td><code>minimizeStack(stack)</code></td>
+                            <td>Collapses a stack to its tab bar, enabling a hover-preview mode.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Content Item Configuration</h2>
+                <p>Properties available to <code>row</code>, <code>column</code>, <code>stack</code>, and <code>component</code> items:</p>
+                <table class="api-table">
+                    <thead><tr><th>Property</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>size</code></td><td>Weight (percentage) relative to siblings.</td></tr>
+                        <tr><td><code>minWidth</code></td><td>Minimum width in pixels. Splitters will respect this during resize.</td></tr>
+                        <tr><td><code>minHeight</code></td><td>Minimum height in pixels. Splitters will respect this during resize.</td></tr>
+                        <tr><td><code>tabPosition</code></td><td>Override global tab orientation for a specific stack (<code>top</code>, <code>bottom</code>, <code>left</code>, <code>right</code>).</td></tr>
+                        <tr><td><code>minimized</code></td><td>Boolean. If true, the stack starts in a collapsed state.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -421,11 +443,177 @@ document.addEventListener("DOMContentLoaded", function () {
         el.style.height = "100%";
         el.style.overflowY = "auto";
         el.style.boxSizing = "border-box";
-        
+
         if (state.topic && docsTopics[state.topic]) {
             el.innerHTML = docsTopics[state.topic].content;
         } else {
             el.innerHTML = `<div class="markdown-body"><p>Select a topic from the sidebar.</p></div>`;
+        }
+
+        return el;
+    }
+
+    function SidebarFactory(state = {}, container = null) {
+        const el = document.createElement("div");
+        el.className = "app-sidebar";
+        el.style.width = "100%";
+        el.style.height = "100%";
+        el.style.borderRight = "none";
+        el.style.boxShadow = "none";
+        el.style.background = "transparent";
+
+        el.innerHTML = `
+        <div>
+            <h1>TulWEB Docs</h1>
+            <p style="color: var(--tulweb-text-secondary); font-size: 13px; margin: 0; line-height: 1.4;">Drag chapters
+                into the workspace to read side-by-side.</p>
+        </div>
+
+        <div class="app-sidebar-scroll">
+            <div style="margin-bottom: 24px;">
+                <h2>Core Concepts</h2>
+                <div class="sidebar-item-container">
+                    <div class="sidebar-item" data-topic="intro">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                        Introduction
+                    </div>
+                    <div class="sidebar-item" data-topic="architecture">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                            <polyline points="2 17 12 22 22 17"></polyline>
+                            <polyline points="2 12 12 17 22 12"></polyline>
+                        </svg>
+                        Architecture
+                    </div>
+                    <div class="sidebar-item" data-topic="dnd">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M16 12l-4-4-4 4M12 8v8"></path>
+                        </svg>
+                        Drag & Drop
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <h2>API Reference</h2>
+                <div class="sidebar-item-container">
+                    <div class="sidebar-item" data-topic="layoutManager">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="3" y1="9" x2="21" y2="9"></line>
+                            <line x1="9" y1="21" x2="9" y2="9"></line>
+                        </svg>
+                        LayoutManager
+                    </div>
+                    <div class="sidebar-item" data-topic="components">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="16 18 22 12 16 6"></polyline>
+                            <polyline points="8 6 2 12 8 18"></polyline>
+                        </svg>
+                        Components
+                    </div>
+                    <div class="sidebar-item" data-topic="events">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                        </svg>
+                        Events & Shortcuts
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <h2>Customization</h2>
+                <div class="sidebar-item-container">
+                    <div class="sidebar-item" data-topic="theming">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                        Theming Engine
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h2>Integrations</h2>
+                <div class="sidebar-item-container">
+                    <div class="sidebar-item" data-topic="reactAngular">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                        </svg>
+                        React & Angular
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h2>Select Theme</h2>
+            <div id="theme-selector" class="theme-selector">
+                <label class="theme-label">
+                    <input type="radio" name="theme" class="theme-radio" value="theme-nordic" checked>
+                    <span class="theme-name">Industrial Graphite</span>
+                </label>
+                <label class="theme-label">
+                    <input type="radio" name="theme" class="theme-radio" value="theme-cyber">
+                    <span class="theme-name">Phosphor Terminal</span>
+                </label>
+                <label class="theme-label">
+                    <input type="radio" name="theme" class="theme-radio" value="theme-light">
+                    <span class="theme-name">Pro Light</span>
+                </label>
+                <label class="theme-label">
+                    <input type="radio" name="theme" class="theme-radio" value="theme-retro">
+                    <span class="theme-name">90's Workstation</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                To Example
+            </a>
+        </div>
+        `;
+
+        if (container) {
+            const layout = container.layoutManager;
+
+            el.querySelectorAll('.sidebar-item').forEach(item => {
+                const topic = item.getAttribute('data-topic');
+                if (topic && docsTopics[topic]) {
+                    const config = {
+                        type: 'component',
+                        componentName: 'docViewer',
+                        title: docsTopics[topic].title,
+                        componentState: { topic: topic }
+                    };
+                    layout.createDragSource(item, config);
+                }
+            });
+
+            const themeSelector = el.querySelector("#theme-selector");
+            themeSelector.addEventListener("change", (e) => {
+                if (e.target.name === 'theme') {
+                    document.body.className = e.target.value;
+                }
+            });
         }
 
         return el;
@@ -436,8 +624,15 @@ document.addEventListener("DOMContentLoaded", function () {
             type: 'row',
             content: [
                 {
+                    type: 'stack',
+                    size: 30,
+                    minWidth: 260,
+                    tabPosition: 'left',
+                    content: [{ type: 'component', componentName: 'sidebar', title: 'Toolkit' }]
+                },
+                {
                     type: 'column',
-                    size: 55,
+                    size: 45,
                     content: [
                         {
                             type: 'stack',
@@ -451,7 +646,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
                 {
                     type: 'column',
-                    size: 45,
+                    size: 35,
                     content: [
                         {
                             type: 'stack',
@@ -479,41 +674,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const containerWrapper = document.getElementById("layout-container");
     const layout = new TulWEB.LayoutManager(null, containerWrapper);
-    
+
     // Register the documentation viewer component
+    layout.registerComponent('sidebar', SidebarFactory);
     layout.registerComponent('docViewer', DocViewerFactory);
-    
+
     // Load the initial layout tree
     try {
         layout.loadLayout(initialLayoutConfig);
     } catch (e) {
-         console.error("Failed to load layout:", e);
+        console.error("Failed to load layout:", e);
     }
 
-    // Setup drag sources from sidebar items
-    const dragItems = document.querySelectorAll('.sidebar-item');
-    dragItems.forEach(item => {
-        const topic = item.getAttribute('data-topic');
-        if (topic && docsTopics[topic]) {
-            const config = {
-                type: 'component',
-                componentName: 'docViewer',
-                title: docsTopics[topic].title,
-                componentState: { topic: topic }
-            };
-            layout.createDragSource(item, config);
-        }
-    });
-
-    // Theme selector handler
-    const themeSelector = document.getElementById("theme-selector");
-    if (themeSelector) {
-        const checkedRadio = themeSelector.querySelector('input[name="theme"]:checked');
-        if (checkedRadio) document.body.className = checkedRadio.value;
-        themeSelector.addEventListener("change", (e) => {
-            if (e.target.name === 'theme') {
-                document.body.className = e.target.value;
-            }
-        });
-    }
 });

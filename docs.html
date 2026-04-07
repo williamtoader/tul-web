@@ -23,18 +23,11 @@
 
         /* Sidebar demo styling */
         .app-sidebar {
-            width: 280px;
-            background: var(--tulweb-bg-panel);
-            border-right: 1px solid var(--tulweb-border);
             padding: 30px 24px;
             display: flex;
             flex-direction: column;
             gap: 28px;
-            z-index: 200;
-            backdrop-filter: blur(var(--tulweb-blur));
-            -webkit-backdrop-filter: blur(var(--tulweb-blur));
-            box-shadow: 0 0 40px var(--tulweb-shadow-color);
-            transition: background 0.3s, border-color 0.3s;
+            height: 100%;
         }
 
         .app-sidebar h1 {
@@ -146,139 +139,8 @@
 
 <body class="theme-nordic">
 
-    <!-- Sidebar with Drag Sources -->
-    <div class="app-sidebar">
-        <div>
-            <h1>TulWEB Docs</h1>
-            <p style="color: var(--tulweb-text-secondary); font-size: 13px; margin: 0; line-height: 1.4;">Drag chapters
-                into the workspace to read side-by-side.</p>
-        </div>
-
-        <div class="app-sidebar-scroll">
-            <div style="margin-bottom: 24px;">
-                <h2>Core Concepts</h2>
-                <div class="sidebar-item-container">
-                    <div class="sidebar-item" data-topic="intro">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                        </svg>
-                        Introduction
-                    </div>
-                    <div class="sidebar-item" data-topic="architecture">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                            <polyline points="2 17 12 22 22 17"></polyline>
-                            <polyline points="2 12 12 17 22 12"></polyline>
-                        </svg>
-                        Architecture
-                    </div>
-                    <div class="sidebar-item" data-topic="dnd">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M16 12l-4-4-4 4M12 8v8"></path>
-                        </svg>
-                        Drag & Drop
-                    </div>
-                </div>
-            </div>
-
-            <div style="margin-bottom: 24px;">
-                <h2>API Reference</h2>
-                <div class="sidebar-item-container">
-                    <div class="sidebar-item" data-topic="layoutManager">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="3" y1="9" x2="21" y2="9"></line>
-                            <line x1="9" y1="21" x2="9" y2="9"></line>
-                        </svg>
-                        LayoutManager
-                    </div>
-                    <div class="sidebar-item" data-topic="components">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <polyline points="16 18 22 12 16 6"></polyline>
-                            <polyline points="8 6 2 12 8 18"></polyline>
-                        </svg>
-                        Components
-                    </div>
-                    <div class="sidebar-item" data-topic="events">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-                        </svg>
-                        Events & Shortcuts
-                    </div>
-                </div>
-            </div>
-
-            <div style="margin-bottom: 24px;">
-                <h2>Customization</h2>
-                <div class="sidebar-item-container">
-                    <div class="sidebar-item" data-topic="theming">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                        </svg>
-                        Theming Engine
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <h2>Integrations</h2>
-                <div class="sidebar-item-container">
-                    <div class="sidebar-item" data-topic="reactAngular">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                        </svg>
-                        React & Angular
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div>
-            <h2>Select Theme</h2>
-            <div id="theme-selector" class="theme-selector">
-                <label class="theme-label">
-                    <input type="radio" name="theme" class="theme-radio" value="theme-nordic" checked>
-                    <span class="theme-name">Industrial Graphite</span>
-                </label>
-                <label class="theme-label">
-                    <input type="radio" name="theme" class="theme-radio" value="theme-cyber">
-                    <span class="theme-name">Phosphor Terminal</span>
-                </label>
-                <label class="theme-label">
-                    <input type="radio" name="theme" class="theme-radio" value="theme-light">
-                    <span class="theme-name">Pro Light</span>
-                </label>
-                <label class="theme-label">
-                    <input type="radio" name="theme" class="theme-radio" value="theme-retro">
-                    <span class="theme-name">90's Workstation</span>
-                </label>
-            </div>
-        </div>
-
-        <div class="nav-links">
-            <a href="index.html" class="nav-link">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="19" y1="12" x2="5" y2="12"></line>
-                    <polyline points="12 19 5 12 12 5"></polyline>
-                </svg>
-                To Example
-            </a>
-        </div>
-    </div>
-
     <!-- Main Workspace Area -->
-    <div id="layout-container"></div>
+    <div id="layout-container" style="width: 100vw; height: 100vh;"></div>
 
     <!-- Load Engine and Docs App -->
     <script src="tulweb.js"></script>

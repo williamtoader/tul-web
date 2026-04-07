@@ -543,14 +543,24 @@ const TulWEB = (function () {
             let newPrevSize = this.startPrevSize + diffPct;
             let newNextSize = this.startNextSize - diffPct;
 
-            // Min size constraints (e.g. 5%)
-            const MIN_SIZE = 10;
-            if (newPrevSize < MIN_SIZE) {
-                newPrevSize = MIN_SIZE;
-                newNextSize = this.totalSize - MIN_SIZE;
-            } else if (newNextSize < MIN_SIZE) {
-                newNextSize = MIN_SIZE;
-                newPrevSize = this.totalSize - MIN_SIZE;
+            // Dynamic Constraints based on item config
+            const getMinPct = (item) => {
+                const minPx = this.isVertical ? (item.minWidth || 0) : (item.minHeight || 0);
+                if (minPx > 0) {
+                    return minPx / this.pixelsPerPercent;
+                }
+                return 5; // Default fallback 5%
+            };
+
+            const minPrev = getMinPct(this.prevItem);
+            const minNext = getMinPct(this.nextItem);
+
+            if (newPrevSize < minPrev) {
+                newPrevSize = minPrev;
+                newNextSize = this.totalSize - minPrev;
+            } else if (newNextSize < minNext) {
+                newNextSize = minNext;
+                newPrevSize = this.totalSize - minNext;
             }
 
             this.prevItem.size = newPrevSize;
@@ -610,6 +620,8 @@ const TulWEB = (function () {
             this.children = [];
             this.element = null;
             this.size = this.config.size || null;
+            this.minWidth = this.config.minWidth || 0;
+            this.minHeight = this.config.minHeight || 0;
             this.id = Utils.generateId();
 
             this._isActive = false;

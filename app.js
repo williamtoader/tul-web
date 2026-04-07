@@ -179,6 +179,178 @@ document.addEventListener("DOMContentLoaded", function () {
         return el;
     }
 
+    function SidebarFactory(state = {}, container = null) {
+        const el = document.createElement("div");
+        el.className = "app-sidebar";
+        el.style.width = "100%";
+        el.style.height = "100%";
+        el.style.borderRight = "none";
+        el.style.boxShadow = "none";
+        el.style.background = "transparent";
+
+        el.innerHTML = `
+        <div>
+            <h1>TulWEB</h1>
+            <h2 style="margin-bottom: 0;">Windowing Toolkit</h2>
+            <p style="color: var(--tulweb-text-secondary); font-size: 12px; margin-top: 4px;">Drag & Drop into layout</p>
+        </div>
+
+        <div>
+            <h2>Components</h2>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div class="sidebar-item" data-type="editor">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Code Editor
+                </div>
+                <div class="sidebar-item" data-type="console">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="4 17 10 11 4 5"></polyline>
+                        <line x1="12" y1="19" x2="20" y2="19"></line>
+                    </svg>
+                    Terminal Console
+                </div>
+                <div class="sidebar-item" data-type="datagrid">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                        <line x1="9" y1="21" x2="9" y2="9"></line>
+                    </svg>
+                    Data Grid
+                </div>
+                <div class="sidebar-item" data-type="image">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    Image Viewer
+                </div>
+                <div class="sidebar-item" data-type="generic">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
+                    Generic Panel
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h2>Theme</h2>
+            <div id="theme-selector" class="theme-selector">
+                <label class="theme-label">
+                    <input type="radio" name="theme" class="theme-radio" value="theme-nordic" checked>
+                    <span class="theme-name">Industrial Graphite</span>
+                </label>
+                <label class="theme-label">
+                    <input type="radio" name="theme" class="theme-radio" value="theme-cyber">
+                    <span class="theme-name">Phosphor Terminal</span>
+                </label>
+                <label class="theme-label">
+                    <input type="radio" name="theme" class="theme-radio" value="theme-light">
+                    <span class="theme-name">Pro Light</span>
+                </label>
+                <label class="theme-label">
+                    <input type="radio" name="theme" class="theme-radio" value="theme-retro">
+                    <span class="theme-name">90's Workstation</span>
+                </label>
+            </div>
+        </div>
+
+        <div>
+            <h2>Presets</h2>
+            <div class="btn-group">
+                <button id="btn-layout-ide" class="btn btn-outline btn-small">IDE</button>
+                <button id="btn-layout-dash" class="btn btn-outline btn-small">Dash</button>
+                <button id="btn-layout-grid" class="btn btn-outline btn-small">Grid</button>
+            </div>
+        </div>
+
+        <div>
+            <h2>Actions API</h2>
+            <button id="btn-add-tab" class="btn btn-outline"
+                style="width: 100%; text-align: left; padding: 10px; font-size: 13px;">+ Add Tab via API</button>
+        </div>
+
+        <div class="actions">
+            <h2>State</h2>
+            <div class="btn-group">
+                <button id="btn-save" class="btn btn-small">Save</button>
+                <button id="btn-load" class="btn btn-outline btn-small">Load</button>
+            </div>
+            <button id="btn-reset" class="btn btn-outline" style="font-size: 12px; padding: 8px;">Reset Default</button>
+        </div>
+        `;
+
+        if (container) {
+            const layout = container.layoutManager;
+
+            el.querySelectorAll('.sidebar-item').forEach(item => {
+                const type = item.getAttribute('data-type');
+                let config;
+                if (type === 'editor') config = { type: 'component', componentName: 'editor', title: 'Code Editor', componentState: {} };
+                else if (type === 'console') config = { type: 'component', componentName: 'console', title: 'Terminal Console', componentState: {} };
+                else if (type === 'datagrid') config = { type: 'component', componentName: 'datagrid', title: 'Data Grid', componentState: {} };
+                else if (type === 'image') config = { type: 'component', componentName: 'image', title: 'Image Viewer', componentState: {} };
+                else config = { type: 'component', componentName: 'generic', title: 'Generic Panel', componentState: { name: 'New Panel' } };
+
+                layout.createDragSource(item, config);
+            });
+
+            el.querySelector("#btn-save").addEventListener("click", () => {
+                const config = layout.toConfig();
+                localStorage.setItem('tulweb_saved_state', JSON.stringify(config));
+                layout.showToast("Layout saved to workspace");
+            });
+
+            el.querySelector("#btn-load").addEventListener("click", () => {
+                const saved = localStorage.getItem('tulweb_saved_state');
+                if (saved) {
+                    layout.loadLayout(JSON.parse(saved));
+                    layout.showToast("Layout loaded successfully");
+                } else {
+                    layout.showToast("No saved layout found", "error");
+                }
+            });
+
+            el.querySelector("#btn-reset").addEventListener("click", () => {
+                layout.loadLayout(window.tulwebLayouts.ide);
+                layout.showToast("Layout reset to IDE Default");
+            });
+
+            el.querySelector("#btn-layout-ide").addEventListener("click", () => layout.loadLayout(window.tulwebLayouts.ide));
+            el.querySelector("#btn-layout-dash").addEventListener("click", () => layout.loadLayout(window.tulwebLayouts.dashboard));
+            el.querySelector("#btn-layout-grid").addEventListener("click", () => layout.loadLayout(window.tulwebLayouts.grid));
+
+            el.querySelector("#btn-add-tab").addEventListener("click", () => {
+                if (layout.activeStack) {
+                    const newComp = layout._buildObjectTree({
+                        type: 'component', componentName: 'generic', title: 'New API Tab', componentState: { name: 'API Generated' }
+                    });
+                    layout.activeStack.addChild(newComp);
+                    layout.showToast("Tab added to active stack");
+                } else {
+                    layout.showToast("Click a tab stack to focus it first", "error");
+                }
+            });
+
+            const themeSelector = el.querySelector("#theme-selector");
+            themeSelector.addEventListener("change", (e) => {
+                if (e.target.name === 'theme') {
+                    document.body.className = e.target.value;
+                }
+            });
+        }
+
+        return el;
+    }
+
     // Pre-defined Layout Configurations
     window.tulwebLayouts = {
         ide: {
@@ -187,20 +359,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 content: [
                     {
                         type: 'stack',
-                        size: 20,
+                        size: 30,
+                        minWidth: 260,
                         tabPosition: 'left',
                         content: [
-                            {
-                                type: 'component',
-                                componentName: 'generic',
-                                title: 'Project Tree',
-                                componentState: { name: 'Workspace' }
-                            }
+                            { type: 'component', componentName: 'sidebar', title: 'Toolkit' }
                         ]
                     },
                     {
                         type: 'column',
-                        size: 60,
+                        size: 80,
                         content: [
                             {
                                 type: 'stack',
@@ -217,57 +385,57 @@ document.addEventListener("DOMContentLoaded", function () {
                                 content: [{ type: 'component', componentName: 'console', title: 'Terminal' }]
                             }
                         ]
-                    },
-                    {
-                        type: 'stack',
-                        size: 20,
-                        tabPosition: 'right',
-                        content: [
-                            {
-                                type: 'component',
-                                componentName: 'generic',
-                                title: 'Assistant',
-                                componentState: { name: 'Assistant' }
-                            }
-                        ]
-                    },
+                    }
                 ]
             }]
         },
         dashboard: {
             content: [{
-                type: 'column',
+                type: 'row',
                 content: [
                     {
-                        type: 'row',
-                        size: 50,
-                        content: [
-                            {
-                                type: 'stack',
-                                size: 50,
-                                content: [{ type: 'component', componentName: 'datagrid', title: 'Live Metrics' }]
-                            },
-                            {
-                                type: 'stack',
-                                size: 50,
-                                tabPosition: 'right',
-                                content: [{ type: 'component', componentName: 'image', title: 'Network Topology', componentState: { url: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1200&auto=format" } }]
-                            }
-                        ]
+                        type: 'stack',
+                        size: 20,
+                        minWidth: 260,
+                        tabPosition: 'left',
+                        content: [{ type: 'component', componentName: 'sidebar', title: 'Toolkit' }]
                     },
                     {
-                        type: 'row',
-                        size: 50,
+                        type: 'column',
+                        size: 80,
                         content: [
                             {
-                                type: 'stack',
-                                size: 30,
-                                content: [{ type: 'component', componentName: 'console', title: 'System Logs' }]
+                                type: 'row',
+                                size: 50,
+                                content: [
+                                    {
+                                        type: 'stack',
+                                        size: 50,
+                                        content: [{ type: 'component', componentName: 'datagrid', title: 'Live Metrics' }]
+                                    },
+                                    {
+                                        type: 'stack',
+                                        size: 50,
+                                        tabPosition: 'right',
+                                        content: [{ type: 'component', componentName: 'image', title: 'Network Topology', componentState: { url: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1200&auto=format" } }]
+                                    }
+                                ]
                             },
                             {
-                                type: 'stack',
-                                size: 70,
-                                content: [{ type: 'component', componentName: 'datagrid', title: 'User List' }]
+                                type: 'row',
+                                size: 50,
+                                content: [
+                                    {
+                                        type: 'stack',
+                                        size: 30,
+                                        content: [{ type: 'component', componentName: 'console', title: 'System Logs' }]
+                                    },
+                                    {
+                                        type: 'stack',
+                                        size: 70,
+                                        content: [{ type: 'component', componentName: 'datagrid', title: 'User List' }]
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -279,24 +447,42 @@ document.addEventListener("DOMContentLoaded", function () {
                 type: 'row',
                 content: [
                     {
-                        type: 'column', size: 33.33,
-                        content: [
-                            { type: 'stack', size: 50, content: [{ type: 'component', componentName: 'generic', title: 'Panel 1' }] },
-                            { type: 'stack', size: 50, content: [{ type: 'component', componentName: 'image', title: 'Panel 2' }] }
-                        ]
+                        type: 'stack',
+                        size: 20,
+                        minWidth: 260,
+                        tabPosition: 'left',
+                        content: [{ type: 'component', componentName: 'sidebar', title: 'Toolkit' }]
                     },
                     {
-                        type: 'column', size: 33.33,
+                        type: 'column',
+                        size: 80,
                         content: [
-                            { type: 'stack', size: 50, content: [{ type: 'component', componentName: 'console', title: 'Panel 3' }] },
-                            { type: 'stack', size: 50, content: [{ type: 'component', componentName: 'editor', title: 'Panel 4' }] }
-                        ]
-                    },
-                    {
-                        type: 'column', size: 33.33,
-                        content: [
-                            { type: 'stack', size: 50, content: [{ type: 'component', componentName: 'datagrid', title: 'Panel 5' }] },
-                            { type: 'stack', size: 50, content: [{ type: 'component', componentName: 'generic', title: 'Panel 6' }] }
+                            {
+                                type: 'row',
+                                content: [
+                                    {
+                                        type: 'column', size: 33.33,
+                                        content: [
+                                            { type: 'stack', size: 50, content: [{ type: 'component', componentName: 'generic', title: 'Panel 1' }] },
+                                            { type: 'stack', size: 50, content: [{ type: 'component', componentName: 'image', title: 'Panel 2' }] }
+                                        ]
+                                    },
+                                    {
+                                        type: 'column', size: 33.33,
+                                        content: [
+                                            { type: 'stack', size: 50, content: [{ type: 'component', componentName: 'console', title: 'Panel 3' }] },
+                                            { type: 'stack', size: 50, content: [{ type: 'component', componentName: 'editor', title: 'Panel 4' }] }
+                                        ]
+                                    },
+                                    {
+                                        type: 'column', size: 33.33,
+                                        content: [
+                                            { type: 'stack', size: 50, content: [{ type: 'component', componentName: 'datagrid', title: 'Panel 5' }] },
+                                            { type: 'stack', size: 50, content: [{ type: 'component', componentName: 'generic', title: 'Panel 6' }] }
+                                        ]
+                                    }
+                                ]
+                            }
                         ]
                     }
                 ]
@@ -311,12 +497,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // Make layout globally accessible for the demo buttons
     window.layout = layout;
 
-    // Listen to Global Events (Phase 3 Developer API)
+    // Listen to Global Events
     layout.on('stateChanged', () => {
-        if (window.tulWebLogger) window.tulWebLogger('Event: stateChanged (Structural layout updated)', '#8be9fd');
+        if (window.tulWebLogger) window.tulWebLogger('Event: stateChanged', '#8be9fd');
     });
     layout.on('componentCreated', (comp) => {
-        if (window.tulWebLogger) window.tulWebLogger(`Event: componentCreated (id: ${comp.id})`, '#50fa7b');
+        if (window.tulWebLogger) window.tulWebLogger('Event: componentCreated', '#50fa7b');
 
         const getName = () => comp.config.title || comp.config.componentName || 'Component';
         comp.on('active', () => layout.showToast(`${getName()} Active`));
@@ -328,6 +514,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // 2. Register Components
+    layout.registerComponent('sidebar', SidebarFactory);
     layout.registerComponent('editor', TextEditorFactory);
     layout.registerComponent('console', ConsoleFactory);
     layout.registerComponent('generic', GenericPanelFactory);
@@ -336,81 +523,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 3. Load Initial Layout
     layout.loadLayout(window.tulwebLayouts.ide);
-
-    // 4. Setup Toolbar Drag Sources & Actions
-    const dragItems = document.querySelectorAll('.sidebar-item');
-    dragItems.forEach(item => {
-        const type = item.getAttribute('data-type');
-        let config;
-        if (type === 'editor') config = { type: 'component', componentName: 'editor', title: 'Code Editor', componentState: {} };
-        else if (type === 'console') config = { type: 'component', componentName: 'console', title: 'Terminal Console', componentState: {} };
-        else if (type === 'datagrid') config = { type: 'component', componentName: 'datagrid', title: 'Data Grid', componentState: {} };
-        else if (type === 'image') config = { type: 'component', componentName: 'image', title: 'Image Viewer', componentState: {} };
-        else config = { type: 'component', componentName: 'generic', title: 'Generic Panel', componentState: { name: 'New Panel' } };
-
-        layout.createDragSource(item, config);
-    });
-
-    // Action Buttons
-    document.getElementById("btn-save").addEventListener("click", () => {
-        const config = layout.toConfig();
-        localStorage.setItem('tulweb_saved_state', JSON.stringify(config));
-        layout.showToast("Layout saved to workspace");
-    });
-
-    document.getElementById("btn-load").addEventListener("click", () => {
-        const saved = localStorage.getItem('tulweb_saved_state');
-        if (saved) {
-            layout.loadLayout(JSON.parse(saved));
-            layout.showToast("Layout loaded successfully");
-        } else {
-            layout.showToast("No saved layout found", "error");
-        }
-    });
-
-    document.getElementById("btn-reset").addEventListener("click", () => {
-        layout.loadLayout(window.tulwebLayouts.ide);
-        layout.showToast("Layout reset to IDE Default");
-    });
-
-    // Layout Presets
-    const btnIde = document.getElementById("btn-layout-ide");
-    const btnDash = document.getElementById("btn-layout-dash");
-    const btnGrid = document.getElementById("btn-layout-grid");
-
-    if (btnIde) btnIde.addEventListener("click", () => layout.loadLayout(window.tulwebLayouts.ide));
-    if (btnDash) btnDash.addEventListener("click", () => layout.loadLayout(window.tulwebLayouts.dashboard));
-    if (btnGrid) btnGrid.addEventListener("click", () => layout.loadLayout(window.tulwebLayouts.grid));
-
-    // API Actions
-    const btnAddTab = document.getElementById("btn-add-tab");
-    if (btnAddTab) {
-        btnAddTab.addEventListener("click", () => {
-            if (layout.activeStack) {
-                const newComp = layout._buildObjectTree({
-                    type: 'component', componentName: 'generic', title: 'New API Tab', componentState: { name: 'API Generated' }
-                });
-                layout.activeStack.addChild(newComp);
-                layout.showToast("Tab added to active stack");
-            } else {
-                layout.showToast("Click a tab stack to focus it first", "error");
-            }
-        });
-    }
-
-    // Switch Theme Dynamically
-    const themeSelector = document.getElementById("theme-selector");
-    if (themeSelector) {
-        const checkedRadio = themeSelector.querySelector('input[name="theme"]:checked');
-        if (checkedRadio) document.body.className = checkedRadio.value;
-
-        const updateTheme = (e) => {
-            if (e.target.name === 'theme') {
-                document.body.className = e.target.value;
-            }
-        };
-
-        themeSelector.addEventListener("change", updateTheme);
-    }
 
 });

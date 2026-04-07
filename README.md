@@ -9,12 +9,15 @@ TulWEB is a lightweight, zero-dependency windowing toolkit designed for building
 
 ## Key Features
 
+- **Multi-Directional Tabs**: Support for Top, Bottom, Left, and Right tab placements per stack.
+- **Stack Minimization**: Collapse stacks to their tab bars with an ultra-sleek hover-based component preview.
+- **Minimum Constraints**: Set `minWidth` and `minHeight` in pixels to prevent panels from becoming unreadable during resize.
 - **Pure JavaScript**: No dependencies (no jQuery, no React/Angular required, but easily integrable).
 - **Flexible Layouts**: Nested rows and columns for complex interfaces.
 - **Tab Stacking**: Group components into stacks with efficient tab management and overflow support.
 - **Drag & Drop**: Native-feeling drag-and-drop experience for reordering tabs and splitting panels.
-- **Resizable Splitters**: Intuitive resizing with double-click to reset behavior.
-- **Premium Themes**: Built-in themes including Industrial Graphite, Phosphor Terminal, and Pro Light.
+- **Resizable Splitters**: Intuitive resizing with splitter constraints.
+- **Premium Themes**: Built-in themes including Industrial Graphite, Phosphor Terminal, Pro Light, and Retro 90s.
 - **State Management**: Save and restored entire layout configurations with a simple JSON format.
 - **Developer-Friendly API**: Event-based system for lifecycle management.
 
@@ -108,6 +111,7 @@ Apply themes by setting the class on the `<body>` element:
 - `theme-nordic` (Industrial Graphite)
 - `theme-cyber` (Phosphor Terminal)
 - `theme-light` (Pro Light)
+- `theme-retro` (90's Workstation/IRIX)
 
 ## Licensing
 
