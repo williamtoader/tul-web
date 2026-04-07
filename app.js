@@ -2,42 +2,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Custom Factory Components for the Demo
     function TextEditorFactory(state = {}, container = null) {
-        const wrapper = document.createElement("div");
-        wrapper.style.height = "100%";
-        wrapper.style.display = "flex";
-        wrapper.style.flexDirection = "column";
+        const wrapper = document.createElement("div")
+        wrapper.style.height = "100%"
+        wrapper.style.display = "flex"
+        wrapper.style.flexDirection = "column"
 
-        const textArea = document.createElement("textarea");
-        textArea.style.flexGrow = "1";
-        textArea.style.width = "100%";
-        textArea.style.background = "var(--tulweb-bg-editor)";
-        textArea.style.color = "var(--tulweb-text-editor)";
-        textArea.style.border = "none"; /* removed border inside panel for pure seamless glass */
-        textArea.style.padding = "16px";
-        textArea.style.resize = "none";
-        textArea.style.fontFamily = "monospace";
-        textArea.style.outline = "none";
-        textArea.style.borderRadius = "4px";
-        textArea.value = state.text || "// Write your code here...\nfunction hello() {\n  console.log('world');\n}";
+        const textArea = document.createElement("textarea")
+        textArea.style.flexGrow = "1"
+        textArea.style.width = "100%"
+        textArea.style.background = "var(--tulweb-bg-editor)"
+        textArea.style.color = "var(--tulweb-text-editor)"
+        textArea.style.border = "none" /* removed border inside panel for pure seamless glass */
+        textArea.style.padding = "16px"
+        textArea.style.resize = "none"
+        textArea.style.fontFamily = "monospace"
+        textArea.style.outline = "none"
+        textArea.style.borderRadius = "4px"
+        textArea.value = state.text || "// Write your code here...\nfunction hello() {\n  console.log('world')\n}";
 
-        wrapper.appendChild(textArea);
+        wrapper.appendChild(textArea)
 
         if (container) {
             container.on('resize', () => {
                 // We could react to resize here
-            });
+            })
         }
 
-        return wrapper;
+        return wrapper
     }
 
     function ConsoleFactory(state = {}, container = null) {
-        const el = document.createElement("div");
-        el.style.height = "100%";
-        el.style.background = "var(--tulweb-bg-console)";
-        el.style.color = "var(--tulweb-text-console)";
-        el.style.fontFamily = "monospace";
-        el.style.padding = "16px";
+        const el = document.createElement("div")
+        el.style.height = "100%"
+        el.style.background = "var(--tulweb-bg-console)"
+        el.style.color = "var(--tulweb-text-console)"
+        el.style.fontFamily = "monospace"
+        el.style.padding = "16px"
         el.style.overflowY = "auto";
 
         const lines = [
