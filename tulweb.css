@@ -452,6 +452,42 @@ body.theme-retro .active-stack .tulweb-header {
   font-weight: bold;
 }
 
+.tulweb-header {
+  border-radius: var(--tulweb-radius-panel) var(--tulweb-radius-panel) 0 0;
+}
+
+.tulweb-stack.minimized .tulweb-header {
+  border-radius: var(--tulweb-radius-panel);
+}
+
+/* tulweb-stack:not(.minimized) .tulweb-stack {
+  border-radius: var(--tulweb-radius-panel) var(--tulweb-radius-panel) 0 0;
+} */
+
+.tulweb-stack.tab-left:not(.minimized) .tulweb-header {
+  border-radius: var(--tulweb-radius-panel) 0 0 var(--tulweb-radius-panel);
+}
+
+.tulweb-stack.tab-right:not(.minimized) .tulweb-header {
+  border-radius: 0 var(--tulweb-radius-panel) var(--tulweb-radius-panel) 0;
+}
+
+.tulweb-stack.tab-left:not(.minimized) .tulweb-stack {
+  border-radius: var(--tulweb-radius-panel) 0 0 var(--tulweb-radius-panel);
+}
+
+.tulweb-stack.tab-right:not(.minimized) .tulweb-stack {
+  border-radius: 0 var(--tulweb-radius-panel) var(--tulweb-radius-panel) 0;
+}
+
+.tulweb-stack.tab-bottom:not(.minimized) .tulweb-header {
+  border-radius: 0 0 var(--tulweb-radius-panel) var(--tulweb-radius-panel);
+}
+
+.tulweb-stack.tab-bottom:not(.minimized) .tulweb-stack {
+  border-radius: 0 0 var(--tulweb-radius-panel) var(--tulweb-radius-panel);
+}
+
 body.theme-retro .tulweb-tab {
   border: 1px solid #ffffff;
   border-right-color: #404040;

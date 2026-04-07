@@ -394,7 +394,7 @@ const TulWEB = (function () {
 
             if (target === 'root') {
                 const row = new RowItem({ type: 'row' }, this.layoutManager);
-                const newStack = new StackItem({ type: 'stack' }, this.layoutManager);
+                const newStack = new StackItem({ type: 'stack', tabPosition: newItemConfig.tabPosition }, this.layoutManager);
                 newComp = new ComponentItem(newItemConfig, this.layoutManager);
                 newStack.addChild(newComp);
                 row.addChild(newStack);
@@ -419,7 +419,7 @@ const TulWEB = (function () {
                 // We need to insert a new Row or Column conceptually, or replace target in its parent
                 // For simplicity: target is a Stack. Its parent is Row or Col.
                 const parent = target.parent;
-                const newStack = new StackItem({ type: 'stack' }, this.layoutManager);
+                const newStack = new StackItem({ type: 'stack', tabPosition: newItemConfig.tabPosition }, this.layoutManager);
                 newComp = new ComponentItem(newItemConfig, this.layoutManager);
                 newStack.addChild(newComp);
 
@@ -774,7 +774,7 @@ const TulWEB = (function () {
             this.element = document.createElement('div');
             this.element.className = 'tulweb-stack';
             if (this.isMinimized) this.element.classList.add('minimized');
-            
+
             if (this.tabPosition && this.tabPosition !== 'top') {
                 this.element.classList.add('tab-' + this.tabPosition);
             }
@@ -1016,10 +1016,10 @@ const TulWEB = (function () {
                 const isVertical = this.tabPosition === 'left' || this.tabPosition === 'right';
                 if (isVertical) {
                     this.element.style.width = 'calc(var(--tulweb-tab-height) + 2px)';
-                    this.element.style.height = '100%';
+                    //this.element.style.height = '100%';
                 } else {
                     this.element.style.height = 'calc(var(--tulweb-tab-height) + 2px)';
-                    this.element.style.width = '100%';
+                    //this.element.style.width = '100%';
                 }
             } else {
                 // Clear any manual width/height set during minimize

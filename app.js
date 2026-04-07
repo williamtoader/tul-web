@@ -238,6 +238,27 @@ document.addEventListener("DOMContentLoaded", function () {
                     </svg>
                     Generic Panel
                 </div>
+                <div class="sidebar-item" data-type="stackL">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
+                    Left Stack
+                </div>
+                <div class="sidebar-item" data-type="stackR">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
+                    Right Stack
+                </div>
+                <div class="sidebar-item" data-type="stackB">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
+                    Bottom Stack
+                </div>
             </div>
         </div>
 
@@ -298,7 +319,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 else if (type === 'console') config = { type: 'component', componentName: 'console', title: 'Terminal Console', componentState: {} };
                 else if (type === 'datagrid') config = { type: 'component', componentName: 'datagrid', title: 'Data Grid', componentState: {} };
                 else if (type === 'image') config = { type: 'component', componentName: 'image', title: 'Image Viewer', componentState: {} };
+                else if (type === 'stackL') config = { type: 'component', componentName: 'generic', title: 'Left Stack', componentState: { name: 'New Panel' }, tabPosition: 'left' };
+                else if (type === 'stackR') config = { type: 'component', componentName: 'generic', title: 'Right Stack', componentState: { name: 'New Panel' }, tabPosition: 'right' };
+                else if (type === 'stackB') config = { type: 'component', componentName: 'generic', title: 'Bottom Stack', componentState: { name: 'New Panel' }, tabPosition: 'bottom' };
                 else config = { type: 'component', componentName: 'generic', title: 'Generic Panel', componentState: { name: 'New Panel' } };
+
 
                 layout.createDragSource(item, config);
             });
