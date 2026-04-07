@@ -9,11 +9,12 @@ body.theme-nordic {
   --tulweb-border: rgba(255, 255, 255, 0.08);
   --tulweb-text-primary: #e6e8ec;
   --tulweb-text-secondary: #9ca3af;
-  --tulweb-accent: #0cbaba; /* Glowing Teal */
+  --tulweb-accent: #0cbaba;
+  /* Glowing Teal */
   --tulweb-accent-hover: #15f0f0;
   --tulweb-drop-zone: rgba(12, 186, 186, 0.2);
   --tulweb-close-hover: rgba(244, 63, 94, 0.9);
-  
+
   --tulweb-bg-editor: rgba(12, 13, 16, 0.8);
   --tulweb-text-editor: #e2e8f0;
   --tulweb-bg-console: rgba(7, 8, 10, 0.8);
@@ -32,6 +33,7 @@ body.theme-nordic {
   --tulweb-font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --tulweb-blur: 24px;
 }
+
 body.theme-cyber {
   /* Phosphor Terminal */
   --tulweb-bg-base: #020202;
@@ -42,11 +44,12 @@ body.theme-cyber {
   --tulweb-border: rgba(245, 158, 11, 0.3);
   --tulweb-text-primary: #fcd34d;
   --tulweb-text-secondary: #d97706;
-  --tulweb-accent: #f59e0b; /* Amber Glow */
+  --tulweb-accent: #f59e0b;
+  /* Amber Glow */
   --tulweb-accent-hover: #fbbf24;
   --tulweb-drop-zone: rgba(245, 158, 11, 0.25);
   --tulweb-close-hover: rgba(239, 68, 68, 0.9);
-  
+
   --tulweb-bg-editor: rgba(0, 0, 0, 0.9);
   --tulweb-text-editor: #facc15;
   --tulweb-bg-console: rgba(0, 0, 0, 0.9);
@@ -54,12 +57,12 @@ body.theme-cyber {
 
   --tulweb-shadow-color: rgba(245, 158, 11, 0.1);
   --tulweb-shadow-glow: rgba(245, 158, 11, 0.4);
-  
+
   --tulweb-tab-height: 36px;
   --tulweb-splitter-size: 4px;
   --tulweb-radius-panel: 0px;
   --tulweb-radius-inner: 0px;
-  
+
   --tulweb-font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --tulweb-blur: 10px;
 }
@@ -74,11 +77,12 @@ body.theme-light {
   --tulweb-border: rgba(15, 23, 42, 0.06);
   --tulweb-text-primary: #0f172a;
   --tulweb-text-secondary: #475569;
-  --tulweb-accent: #2563eb; /* Apple Blue */
+  --tulweb-accent: #2563eb;
+  /* Apple Blue */
   --tulweb-accent-hover: #1d4ed8;
   --tulweb-drop-zone: rgba(37, 99, 235, 0.15);
   --tulweb-close-hover: #ef4444;
-  
+
   --tulweb-bg-editor: rgba(255, 255, 255, 0.9);
   --tulweb-text-editor: #334155;
   --tulweb-bg-console: rgba(30, 41, 59, 0.95);
@@ -106,11 +110,12 @@ body.theme-retro {
   --tulweb-border: #404040;
   --tulweb-text-primary: #000000;
   --tulweb-text-secondary: #333333;
-  --tulweb-accent: #000080; /* Classic Win95/CDE Navy Blue */
+  --tulweb-accent: #000080;
+  /* Classic Win95/CDE Navy Blue */
   --tulweb-accent-hover: #0000ff;
   --tulweb-drop-zone: rgba(0, 0, 128, 0.2);
   --tulweb-close-hover: #ff0000;
-  
+
   --tulweb-bg-editor: #ffffff;
   --tulweb-text-editor: #000000;
   --tulweb-bg-console: #000000;
@@ -140,32 +145,32 @@ body {
   color: var(--tulweb-text-primary);
   overflow: hidden;
   /* Premium radial + linear blend */
-  background-image: 
-    radial-gradient(circle at 50% 0%, rgba(255,255,255,0.03) 0%, transparent 50%),
-    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
   background-size: 100% 100%, 40px 40px, 40px 40px;
   background-position: 0 0, -1px -1px, -1px -1px;
 }
 
 body.theme-cyber {
-  background-image: 
+  background-image:
     linear-gradient(rgba(245, 158, 11, 0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(245, 158, 11, 0.05) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
 body.theme-light {
-  background-image: 
-    radial-gradient(circle at top left, rgba(255,255,255,0.8), transparent 40%),
+  background-image:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.8), transparent 40%),
     radial-gradient(circle at bottom right, rgba(226, 232, 240, 0.8), transparent 40%);
 }
 
 body.theme-retro {
-  background-image: 
-    linear-gradient(45deg, #a0a0a0 25%, transparent 25%), 
-    linear-gradient(-45deg, #a0a0a0 25%, transparent 25%), 
-    linear-gradient(45deg, transparent 75%, #a0a0a0 75%), 
+  background-image:
+    linear-gradient(45deg, #a0a0a0 25%, transparent 25%),
+    linear-gradient(-45deg, #a0a0a0 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #a0a0a0 75%),
     linear-gradient(-45deg, transparent 75%, #a0a0a0 75%);
   background-size: 4px 4px;
   background-color: #909090;
@@ -281,9 +286,9 @@ body.theme-retro {
 
 .active-stack {
   border-color: var(--tulweb-accent);
-  box-shadow: 0 0 0 1px var(--tulweb-accent) inset, 
-              0 16px 48px var(--tulweb-shadow-color),
-              0 0 16px var(--tulweb-shadow-glow);
+  box-shadow: 0 0 0 1px var(--tulweb-accent) inset,
+    0 16px 48px var(--tulweb-shadow-color),
+    0 0 16px var(--tulweb-shadow-glow);
 }
 
 .tulweb-stack.maximized.active-stack {
@@ -371,7 +376,13 @@ body.theme-retro .tulweb-stack {
   box-shadow: 2px 2px 0 #000000;
 }
 
-body.theme-retro .tulweb-header {
+body.theme-retro .active-stack .tulweb-header {
+  background: var(--tulweb-bg-tab);
+  color: #ffffff;
+  font-weight: bold;
+}
+
+body.theme-retro .active-stack .tulweb-header {
   background: var(--tulweb-accent);
   color: #ffffff;
   font-weight: bold;
