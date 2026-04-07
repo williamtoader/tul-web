@@ -1145,8 +1145,11 @@ class StackItem extends ContentItem {
             this.overflowBtn.addEventListener('click', (e) => {
                 e.stopPropagation()
                 const show = this.dropdownEl.style.display === 'none'
+                if (show) {
+                    this.updateDropdownPosition()
+                    this.renderDropdown()
+                }
                 this.dropdownEl.style.display = show ? 'block' : 'none'
-                if (show) this.renderDropdown()
             })
 
             document.addEventListener('mousedown', (e) => {
@@ -1169,6 +1172,42 @@ class StackItem extends ContentItem {
             this.hiddenTabs.push(this.children[i])
         }
         this.hiddenTabs.reverse()
+    }
+
+    updateDropdownPosition() {
+        if (!this.overflowBtn || !this.dropdownEl) return
+        const btnRect = this.overflowBtn.getBoundingClientRect()
+        const containerRect = this.element.getBoundingClientRect()
+
+        const top = btnRect.top - containerRect.top
+        const left = btnRect.left - containerRect.left
+        const right = containerRect.right - btnRect.right
+        const bottom = containerRect.bottom - btnRect.bottom
+
+        if (this.tabPosition === 'left') {
+            this.dropdownEl.style.top = top + 'px'
+            this.dropdownEl.style.left = (left + btnRect.width + 5) + 'px'
+            this.dropdownEl.style.right = 'auto'
+            this.dropdownEl.style.bottom = 'auto'
+        } else if (this.tabPosition === 'right') {
+            this.dropdownEl.style.top = top + 'px'
+            this.dropdownEl.style.right = (right + btnRect.width + 5) + 'px'
+            this.dropdownEl.style.left = 'auto'
+            this.dropdownEl.style.bottom = 'auto'
+        } else if (this.tabPosition === 'bottom') {
+            this.dropdownEl.style.bottom = (bottom + btnRect.height + 5) + 'px'
+            this.dropdownEl.style.left = (left + btnRect.width - 150) + 'px' // Align right-ish
+            if (parseInt(this.dropdownEl.style.left) < 0) this.dropdownEl.style.left = '5px'
+            this.dropdownEl.style.top = 'auto'
+            this.dropdownEl.style.right = 'auto'
+        } else {
+            // Top (default)
+            this.dropdownEl.style.top = (top + btnRect.height + 5) + 'px'
+            this.dropdownEl.style.left = (left + btnRect.width - 150) + 'px' // Align right-ish
+            if (parseInt(this.dropdownEl.style.left) < 0) this.dropdownEl.style.left = '5px'
+            this.dropdownEl.style.right = 'auto'
+            this.dropdownEl.style.bottom = 'auto'
+        }
     }
 
     renderDropdown() {
@@ -1279,7 +1318,6 @@ class StackItem extends ContentItem {
             this.element.classList.remove('maximized')
             if (this.maxBtn) this.maxBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6z"/></svg>'
         }
-
     }
 
     closeAll() {
