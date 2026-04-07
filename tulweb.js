@@ -16,14 +16,18 @@ const TulWEB = (function () {
             return Math.random().toString(36).substr(2, 9);
         },
         getRelativePos(evt, elem) {
+            const isTouch = evt.touches && evt.touches.length > 0;
+            const clientX = isTouch ? evt.touches[0].clientX : evt.clientX;
+            const clientY = isTouch ? evt.touches[0].clientY : evt.clientY;
             const rect = elem.getBoundingClientRect();
+
             return {
-                x: evt.clientX - rect.left,
-                y: evt.clientY - rect.top,
+                x: clientX - rect.left,
+                y: clientY - rect.top,
                 w: rect.width,
                 h: rect.height,
-                pointerX: evt.clientX,
-                pointerY: evt.clientY
+                pointerX: clientX,
+                pointerY: clientY
             };
         }
     };
@@ -49,6 +53,12 @@ const TulWEB = (function () {
             this.handlePendingMove = this.handlePendingMove.bind(this);
             this.handlePendingUp = this.handlePendingUp.bind(this);
 
+            // Touch bindings
+            this.handleTouchMove = (e) => { this.handleMouseMove(e); if (this.isDragging) e.preventDefault(); };
+            this.handleTouchEnd = (e) => this.handleMouseUp(e);
+            this.handlePendingTouchMove = (e) => this.handlePendingMove(e);
+            this.handlePendingTouchEnd = (e) => this.handlePendingUp(e);
+
             // Create indicator element
             this.indicator = Utils.createElement('div', 'tulweb-drop-indicator', document.body);
             this.indicator.style.display = 'none';
@@ -60,21 +70,37 @@ const TulWEB = (function () {
 
         pendDrag(evt, itemConfig, type, sourceStack, title) {
             this.isPendingDrag = true;
-            this.pendingStartPos = { x: evt.clientX, y: evt.clientY };
+            const isTouch = evt.touches && evt.touches.length > 0;
+            const clientX = isTouch ? evt.touches[0].clientX : evt.clientX;
+            const clientY = isTouch ? evt.touches[0].clientY : evt.clientY;
+            
+            this.pendingStartPos = { x: clientX, y: clientY };
             this.pendingArgs = { itemConfig, type, sourceStack, title };
 
-            document.addEventListener('mousemove', this.handlePendingMove);
-            document.addEventListener('mouseup', this.handlePendingUp);
+            if (isTouch) {
+                document.addEventListener('touchmove', this.handlePendingTouchMove, { passive: false });
+                document.addEventListener('touchend', this.handlePendingTouchEnd);
+            } else {
+                document.addEventListener('mousemove', this.handlePendingMove);
+                document.addEventListener('mouseup', this.handlePendingUp);
+            }
         },
 
         handlePendingMove(evt) {
             if (!this.isPendingDrag) return;
-            const dx = evt.clientX - this.pendingStartPos.x;
-            const dy = evt.clientY - this.pendingStartPos.y;
-            if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+            const isTouch = evt.touches && evt.touches.length > 0;
+            const clientX = isTouch ? evt.touches[0].clientX : evt.clientX;
+            const clientY = isTouch ? evt.touches[0].clientY : evt.clientY;
+
+            const dx = clientX - this.pendingStartPos.x;
+            const dy = clientY - this.pendingStartPos.y;
+            if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
                 this.isPendingDrag = false;
                 document.removeEventListener('mousemove', this.handlePendingMove);
                 document.removeEventListener('mouseup', this.handlePendingUp);
+                document.removeEventListener('touchmove', this.handlePendingTouchMove);
+                document.removeEventListener('touchend', this.handlePendingTouchEnd);
+                
                 const a = this.pendingArgs;
                 this.startDrag(evt, a.itemConfig, a.type, a.sourceStack, a.title);
             }
@@ -84,6 +110,8 @@ const TulWEB = (function () {
             this.isPendingDrag = false;
             document.removeEventListener('mousemove', this.handlePendingMove);
             document.removeEventListener('mouseup', this.handlePendingUp);
+            document.removeEventListener('touchmove', this.handlePendingTouchMove);
+            document.removeEventListener('touchend', this.handlePendingTouchEnd);
         },
 
         startDrag(evt, itemConfig, type, sourceStack, title) {
@@ -97,8 +125,13 @@ const TulWEB = (function () {
             this.proxy.textContent = title || itemConfig.title || 'Component';
             this.updateProxyPos(evt);
 
-            document.addEventListener('mousemove', this.handleMouseMove);
-            document.addEventListener('mouseup', this.handleMouseUp);
+            if (evt.touches) {
+                document.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+                document.addEventListener('touchend', this.handleTouchEnd);
+            } else {
+                document.addEventListener('mousemove', this.handleMouseMove);
+                document.addEventListener('mouseup', this.handleMouseUp);
+            }
 
             // If dragging from a stack, make it look active but keep it in the DOM until drop
             if (sourceStack) {
@@ -108,8 +141,11 @@ const TulWEB = (function () {
 
         updateProxyPos(evt) {
             if (this.proxy) {
-                this.proxy.style.left = (evt.clientX + 10) + 'px';
-                this.proxy.style.top = (evt.clientY + 10) + 'px';
+                const isTouch = evt.touches && evt.touches.length > 0;
+                const clientX = isTouch ? evt.touches[0].clientX : evt.clientX;
+                const clientY = isTouch ? evt.touches[0].clientY : evt.clientY;
+                this.proxy.style.left = (clientX + 10) + 'px';
+                this.proxy.style.top = (clientY + 10) + 'px';
             }
         },
 
@@ -126,6 +162,8 @@ const TulWEB = (function () {
 
             document.removeEventListener('mousemove', this.handleMouseMove);
             document.removeEventListener('mouseup', this.handleMouseUp);
+            document.removeEventListener('touchmove', this.handleTouchMove);
+            document.removeEventListener('touchend', this.handleTouchEnd);
 
             if (this.proxy) {
                 document.body.removeChild(this.proxy);
@@ -156,8 +194,12 @@ const TulWEB = (function () {
         currentDropZone: null, // { targetItem, edge: 'top'|'bottom'|'left'|'right'|'center' }
 
         findDropZone(evt) {
+            const isTouch = evt.touches && evt.touches.length > 0;
+            const clientX = isTouch ? evt.touches[0].clientX : evt.clientX;
+            const clientY = isTouch ? evt.touches[0].clientY : evt.clientY;
+
             // Find what we are over. The proxy has pointer-events: none, so this gets the actual element
-            const el = document.elementFromPoint(evt.clientX, evt.clientY);
+            const el = document.elementFromPoint(clientX, clientY);
             if (!el) return this.hideIndicator();
 
             // Find the closest Layout Item
@@ -216,7 +258,7 @@ const TulWEB = (function () {
                             if (tab.style.display === 'none') continue;
 
                             if (isVertical) {
-                                if (evt.clientY < rect.top + rect.height / 2) {
+                                if (clientY < rect.top + rect.height / 2) {
                                     dropIdx = i;
                                     dropLeft = rect.left;
                                     dropTop = rect.top;
@@ -225,7 +267,7 @@ const TulWEB = (function () {
                                     break;
                                 }
                             } else {
-                                if (evt.clientX < rect.left + rect.width / 2) {
+                                if (clientX < rect.left + rect.width / 2) {
                                     dropIdx = i;
                                     dropLeft = rect.left;
                                     dropTop = rect.top;
@@ -476,12 +518,14 @@ const TulWEB = (function () {
             this.layoutManager = layoutManager;
             this.element.classList.add('tulweb-drag-source');
 
-            this.element.addEventListener('mousedown', (e) => {
-                e.preventDefault(); // Prevent text selection
+            const startHandler = (e) => {
                 // Clone config so we don't mutate original
                 const configCopy = JSON.parse(JSON.stringify(this.itemConfig));
                 DragManager.pendDrag(e, configCopy, 'external', null, this.itemConfig.title);
-            });
+            };
+
+            this.element.addEventListener('mousedown', startHandler);
+            this.element.addEventListener('touchstart', startHandler, { passive: true });
         }
     }
 
@@ -503,6 +547,7 @@ const TulWEB = (function () {
             this._onDblClick = this._onDblClick.bind(this);
 
             this.element.addEventListener('mousedown', this._onMouseDown);
+            this.element.addEventListener('touchstart', this._onMouseDown, { passive: false });
             this.element.addEventListener('dblclick', this._onDblClick);
         }
 
@@ -516,12 +561,21 @@ const TulWEB = (function () {
         }
 
         _onMouseDown(e) {
-            e.preventDefault();
+            if (e.type === 'touchstart') {
+                // Not calling preventDefault here to allow gestures, but we'll monitor moves
+            } else {
+                e.preventDefault();
+            }
+            
+            const isTouch = e.touches && e.touches.length > 0;
+            const clientX = isTouch ? e.touches[0].clientX : e.clientX;
+            const clientY = isTouch ? e.touches[0].clientY : e.clientY;
+
             this.isDragging = true;
             this.element.classList.add('active');
 
             // Calculate base metrics
-            this.startPos = this.isVertical ? e.clientX : e.clientY;
+            this.startPos = this.isVertical ? clientX : clientY;
             this.startPrevSize = this.prevItem.size || 50;
             this.startNextSize = this.nextItem.size || 50;
             this.totalSize = this.startPrevSize + this.startNextSize;
@@ -532,11 +586,19 @@ const TulWEB = (function () {
 
             document.addEventListener('mousemove', this._onMouseMove);
             document.addEventListener('mouseup', this._onMouseUp);
+            document.addEventListener('touchmove', this._onMouseMove, { passive: false });
+            document.addEventListener('touchend', this._onMouseUp);
         }
 
         _onMouseMove(e) {
             if (!this.isDragging) return;
-            const currentPos = this.isVertical ? e.clientX : e.clientY;
+            const isTouch = e.touches && e.touches.length > 0;
+            const clientX = isTouch ? e.touches[0].clientX : e.clientX;
+            const clientY = isTouch ? e.touches[0].clientY : e.clientY;
+            
+            if (isTouch) e.preventDefault(); // Prevent scrolling during resize
+
+            const currentPos = this.isVertical ? clientX : clientY;
             const diffPx = currentPos - this.startPos;
             const diffPct = diffPx / this.pixelsPerPercent;
 
@@ -577,6 +639,8 @@ const TulWEB = (function () {
                 this.element.classList.remove('active');
                 document.removeEventListener('mousemove', this._onMouseMove);
                 document.removeEventListener('mouseup', this._onMouseUp);
+                document.removeEventListener('touchmove', this._onMouseMove);
+                document.removeEventListener('touchend', this._onMouseUp);
             }
         }
 
@@ -891,12 +955,14 @@ const TulWEB = (function () {
                 });
 
                 // Tab drag
-                tab.addEventListener('mousedown', (e) => {
-                    if (e.target !== close && this.children.length > 0 && e.button === 0) {
-                        e.preventDefault(); // Prevent text selection
+                const startDragHandler = (e) => {
+                    if (e.target !== close && this.children.length > 0 && (e.type === 'touchstart' || e.button === 0)) {
                         DragManager.pendDrag(e, child.config, 'tab', this, child.config.title);
                     }
-                });
+                };
+
+                tab.addEventListener('mousedown', startDragHandler);
+                tab.addEventListener('touchstart', startDragHandler, { passive: true });
             });
             this.updateOverflow();
         }
@@ -960,11 +1026,13 @@ const TulWEB = (function () {
             this.hiddenTabs.forEach(child => {
                 const item = Utils.createElement('div', 'tulweb-dropdown-item', this.dropdownEl);
                 item.textContent = child.config.title || child.config.componentName || 'Tab';
-                item.addEventListener('click', () => {
+                const selectTab = () => {
                     const index = this.children.indexOf(child);
                     this.setActive(index);
                     this.dropdownEl.style.display = 'none';
-                });
+                };
+                item.addEventListener('click', selectTab);
+                item.addEventListener('touchstart', selectTab, { passive: true });
             });
         }
 

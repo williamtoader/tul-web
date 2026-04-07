@@ -1081,3 +1081,44 @@ body.theme-retro .tab-right .tulweb-tab.active {
   /* Make components inside preview looks slightly different? */
   background: transparent;
 }
+
+/* --- Mobile / Touch Device Optimizations --- */
+@media (max-width: 768px) {
+  :root {
+    --tulweb-tab-height: 48px; /* Larger hit targets for thumbs */
+    --tulweb-splitter-size: 12px; /* Easier to grab splitters */
+  }
+
+  .tulweb-splitter::after {
+    opacity: 0.6; /* More visible by default on mobile */
+  }
+
+  /* Ensure the drag proxy is large enough on mobile */
+  .tulweb-drag-proxy {
+    padding: 12px 24px !important;
+    font-size: 15px !important;
+  }
+  
+  .tulweb-tab-title {
+    font-size: 14px;
+  }
+}
+
+/* Specific fix for draggable items to be more touch friendly */
+.sidebar-item {
+  min-height: 44px;
+  touch-action: none; /* Prevent scrolling when starting a drag */
+}
+
+.tulweb-tab {
+  touch-action: none;
+}
+
+.tulweb-splitter {
+  touch-action: none;
+}
+
+.tulweb-header {
+  touch-action: none;
+}
+
