@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+- New stack configuration options: `displayMinimizeButton`, `displayMaximizeButton`, `displayCloseButton` to control visibility of stack header buttons.
+- New component configuration option: `closeable` (boolean) to toggle the close button on individual tabs and its associated context menu options.
+
 ## [2.0.0] - 2026-04-07
 ### Changed
 - Migrated core library to ES6 modules (removed `TulWEB` global).

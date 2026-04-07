@@ -332,12 +332,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
             el.querySelector("#btn-save").addEventListener("click", () => {
                 const config = layout.toConfig();
-                localStorage.setItem('tulweb_saved_state', JSON.stringify(config));
+                localStorage.setItem('tulweb_saved_state_v2', JSON.stringify(config));
                 layout.showToast("Layout saved to workspace");
             });
 
             el.querySelector("#btn-load").addEventListener("click", () => {
-                const saved = localStorage.getItem('tulweb_saved_state');
+                const saved = localStorage.getItem('tulweb_saved_state_v2');
                 if (saved) {
                     layout.loadLayout(JSON.parse(saved));
                     layout.showToast("Layout loaded successfully");
@@ -389,8 +389,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         size: 30,
                         minWidth: 260,
                         tabPosition: 'left',
+                        displayMinimizeButton: false,
+                        displayMaximizeButton: false,
+                        displayCloseButton: false,
+                        preventEmptyClosure: true,
                         content: [
-                            { type: 'component', componentName: 'sidebar', title: 'Toolkit' }
+                            { type: 'component', componentName: 'sidebar', title: 'Toolkit', closeable: false }
                         ]
                     },
                     {
@@ -409,7 +413,9 @@ document.addEventListener("DOMContentLoaded", function () {
                                 type: 'stack',
                                 size: 30,
                                 tabPosition: 'bottom',
-                                content: [{ type: 'component', componentName: 'console', title: 'Terminal' }]
+                                displayMinimizeButton: false,
+                                preventEmptyClosure: true,
+                                content: [{ type: 'component', componentName: 'console', title: 'Terminal', closeable: false }]
                             }
                         ]
                     },
@@ -418,6 +424,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         size: 20,
                         tabPosition: 'right',
                         minimized: true,
+                        displayCloseButton: false,
+                        preventEmptyClosure: true,
                         content: [
                             { type: 'component', componentName: 'generic', title: 'Assistant', componentState: { name: 'Assistant' } },
                             { type: 'component', componentName: 'datagrid', title: 'Database', componentState: { name: 'Database' } }
@@ -432,15 +440,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 content: [
                     {
                         type: 'stack',
-                        size: 20,
-                        minWidth: 260,
-                        tabPosition: 'left',
-                        content: [{ type: 'component', componentName: 'sidebar', title: 'Toolkit' }]
+                        size: 30,
+                        preventEmptyClosure: true,
+                        content: [{ type: 'component', componentName: 'generic', title: 'Persistent Area', componentState: { name: 'This area will NOT vanish even if you close all tabs.' } }]
                     },
                     {
                         type: 'column',
-                        size: 80,
+                        size: 70,
                         content: [
+                            {
+                                type: 'stack',
+                                size: 50,
+                                content: [{ type: 'component', componentName: 'generic', title: 'Stats', componentState: { name: 'Stats' } }]
+                            },
                             {
                                 type: 'row',
                                 size: 50,

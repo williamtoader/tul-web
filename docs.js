@@ -113,6 +113,19 @@ const docsTopics = {
                         <tr><td><code>minHeight</code></td><td>Minimum height in pixels. Splitters will respect this during resize.</td></tr>
                         <tr><td><code>tabPosition</code></td><td>Override global tab orientation for a specific stack (<code>top</code>, <code>bottom</code>, <code>left</code>, <code>right</code>).</td></tr>
                         <tr><td><code>minimized</code></td><td>Boolean. If true, the stack starts in a collapsed state.</td></tr>
+                        <tr><td><code>displayMinimizeButton</code></td><td>Boolean (default: <code>true</code>). Shows/hides the minimize button in the stack header.</td></tr>
+                        <tr><td><code>displayMaximizeButton</code></td><td>Boolean (default: <code>true</code>). Shows/hides the maximize button in the stack header.</td></tr>
+                        <tr><td><code>displayCloseButton</code></td><td>Boolean (default: <code>true</code>). Shows/hides the entire stack close button and its separator.</td></tr>
+                        <tr><td><code>preventEmptyClosure</code></td><td>Boolean (default: <code>false</code>). If <code>true</code>, the stack will NO longer auto-remove itself if all the tabs inside it are closed.</td></tr>
+                    </tbody>
+                </table>
+
+                <h2>Component Configuration</h2>
+                <p>Properties specific to <code>component</code> items:</p>
+                <table class="api-table">
+                    <thead><tr><th>Property</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>closeable</code></td><td>Boolean (default: <code>true</code>). If <code>false</code>, the close button (×) is removed from the tab, and 'Close' options are hidden from the context menu.</td></tr>
                     </tbody>
                 </table>
             </div>

@@ -5,7 +5,7 @@
   "main": "tulweb.js",
   "type": "module",
   "scripts": {
-    "start": "npx -y http-server ./",
+    "start": "npx -y http-server ./ -c-1",
     "bundle-docs": "node bundle-docs.js"
   },
   "keywords": [

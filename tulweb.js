@@ -785,11 +785,15 @@
     class ComponentItem extends ContentItem {
         constructor(config, layoutManager) {
             super(config, layoutManager)
+            this.type = 'component'
+            this.isCloseable = config.closeable !== false
         }
 
         createDOM() {
             this.element = document.createElement('div')
             this.element.className = 'tulweb-component'
+            this.element.setAttribute('data-component', this.config.componentName)
+            if (!this.isCloseable) this.element.setAttribute('data-closeable', 'false')
             this.layoutManager.emit('componentCreated', this)
         }
 
@@ -825,12 +829,14 @@
         }
 
         toConfig() {
-            return {
+            const res = {
                 type: 'component',
                 title: this.config.title,
                 componentName: this.config.componentName,
                 componentState: this.config.componentState
             }
+            if (this.config.closeable === false) res.closeable = false
+            return res
         }
     }
 
@@ -838,8 +844,10 @@
     class StackItem extends ContentItem {
         constructor(config, layoutManager) {
             super(config, layoutManager)
+            this.type = 'stack'
             this.activeChildIndex = 0
             this.isMaximized = false
+            this.controlsEl = null
             // isMinimized is initialized in createDOM which is called by the super constructor
             this.hiddenTabs = []
         }
@@ -847,8 +855,16 @@
         createDOM() {
             this.tabPosition = this.config.tabPosition || 'top'
             this.isMinimized = !!this.config.minimized
+            
+            // Per-stack control button visibility
+            this.displayMinimizeButton = this.config.displayMinimizeButton !== false
+            this.displayMaximizeButton = this.config.displayMaximizeButton !== false
+            this.displayCloseButton = this.config.displayCloseButton !== false
+            this.preventEmptyClosure = !!this.config.preventEmptyClosure
+
             this.element = document.createElement('div')
             this.element.className = 'tulweb-stack'
+            if (this.preventEmptyClosure) this.element.setAttribute('data-persistent', 'true')
             if (this.isMinimized) this.element.classList.add('minimized')
 
             if (this.tabPosition && this.tabPosition !== 'top') {
@@ -861,30 +877,42 @@
 
             this.headerEl = Utils.createElement('div', 'tulweb-header', this.element)
             this.tabsEl = Utils.createElement('div', 'tulweb-tabs', this.headerEl)
-            this.controlsEl = Utils.createElement('div', 'tulweb-header-controls', this.headerEl)
 
-            if (this.layoutManager.settings.enableMinimize !== false) {
-                this.minBtn = Utils.createElement('div', 'tulweb-control', this.controlsEl)
-                this.minBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h12v2H6z"/></svg>'
-                this.minBtn.addEventListener('click', (e) => {
-                    e.stopPropagation()
-                    this.toggleMinimize()
-                })
+            const showMin = this.displayMinimizeButton && this.layoutManager.settings.enableMinimize !== false
+            const showMax = this.displayMaximizeButton
+            const showClose = this.displayCloseButton
+
+            if (showMin || showMax || showClose) {
+                this.controlsEl = Utils.createElement('div', 'tulweb-header-controls', this.headerEl)
+
+                if (showMin) {
+                    this.minBtn = Utils.createElement('div', 'tulweb-control', this.controlsEl)
+                    this.minBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h12v2H6z"/></svg>'
+                    this.minBtn.addEventListener('click', (e) => {
+                        e.stopPropagation()
+                        this.toggleMinimize()
+                    })
+                }
+
+                // Maximize button
+                if (showMax) {
+                    this.maxBtn = Utils.createElement('div', 'tulweb-control', this.controlsEl)
+                    this.maxBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6z"/></svg>'
+                    this.maxBtn.addEventListener('click', () => this.toggleMaximize())
+                }
+
+                // Close Stack Button
+                if (showClose) {
+                    this.closeBtn = Utils.createElement('div', 'tulweb-control', this.controlsEl)
+                    this.closeBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>'
+                    this.closeBtn.addEventListener('click', () => {
+                        this.closeAll()
+                        if (this.children.length === 0) {
+                            this.destroy()
+                        }
+                    })
+                }
             }
-
-            // Maximize button
-            this.maxBtn = Utils.createElement('div', 'tulweb-control', this.controlsEl)
-            this.maxBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6z"/></svg>'
-            this.maxBtn.addEventListener('click', () => this.toggleMaximize())
-
-            // Close Stack Button
-            this.closeBtn = Utils.createElement('div', 'tulweb-control', this.controlsEl)
-            this.closeBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>'
-            this.closeBtn.addEventListener('click', () => {
-                console.log(this)
-                this.closeAll()
-                this.destroy()
-            })
 
             this.contentAreaEl = Utils.createElement('div', 'tulweb-content-area', this.element)
 
@@ -935,15 +963,24 @@
                 const title = Utils.createElement('div', 'tulweb-tab-title', tab)
                 title.textContent = child.config.title || child.config.componentName || 'Tab'
 
-                const close = Utils.createElement('div', 'tulweb-tab-close', tab)
-                close.textContent = '×'
-                close.addEventListener('click', (e) => {
-                    e.stopPropagation()
-                    this.removeChild(child)
-                    if (this.children.length === 0) {
-                        this.layoutManager._cleanupEmptyStack(this)
-                    }
-                })
+                let close = null
+                const isCloseable = child.isCloseable
+                if (isCloseable) {
+                    close = Utils.createElement('div', 'tulweb-tab-close', tab)
+                    close.textContent = '×'
+                    close.addEventListener('click', (e) => {
+                        e.stopPropagation()
+                        this.removeChild(child)
+                        if (this.children.length === 0) {
+                            this.layoutManager._cleanupEmptyStack(this)
+                        }
+                    })
+
+                    // Tab drag (allow only if closeable target wasn't clicked, though we check that later)
+                    tab.addEventListener('mousedown', (e) => {
+                        if (e.target === close) return // Handled by close listener
+                    })
+                }
 
                 // Tab click
                 tab.addEventListener('mousedown', (e) => {
@@ -1130,27 +1167,34 @@
             this.isMaximized = !this.isMaximized
             if (this.isMaximized) {
                 this.element.classList.add('maximized')
-                this.maxBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 4h4v2H6v4H4V4zm16 0h-4v2h2v4h2V4zM4 20h4v-2H6v-4H4v6zm16 0h-4v-2h2v-4h2v6z"/></svg>'
+                if (this.maxBtn) this.maxBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 4h4v2H6v4H4V4zm16 0h-4v2h2v4h2V4zM4 20h4v-2H6v-4H4v6zm16 0h-4v-2h2v-4h2v6z"/></svg>'
             } else {
                 this.element.classList.remove('maximized')
-                this.maxBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6z"/></svg>'
+                if (this.maxBtn) this.maxBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6z"/></svg>'
             }
         }
 
         closeAll() {
-            const kids = [...this.children]
+            const kids = this.children.filter(c => c.config.closeable !== false)
             kids.forEach(child => child.destroy())
-            this.layoutManager._cleanupEmptyStack(this)
+            if (this.children.length === 0) {
+                this.layoutManager._cleanupEmptyStack(this)
+            }
         }
 
         toConfig() {
             const res = super.toConfig()
+            res.activeChildIndex = this.activeChildIndex
             if (this.tabPosition !== 'top') {
                 res.tabPosition = this.tabPosition
             }
             if (this.isMinimized) {
                 res.minimized = true
             }
+            if (!this.displayMinimizeButton) res.displayMinimizeButton = false
+            if (!this.displayMaximizeButton) res.displayMaximizeButton = false
+            if (!this.displayCloseButton) res.displayCloseButton = false
+            if (this.preventEmptyClosure) res.preventEmptyClosure = true
             return res
         }
     }
@@ -1269,12 +1313,20 @@
 
             this._closeHandler = this._closeHandler.bind(this)
 
-            this.addOption('Close Tab', () => child.destroy())
+            if (child.config.closeable !== false) {
+                this.addOption('Close Tab', () => child.destroy())
+            }
             this.addOption('Close Other Tabs', () => {
-                const toClose = stack.children.filter(c => c.id !== child.id)
+                const toClose = stack.children.filter(c => c.id !== child.id && c.config.closeable !== false)
                 toClose.forEach(c => c.destroy())
             })
-            this.addOption('Close All Tabs', () => stack.closeAll())
+            this.addOption('Close All Tabs', () => {
+                const toClose = stack.children.filter(c => c.config.closeable !== false)
+                toClose.forEach(c => c.destroy())
+                if (stack.children.length === 0) {
+                    stack.layoutManager._cleanupEmptyStack(stack)
+                }
+            })
 
             setTimeout(() => document.addEventListener('mousedown', this._closeHandler), 0)
         }
@@ -1483,6 +1535,7 @@
 
         // Helper: cleans up stacks when empty, or simplifies tree
         _cleanupEmptyStack(stackItem) {
+            if (stackItem.type === 'stack' && stackItem.preventEmptyClosure) return
             if (this.activeStack === stackItem) {
                 this.setActiveStack(null)
             }
