@@ -977,12 +977,13 @@ body.theme-retro .tab-right .tulweb-tab.active {
   border-bottom: none;
   border-top: 1px solid var(--tulweb-border);
   height: calc(var(--tulweb-tab-height) + 7px);
-  padding-left: 10px;
+  padding-left: 7px;
 }
 
 .tulweb-stack.tab-bottom.minimized .tulweb-header {
   border-bottom: none;
   border-top: 1px solid var(--tulweb-border);
+  padding-top: 1px;
   height: calc(var(--tulweb-tab-height));
 }
 
