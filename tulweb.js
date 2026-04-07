@@ -764,14 +764,17 @@ const TulWEB = (function () {
             super(config, layoutManager);
             this.activeChildIndex = 0;
             this.isMaximized = false;
-            this.isMinimized = false;
+            // isMinimized is initialized in createDOM which is called by the super constructor
             this.hiddenTabs = [];
         }
 
         createDOM() {
             this.tabPosition = this.config.tabPosition || 'top';
+            this.isMinimized = !!this.config.minimized;
             this.element = document.createElement('div');
             this.element.className = 'tulweb-stack';
+            if (this.isMinimized) this.element.classList.add('minimized');
+            
             if (this.tabPosition && this.tabPosition !== 'top') {
                 this.element.classList.add('tab-' + this.tabPosition);
             }
@@ -1067,6 +1070,9 @@ const TulWEB = (function () {
             const res = super.toConfig();
             if (this.tabPosition !== 'top') {
                 res.tabPosition = this.tabPosition;
+            }
+            if (this.isMinimized) {
+                res.minimized = true;
             }
             return res;
         }

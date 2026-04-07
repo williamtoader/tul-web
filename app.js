@@ -385,7 +385,17 @@ document.addEventListener("DOMContentLoaded", function () {
                                 content: [{ type: 'component', componentName: 'console', title: 'Terminal' }]
                             }
                         ]
-                    }
+                    },
+                    {
+                        type: 'stack',
+                        size: 20,
+                        tabPosition: 'right',
+                        minimized: true,
+                        content: [
+                            { type: 'component', componentName: 'generic', title: 'Assistant', componentState: { name: 'Assistant' } },
+                            { type: 'component', componentName: 'datagrid', title: 'Database', componentState: { name: 'Database' } }
+                        ]
+                    },
                 ]
             }]
         },
