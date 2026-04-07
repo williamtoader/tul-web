@@ -188,6 +188,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     {
                         type: 'stack',
                         size: 20,
+                        tabPosition: 'left',
                         content: [
                             {
                                 type: 'component',
@@ -199,7 +200,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     {
                         type: 'column',
-                        size: 80,
+                        size: 60,
                         content: [
                             {
                                 type: 'stack',
@@ -212,10 +213,24 @@ document.addEventListener("DOMContentLoaded", function () {
                             {
                                 type: 'stack',
                                 size: 30,
+                                tabPosition: 'bottom',
                                 content: [{ type: 'component', componentName: 'console', title: 'Terminal' }]
                             }
                         ]
-                    }
+                    },
+                    {
+                        type: 'stack',
+                        size: 20,
+                        tabPosition: 'right',
+                        content: [
+                            {
+                                type: 'component',
+                                componentName: 'generic',
+                                title: 'Assistant',
+                                componentState: { name: 'Assistant' }
+                            }
+                        ]
+                    },
                 ]
             }]
         },
@@ -235,6 +250,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             {
                                 type: 'stack',
                                 size: 50,
+                                tabPosition: 'right',
                                 content: [{ type: 'component', componentName: 'image', title: 'Network Topology', componentState: { url: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1200&auto=format" } }]
                             }
                         ]

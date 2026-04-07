@@ -325,6 +325,22 @@ body.theme-retro {
   /* visually separate tabs from top edge */
 }
 
+.tab-bottom .tulweb-tabs {
+  display: flex;
+  flex-grow: 1;
+  overflow: hidden;
+  padding-bottom: 3px;
+  padding-top: 0px;
+  padding-left: 8px;
+  min-width: 0;
+  height: var(--tulweb-tab-height);
+  /* visually separate tabs from top edge */
+}
+
+.tab-bottom .tulweb-tab {
+  margin-top: -1px;
+}
+
 .tulweb-tab {
   display: flex;
   align-items: center;
@@ -361,12 +377,59 @@ body.theme-cyber .tulweb-tab.active {
   box-shadow: inset 0 2px 0 var(--tulweb-accent), inset 0 6px 12px var(--tulweb-shadow-glow);
 }
 
+body.theme-retro .tab-left .tulweb-tabs {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+body.theme-retro .tab-right .tulweb-tabs {
+  padding-right: 0px;
+  padding-left: 0px;
+}
+
+
+body.theme-retro .tab-left .tulweb-tab {
+  margin-right: 0px;
+  margin-left: 7px;
+}
+
+body.theme-retro .tab-right .tulweb-tab {
+  margin-left: -7px;
+  margin-right: 0px;
+}
+
+body.theme-retro .tab-bottom .tulweb-tab.active {
+  margin-top: -2px;
+}
+
+body.theme-retro .tab-bottom .tulweb-tabs {
+  padding-bottom: 8px;
+}
+
 body.theme-retro .tulweb-tab.active {
   background-color: var(--tulweb-bg-tab-active);
   color: var(--tulweb-text-primary);
   border: 1px solid var(--tulweb-border);
-  border-bottom: none;
-  box-shadow: inset 2px 2px 0 #ffffff, inset -1px 0 0 #404040;
+  box-shadow: inset 2px -2px 0 #ffffff, inset -1px 0 0 #404040;
+}
+
+
+body.theme-retro .tab-left .tulweb-tab.active {
+  background-color: var(--tulweb-bg-tab-active);
+  color: var(--tulweb-text-primary);
+  border: 1px solid var(--tulweb-border);
+  margin-right: 0;
+  margin-left: 3px;
+  box-shadow: inset 2px -2px 0 #ffffff, inset -1px 0 0 #404040;
+}
+
+body.theme-retro .tab-right .tulweb-tab.active {
+  background-color: var(--tulweb-bg-tab-active);
+  color: var(--tulweb-text-primary);
+  border: 1px solid var(--tulweb-border);
+  margin-left: -3px;
+  margin-right: 0;
+  box-shadow: inset -2px -2px 0 #ffffff, inset -1px 0 0 #404040;
 }
 
 body.theme-retro .tulweb-stack {
@@ -375,6 +438,7 @@ body.theme-retro .tulweb-stack {
   border-bottom-color: #404040;
   box-shadow: 2px 2px 0 #000000;
 }
+
 
 body.theme-retro .active-stack .tulweb-header {
   background: var(--tulweb-bg-tab);
@@ -392,7 +456,7 @@ body.theme-retro .tulweb-tab {
   border: 1px solid #ffffff;
   border-right-color: #404040;
   border-bottom: none;
-  margin-top: 2px;
+  margin-top: 0px;
   background: #c0c0c0;
   color: #000000;
 }
@@ -401,6 +465,27 @@ body.theme-retro .tulweb-tab.active {
   background: #d0d0d0;
   margin-top: 0;
   height: calc(var(--tulweb-tab-height) + 2px);
+  width: auto;
+}
+
+body.theme-retro .tab-left .tulweb-tab {
+  width: calc(var(--tulweb-tab-height));
+  height: auto;
+}
+
+body.theme-retro .tab-right .tulweb-tab {
+  width: calc(var(--tulweb-tab-height));
+  height: auto;
+}
+
+body.theme-retro .tab-left .tulweb-tab.active {
+  width: calc(var(--tulweb-tab-height));
+  height: auto;
+}
+
+body.theme-retro .tab-right .tulweb-tab.active {
+  width: calc(var(--tulweb-tab-height));
+  height: auto;
 }
 
 .tulweb-tab-title {
@@ -547,10 +632,9 @@ body.theme-retro .tulweb-tab.active {
 .tulweb-tab-drop-indicator {
   position: absolute;
   z-index: 1000;
-  width: 2px;
   background-color: var(--tulweb-accent);
   pointer-events: none;
-  transition: opacity 0.15s ease-out, left 0.1s ease-out, top 0.1s ease-out;
+  transition: opacity 0.15s ease-out, left 0.1s ease-out, top 0.1s ease-out, width 0.1s ease-out, height 0.1s ease-out;
   opacity: 0;
   box-shadow: 0 0 8px var(--tulweb-accent);
 }
@@ -773,4 +857,112 @@ body.theme-retro .tulweb-tab.active {
   border-color: var(--tulweb-accent);
   background: var(--tulweb-accent);
   box-shadow: 0 0 8px var(--tulweb-accent);
+}
+
+/* --- Tab Positioning --- */
+
+.tulweb-stack.tab-bottom {
+  flex-direction: column-reverse;
+}
+
+.tulweb-stack.tab-left {
+  flex-direction: row;
+}
+
+.tulweb-stack.tab-right {
+  flex-direction: row-reverse;
+}
+
+/* Vertical Headers */
+.tulweb-stack.tab-left .tulweb-header,
+.tulweb-stack.tab-right .tulweb-header {
+  flex-direction: column;
+  height: 100%;
+  width: var(--tulweb-tab-height);
+  min-width: var(--tulweb-tab-height);
+  border-bottom: none;
+}
+
+.tulweb-stack.tab-left .tulweb-header {
+  border-right: 1px solid var(--tulweb-border);
+}
+
+.tulweb-stack.tab-right .tulweb-header {
+  border-left: 1px solid var(--tulweb-border);
+}
+
+/* Vertical Tabs container */
+.tulweb-stack.tab-left .tulweb-tabs,
+.tulweb-stack.tab-right .tulweb-tabs {
+  flex-direction: column;
+  padding-top: 8px;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+/* Individual tab for vertical */
+.tulweb-stack.tab-left .tulweb-tab,
+.tulweb-stack.tab-right .tulweb-tab {
+  margin-right: 0;
+  margin-bottom: 2px;
+  height: auto;
+  min-height: var(--tulweb-tab-height);
+  width: 100%;
+  border-radius: var(--tulweb-radius-inner);
+  padding: 16px 0;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.tulweb-stack.tab-left .tulweb-tab-title,
+.tulweb-stack.tab-right .tulweb-tab-title {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  margin-right: 0;
+  margin-bottom: 8px;
+}
+
+.tulweb-stack.tab-left .tulweb-tab-close,
+.tulweb-stack.tab-right .tulweb-tab-close {
+  margin: 0;
+}
+
+.tulweb-stack.tab-left .tulweb-tab.active {
+  box-shadow: inset 3px 0 0 var(--tulweb-accent);
+}
+
+.tulweb-stack.tab-right .tulweb-tab.active {
+  box-shadow: inset -3px 0 0 var(--tulweb-accent);
+}
+
+/* Tab bottom header/tab overrides */
+.tulweb-stack.tab-bottom .tulweb-header {
+  border-bottom: none;
+  border-top: 1px solid var(--tulweb-border);
+  height: calc(var(--tulweb-tab-height) + 7px);
+}
+
+.tulweb-stack.tab-bottom .tulweb-tab {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: var(--tulweb-radius-inner);
+  border-bottom-right-radius: var(--tulweb-radius-inner);
+  border-top: none;
+  border-bottom: 1px solid transparent;
+}
+
+.tulweb-stack.tab-bottom .tulweb-tab.active {
+  box-shadow: inset 0 -3px 0 var(--tulweb-accent);
+  border-bottom: 1px solid var(--tulweb-border);
+}
+
+/* Vertical Header Controls */
+.tulweb-stack.tab-left .tulweb-header-controls,
+.tulweb-stack.tab-right .tulweb-header-controls {
+  flex-direction: row;
+  justify-content: center;
+  padding: 8px 0;
+  border-left: none;
+  border-top: 1px solid var(--tulweb-border);
+  flex-wrap: wrap;
 }

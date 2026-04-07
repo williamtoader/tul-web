@@ -205,6 +205,9 @@ const TulWEB = (function () {
                     let dropLeft = 0;
                     let dropTop = 0;
                     let dropHeight = 0;
+                    let dropWidth = 0;
+
+                    const isVertical = targetItem.tabPosition === 'left' || targetItem.tabPosition === 'right';
 
                     if (tabs.length > 0) {
                         for (let i = 0; i < tabs.length; i++) {
@@ -212,12 +215,24 @@ const TulWEB = (function () {
                             const rect = tab.getBoundingClientRect();
                             if (tab.style.display === 'none') continue;
 
-                            if (evt.clientX < rect.left + rect.width / 2) {
-                                dropIdx = i;
-                                dropLeft = rect.left;
-                                dropTop = rect.top;
-                                dropHeight = rect.height;
-                                break;
+                            if (isVertical) {
+                                if (evt.clientY < rect.top + rect.height / 2) {
+                                    dropIdx = i;
+                                    dropLeft = rect.left;
+                                    dropTop = rect.top;
+                                    dropWidth = rect.width;
+                                    dropHeight = 2;
+                                    break;
+                                }
+                            } else {
+                                if (evt.clientX < rect.left + rect.width / 2) {
+                                    dropIdx = i;
+                                    dropLeft = rect.left;
+                                    dropTop = rect.top;
+                                    dropWidth = 2;
+                                    dropHeight = rect.height;
+                                    break;
+                                }
                             }
                         }
 
@@ -232,26 +247,50 @@ const TulWEB = (function () {
                             }
                             if (lastVisible) {
                                 const rect = lastVisible.getBoundingClientRect();
-                                dropLeft = rect.right;
-                                dropTop = rect.top;
-                                dropHeight = rect.height;
+                                if (isVertical) {
+                                    dropLeft = rect.left;
+                                    dropTop = rect.bottom;
+                                    dropWidth = rect.width;
+                                    dropHeight = 2;
+                                } else {
+                                    dropLeft = rect.right;
+                                    dropTop = rect.top;
+                                    dropWidth = 2;
+                                    dropHeight = rect.height;
+                                }
                             } else {
                                 // Fallback if all hidden
-                                const rect = targetItem.headerEl.getBoundingClientRect();
-                                dropLeft = rect.left + 8;
-                                dropTop = rect.top + 4;
-                                dropHeight = rect.height - 8;
+                                const rect = targetItem.tabsEl.getBoundingClientRect();
+                                if (isVertical) {
+                                    dropLeft = rect.left + 4;
+                                    dropTop = rect.top + 8;
+                                    dropWidth = rect.width - 8;
+                                    dropHeight = 2;
+                                } else {
+                                    dropLeft = rect.left + 8;
+                                    dropTop = rect.top + 4;
+                                    dropWidth = 2;
+                                    dropHeight = rect.height - 8;
+                                }
                             }
                         }
                     } else {
-                        const rect = targetItem.headerEl.getBoundingClientRect();
-                        dropLeft = rect.left + 8;
-                        dropTop = rect.top + 4;
-                        dropHeight = rect.height - 8;
+                        const rect = targetItem.tabsEl.getBoundingClientRect();
+                        if (isVertical) {
+                            dropLeft = rect.left + 4;
+                            dropTop = rect.top + 8;
+                            dropWidth = rect.width - 8;
+                            dropHeight = 2;
+                        } else {
+                            dropLeft = rect.left + 8;
+                            dropTop = rect.top + 4;
+                            dropWidth = 2;
+                            dropHeight = rect.height - 8;
+                        }
                     }
 
                     this.currentDropZone = { target: targetItem, edge: edge, insertIndex: dropIdx };
-                    this.showTabIndicator(dropLeft, dropTop, dropHeight);
+                    this.showTabIndicator(dropLeft, dropTop, dropWidth, dropHeight);
                     return;
 
                 } else {
@@ -279,12 +318,13 @@ const TulWEB = (function () {
             this.showIndicator(targetItem.element, edge);
         },
 
-        showTabIndicator(l, t, h) {
+        showTabIndicator(l, t, w, h) {
             this.indicator.style.display = 'none';
             this.indicator.classList.remove('visible');
 
             this.tabIndicator.style.top = t + 'px';
             this.tabIndicator.style.left = l + 'px';
+            this.tabIndicator.style.width = w + 'px';
             this.tabIndicator.style.height = h + 'px';
             this.tabIndicator.style.display = 'block';
 
@@ -716,8 +756,12 @@ const TulWEB = (function () {
         }
 
         createDOM() {
+            this.tabPosition = this.config.tabPosition || 'top';
             this.element = document.createElement('div');
             this.element.className = 'tulweb-stack';
+            if (this.tabPosition && this.tabPosition !== 'top') {
+                this.element.classList.add('tab-' + this.tabPosition);
+            }
 
             this.element.addEventListener('mousedown', () => {
                 this.layoutManager.setActiveStack(this);
@@ -832,9 +876,13 @@ const TulWEB = (function () {
 
             if (tabs.length <= 1) return;
 
-            // Add 8px to account for the container's padding-left 
-            let totalWidth = tabs.reduce((w, t) => w + t.offsetWidth + 2, 0) + 8;
-            if (totalWidth <= this.tabsEl.clientWidth) return;
+            const isVertical = this.tabPosition === 'left' || this.tabPosition === 'right';
+
+            // Add 8px to account for the container's padding-left/top 
+            let totalSize = tabs.reduce((w, t) => w + (isVertical ? t.offsetHeight : t.offsetWidth) + 2, 0) + 8;
+            let maxSize = isVertical ? this.tabsEl.clientHeight : this.tabsEl.clientWidth;
+
+            if (totalSize <= maxSize) return;
 
             if (!this.overflowBtn) {
                 this.overflowBtn = Utils.createElement('div', 'tulweb-tab-overflow', this.headerEl);
@@ -861,13 +909,13 @@ const TulWEB = (function () {
             this.overflowBtn.style.display = 'flex';
             this.hiddenTabs = [];
 
-            const maxW = this.tabsEl.clientWidth - 30; // space for btn
+            const maxW = maxSize - 30; // space for btn
             for (let i = tabs.length - 1; i >= 0; i--) {
-                if (totalWidth <= maxW) break;
+                if (totalSize <= maxW) break;
                 if (i === this.activeChildIndex) continue;
 
                 tabs[i].style.display = 'none';
-                totalWidth -= (tabs[i].offsetWidth + 2);
+                totalSize -= ((isVertical ? tabs[i].offsetHeight : tabs[i].offsetWidth) + 2);
                 this.hiddenTabs.push(this.children[i]);
             }
             this.hiddenTabs.reverse();
@@ -950,6 +998,14 @@ const TulWEB = (function () {
             const kids = [...this.children];
             kids.forEach(child => child.destroy());
             this.layoutManager._cleanupEmptyStack(this)
+        }
+
+        toConfig() {
+            const res = super.toConfig();
+            if (this.tabPosition !== 'top') {
+                res.tabPosition = this.tabPosition;
+            }
+            return res;
         }
     }
 
