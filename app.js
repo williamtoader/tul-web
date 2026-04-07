@@ -386,10 +386,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 content: [
                     {
                         type: 'stack',
-                        size: 30,
-                        minWidth: 260,
+                        size: "300px",
+                        minWidth: "300px",
                         tabPosition: 'left',
-                        displayMinimizeButton: false,
                         displayMaximizeButton: false,
                         displayCloseButton: false,
                         preventEmptyClosure: true,
@@ -413,7 +412,6 @@ document.addEventListener("DOMContentLoaded", function () {
                                 type: 'stack',
                                 size: 30,
                                 tabPosition: 'bottom',
-                                displayMinimizeButton: false,
                                 preventEmptyClosure: true,
                                 content: [{ type: 'component', componentName: 'console', title: 'Terminal', closeable: false }]
                             }

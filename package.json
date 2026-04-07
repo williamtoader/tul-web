@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "npx -y http-server ./ -c-1",
-    "bundle-docs": "node bundle-docs.js"
+    "bundle-docs": "node bundle.js",
+    "bundle": "node bundle.js"
   },
   "keywords": [
     "windowing",

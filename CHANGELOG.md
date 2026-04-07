@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - New stack configuration options: `displayMinimizeButton`, `displayMaximizeButton`, `displayCloseButton` to control visibility of stack header buttons.
 - New component configuration option: `closeable` (boolean) to toggle the close button on individual tabs and its associated context menu options.
+- `size`, `minWidth`, and `minHeight` properties now support CSS units (e.g., `"300px"`, `"20%"`), in addition to numeric values.
+- Minimum size constraints are now automatically bypassed when a stack is minimized, preventing geometric conflicts during collapse.
 
 ## [2.0.0] - 2026-04-07
 ### Changed

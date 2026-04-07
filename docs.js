@@ -108,9 +108,9 @@ const docsTopics = {
                 <table class="api-table">
                     <thead><tr><th>Property</th><th>Description</th></tr></thead>
                     <tbody>
-                        <tr><td><code>size</code></td><td>Weight (percentage) relative to siblings.</td></tr>
-                        <tr><td><code>minWidth</code></td><td>Minimum width in pixels. Splitters will respect this during resize.</td></tr>
-                        <tr><td><code>minHeight</code></td><td>Minimum height in pixels. Splitters will respect this during resize.</td></tr>
+                        <tr><td><code>size</code></td><td>Flex weight (number) or CSS unit (e.g., <code>"300px"</code>, <code>"25%"</code>). Numbers distribute space proportionally among siblings, while CSS units fix the item size.</td></tr>
+                        <tr><td><code>minWidth</code></td><td>Minimum width. Supports numbers (pixels) or CSS units (e.g., <code>"300px"</code>, <code>"20%"</code>). Automatically bypassed when stack is minimized.</td></tr>
+                        <tr><td><code>minHeight</code></td><td>Minimum height. Supports numbers (pixels) or CSS units (e.g., <code>"300px"</code>, <code>"20%"</code>). Automatically bypassed when stack is minimized.</td></tr>
                         <tr><td><code>tabPosition</code></td><td>Override global tab orientation for a specific stack (<code>top</code>, <code>bottom</code>, <code>left</code>, <code>right</code>).</td></tr>
                         <tr><td><code>minimized</code></td><td>Boolean. If true, the stack starts in a collapsed state.</td></tr>
                         <tr><td><code>displayMinimizeButton</code></td><td>Boolean (default: <code>true</code>). Shows/hides the minimize button in the stack header.</td></tr>

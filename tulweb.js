@@ -26,6 +26,26 @@ class Utils {
             pointerY: clientY
         }
     }
+
+    static parseSize(size) {
+        if (typeof size === 'number') return { value: size, unit: 'weight' };
+        if (typeof size !== 'string') return { value: 0, unit: 'weight' };
+        const match = size.match(/^([\d.]+)([a-z%]*)$/);
+        if (!match) {
+            const val = parseFloat(size);
+            return isNaN(val) ? { value: 0, unit: 'weight' } : { value: val, unit: 'px' };
+        }
+        return { value: parseFloat(match[1]), unit: match[2] || 'px' };
+    }
+
+    static resolveToPixels(size, totalPixels) {
+        if (typeof size === 'number') return size; 
+        const parsed = Utils.parseSize(size);
+        if (parsed.unit === 'px') return parsed.value;
+        if (parsed.unit === '%') return (parsed.value / 100) * totalPixels;
+        if (parsed.unit === 'weight') return (parsed.value / 100) * totalPixels; // Optional but consistent
+        return parsed.value; 
+    }
 }
 
 // --- Drag & Drop Manager Singleton ---
@@ -467,18 +487,31 @@ class DragManagerClass {
             if (parent instanceof RowItem && isHoriz) {
                 // Split row
                 const index = parent.children.indexOf(target)
-                // Split size
-                const targetSize = target.size || 50
-                target.size = targetSize / 2
-                newStack.size = targetSize / 2
+                const targetSize = target.size ?? 50
+
+                if (typeof targetSize === 'number') {
+                    target.size = targetSize / 2
+                    newStack.size = targetSize / 2
+                } else {
+                    const parsed = Utils.parseSize(targetSize)
+                    target.size = (parsed.value / 2) + parsed.unit
+                    newStack.size = (parsed.value / 2) + parsed.unit
+                }
                 parent.addChild(newStack, isFirst ? index : index + 1)
             }
             else if (parent instanceof ColumnItem && !isHoriz) {
                 // Split column
                 const index = parent.children.indexOf(target)
-                const targetSize = target.size || 50
-                target.size = targetSize / 2
-                newStack.size = targetSize / 2
+                const targetSize = target.size ?? 50
+
+                if (typeof targetSize === 'number') {
+                    target.size = targetSize / 2
+                    newStack.size = targetSize / 2
+                } else {
+                    const parsed = Utils.parseSize(targetSize)
+                    target.size = (parsed.value / 2) + parsed.unit
+                    newStack.size = (parsed.value / 2) + parsed.unit
+                }
                 parent.addChild(newStack, isFirst ? index : index + 1)
             }
             else {
@@ -554,19 +587,18 @@ class Splitter {
 
     _onDblClick(e) {
         e.preventDefault()
-        const total = (this.prevItem.size || 50) + (this.nextItem.size || 50)
-        this.prevItem.size = total / 2
-        this.nextItem.size = total / 2
-        this.prevItem.updateFlex()
-        this.nextItem.updateFlex()
+        this.prevItem.size = 50
+        this.nextItem.size = 50
+        if (this.parentContainer.tulwebItem) {
+            this.parentContainer.tulwebItem.updateLayout()
+        } else {
+            this.prevItem.updateFlex()
+            this.nextItem.updateFlex()
+        }
     }
 
     _onMouseDown(e) {
-        if (e.type === 'touchstart') {
-            // Not calling preventDefault here to allow gestures, but we'll monitor moves
-        } else {
-            e.preventDefault()
-        }
+        if (e.type !== 'touchstart') e.preventDefault()
 
         const isTouch = e.touches && e.touches.length > 0
         const clientX = isTouch ? e.touches[0].clientX : e.clientX
@@ -577,11 +609,13 @@ class Splitter {
 
         // Calculate base metrics
         this.startPos = this.isVertical ? clientX : clientY
-        this.startPrevSize = this.prevItem.size || 50
-        this.startNextSize = this.nextItem.size || 50
-        this.totalSize = this.startPrevSize + this.startNextSize
+        this.startPrevSize = this.prevItem.size ?? 50
+        this.startNextSize = this.nextItem.size ?? 50
 
-        // Get pixels to percentage ratio
+        this.prevType = typeof this.startPrevSize === 'number' ? 'weight' : 'fixed'
+        this.nextType = typeof this.startNextSize === 'number' ? 'weight' : 'fixed'
+
+        // Get pixels to percentage ratio for weights
         const parentRect = this.parentContainer.getBoundingClientRect()
         this.pixelsPerPercent = (this.isVertical ? parentRect.width : parentRect.height) / 100
 
@@ -601,33 +635,65 @@ class Splitter {
 
         const currentPos = this.isVertical ? clientX : clientY
         const diffPx = currentPos - this.startPos
-        const diffPct = diffPx / this.pixelsPerPercent
 
-        let newPrevSize = this.startPrevSize + diffPct
-        let newNextSize = this.startNextSize - diffPct
+        const minPrevPx = this.isVertical ? (this.prevItem.getMinWidthPx() || 40) : (this.prevItem.getMinHeightPx() || 40)
+        const minNextPx = this.isVertical ? (this.nextItem.getMinWidthPx() || 40) : (this.nextItem.getMinHeightPx() || 40)
 
-        // Dynamic Constraints based on item config
-        const getMinPct = (item) => {
-            const minPx = this.isVertical ? (item.minWidth || 0) : (item.minHeight || 0)
-            if (minPx > 0) {
-                return minPx / this.pixelsPerPercent
+        if (this.prevType === 'weight' && this.nextType === 'weight') {
+            const diffPct = diffPx / this.pixelsPerPercent
+            let newPrev = this.startPrevSize + diffPct
+            let newNext = this.startNextSize - diffPct
+
+            const totalWeight = this.startPrevSize + this.startNextSize
+            const minPrevWeight = minPrevPx / this.pixelsPerPercent
+            const minNextWeight = minNextPx / this.pixelsPerPercent
+
+            if (newPrev < minPrevWeight) {
+                newPrev = minPrevWeight
+                newNext = totalWeight - minPrevWeight
+            } else if (newNext < minNextWeight) {
+                newNext = minNextWeight
+                newPrev = totalWeight - minNextWeight
             }
-            return 5 // Default fallback 5%
+
+            this.prevItem.size = newPrev
+            this.nextItem.size = newNext
+        } else {
+            // Mixed or Both Fixed
+            if (this.prevType === 'fixed') {
+                const parsed = Utils.parseSize(this.startPrevSize)
+                if (parsed.unit === 'px' || parsed.unit === '%') {
+                    let newVal = parsed.value + (parsed.unit === '%' ? diffPx / this.pixelsPerPercent : diffPx)
+                    const minVal = parsed.unit === '%' ? minPrevPx / this.pixelsPerPercent : minPrevPx
+                    if (newVal < minVal) newVal = minVal
+                    this.prevItem.size = newVal + parsed.unit
+                } else {
+                    // Fallback for other units: convert to px once dragged
+                    const currentPx = this.isVertical ? this.prevItem.element.offsetWidth : this.prevItem.element.offsetHeight
+                    let newVal = currentPx + diffPx
+                    if (newVal < minPrevPx) newVal = minPrevPx
+                    this.prevItem.size = newVal + 'px'
+                    this.startPrevSize = this.prevItem.size // Update base for next move
+                    this.startPos = currentPos
+                }
+            }
+            if (this.nextType === 'fixed') {
+                const parsed = Utils.parseSize(this.startNextSize)
+                if (parsed.unit === 'px' || parsed.unit === '%') {
+                    let newVal = parsed.value - (parsed.unit === '%' ? diffPx / this.pixelsPerPercent : diffPx)
+                    const minVal = parsed.unit === '%' ? minNextPx / this.pixelsPerPercent : minNextPx
+                    if (newVal < minVal) newVal = minVal
+                    this.nextItem.size = newVal + parsed.unit
+                } else {
+                    const currentPx = this.isVertical ? this.nextItem.element.offsetWidth : this.nextItem.element.offsetHeight
+                    let newVal = currentPx - diffPx
+                    if (newVal < minNextPx) newVal = minNextPx
+                    this.nextItem.size = newVal + 'px'
+                    this.startNextSize = this.nextItem.size
+                    this.startPos = currentPos
+                }
+            }
         }
-
-        const minPrev = getMinPct(this.prevItem)
-        const minNext = getMinPct(this.nextItem)
-
-        if (newPrevSize < minPrev) {
-            newPrevSize = minPrev
-            newNextSize = this.totalSize - minPrev
-        } else if (newNextSize < minNext) {
-            newNextSize = minNext
-            newPrevSize = this.totalSize - minNext
-        }
-
-        this.prevItem.size = newPrevSize
-        this.nextItem.size = newNextSize
 
         // Re-render
         this.prevItem.updateFlex()
@@ -685,8 +751,8 @@ class ContentItem extends EventEmitter {
         this.children = []
         this.element = null
         this.size = this.config.size || null
-        this.minWidth = this.config.minWidth || 0
-        this.minHeight = this.config.minHeight || 0
+        this.minWidth = this.config.minWidth ?? 0
+        this.minHeight = this.config.minHeight ?? 0
         this.id = Utils.generateId()
 
         this._isActive = false
@@ -737,13 +803,44 @@ class ContentItem extends EventEmitter {
 
     updateLayout() { /* Override */ }
 
+    getMinWidthPx() {
+        if (this.isMinimized) return 0;
+        const parentPx = this.parent ? this.parent.element.offsetWidth : (this.layoutManager ? this.layoutManager.rootElement.offsetWidth : window.innerWidth);
+        return Utils.resolveToPixels(this.minWidth, parentPx);
+    }
+
+    getMinHeightPx() {
+        if (this.isMinimized) return 0;
+        const parentPx = this.parent ? this.parent.element.offsetHeight : (this.layoutManager ? this.layoutManager.rootElement.offsetHeight : window.innerHeight);
+        return Utils.resolveToPixels(this.minHeight, parentPx);
+    }
+
     updateFlex() {
-        if (this.size && this.element) {
-            this.element.style.flex = `${this.size} 1 0%`
-        } else if (this.element) {
-            this.element.style.flex = '1 1 auto'
+        if (!this.element) return;
+        const size = this.size;
+
+        this.element.style.minWidth = this.isMinimized ? '' : (typeof this.minWidth === 'number' ? `${this.minWidth}px` : this.minWidth);
+        this.element.style.minHeight = this.isMinimized ? '' : (typeof this.minHeight === 'number' ? `${this.minHeight}px` : this.minHeight);
+        if (typeof size === 'number') {
+            this.element.style.flex = `${size} 1 0%`;
+            this.element.style.width = '';
+            this.element.style.height = '';
+        } else if (typeof size === 'string') {
+            this.element.style.flex = `0 0 ${size}`;
+            const isRow = this.parent && this.parent.config.type === 'row';
+            if (isRow) {
+                this.element.style.width = size;
+                this.element.style.height = '';
+            } else {
+                this.element.style.height = size;
+                this.element.style.width = '';
+            }
+        } else {
+            this.element.style.flex = '1 1 auto';
+            this.element.style.width = '';
+            this.element.style.height = '';
         }
-        this.emit('resize')
+        this.emit('resize');
     }
 
     destroy() {
@@ -772,7 +869,9 @@ class ContentItem extends EventEmitter {
     toConfig() {
         const res = {
             type: this.config.type,
-            size: this.size
+            size: this.size,
+            minWidth: this.minWidth,
+            minHeight: this.minHeight
         }
         if (this.children.length > 0) {
             res.content = this.children.map(c => c.toConfig())
@@ -1130,18 +1229,21 @@ class StackItem extends ContentItem {
     }
 
     updateFlex() {
+        super.updateFlex()
+
         if (this.isMinimized) {
             this.element.style.flex = '0 0 auto'
             const isVertical = this.tabPosition === 'left' || this.tabPosition === 'right'
             if (isVertical) {
                 this.element.style.width = 'calc(var(--tulweb-tab-height) + 2px)'
+                this.element.style.height = ''
             } else {
                 this.element.style.height = 'calc(var(--tulweb-tab-height) + 2px)'
+                this.element.style.width = ''
             }
         } else {
             this.element.style.width = ''
             this.element.style.height = ''
-            super.updateFlex()
         }
 
         const onlyActive = this.layoutManager.settings && this.layoutManager.settings.onlyResizeActiveTabs
@@ -1242,16 +1344,17 @@ class ContainerItem extends ContentItem {
     }
 
     updateLayout() {
-        // Ensure sizes sum to 100 roughly
+        // Ensure weights (numbers) sum to 100 roughly
         if (this.children.length > 0) {
-            let totalSize = this.children.reduce((sum, c) => sum + (c.size || 0), 0)
-            if (totalSize === 0) {
-                // Distribute equally
-                const p = 100 / this.children.length
-                this.children.forEach(c => c.size = p)
-            } else if (Math.abs(totalSize - 100) > 1) {
-                // Normalize
-                this.children.forEach(c => c.size = (c.size / totalSize) * 100)
+            const weightChildren = this.children.filter(c => typeof c.size === 'number');
+            if (weightChildren.length > 0) {
+                let totalWeight = weightChildren.reduce((sum, c) => sum + (c.size || 0), 0);
+                if (totalWeight === 0) {
+                    const p = 100 / weightChildren.length;
+                    weightChildren.forEach(c => c.size = p);
+                } else if (Math.abs(totalWeight - 100) > 1) {
+                    weightChildren.forEach(c => c.size = (c.size / totalWeight) * 100);
+                }
             }
         }
 

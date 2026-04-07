@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TulWEB - Pure JS Windowing Toolkit</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Core Toolkit CSS -->
+    <style>
+:root,
+body.theme-nordic {
+  /* Industrial Graphite */
+  --tulweb-bg-base: #0f1115;
+  --tulweb-bg-panel: rgba(22, 25, 30, 0.65);
+  --tulweb-bg-tab: rgba(18, 20, 24, 0.5);
+  --tulweb-bg-tab-active: rgba(30, 34, 40, 0.9);
+  --tulweb-bg-header: rgba(16, 18, 22, 0.7);
+  --tulweb-border: rgba(255, 255, 255, 0.08);
+  --tulweb-text-primary: #e6e8ec;
+  --tulweb-text-secondary: #9ca3af;
+  --tulweb-accent: #0cbaba;
+  /* Glowing Teal */
+  --tulweb-accent-hover: #15f0f0;
+  --tulweb-drop-zone: rgba(12, 186, 186, 0.2);
+  --tulweb-close-hover: rgba(244, 63, 94, 0.9);
+
+  --tulweb-bg-editor: rgba(12, 13, 16, 0.8);
+  --tulweb-text-editor: #e2e8f0;
+  --tulweb-bg-console: rgba(7, 8, 10, 0.8);
+  --tulweb-text-console: #94a3b8;
+
+  --tulweb-shadow-color: rgba(0, 0, 0, 0.4);
+  --tulweb-shadow-glow: rgba(12, 186, 186, 0.3);
+
+  /* Spacing & Sizes */
+  --tulweb-tab-height: 40px;
+  --tulweb-splitter-size: 6px;
+  --tulweb-radius-panel: 12px;
+  --tulweb-radius-inner: 8px;
+
+  /* Typography & Effects */
+  --tulweb-font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --tulweb-blur: 24px;
+}
+
+body.theme-cyber {
+  /* Phosphor Terminal */
+  --tulweb-bg-base: #020202;
+  --tulweb-bg-panel: rgba(8, 8, 8, 0.85);
+  --tulweb-bg-tab: rgba(4, 4, 4, 0.9);
+  --tulweb-bg-tab-active: rgba(20, 20, 20, 1);
+  --tulweb-bg-header: rgba(5, 5, 5, 0.9);
+  --tulweb-border: rgba(245, 158, 11, 0.3);
+  --tulweb-text-primary: #fcd34d;
+  --tulweb-text-secondary: #d97706;
+  --tulweb-accent: #f59e0b;
+  /* Amber Glow */
+  --tulweb-accent-hover: #fbbf24;
+  --tulweb-drop-zone: rgba(245, 158, 11, 0.25);
+  --tulweb-close-hover: rgba(239, 68, 68, 0.9);
+
+  --tulweb-bg-editor: rgba(0, 0, 0, 0.9);
+  --tulweb-text-editor: #facc15;
+  --tulweb-bg-console: rgba(0, 0, 0, 0.9);
+  --tulweb-text-console: #fbbf24;
+
+  --tulweb-shadow-color: rgba(245, 158, 11, 0.1);
+  --tulweb-shadow-glow: rgba(245, 158, 11, 0.4);
+
+  --tulweb-tab-height: 36px;
+  --tulweb-splitter-size: 4px;
+  --tulweb-radius-panel: 0px;
+  --tulweb-radius-inner: 0px;
+
+  --tulweb-font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --tulweb-blur: 10px;
+}
+
+body.theme-light {
+  /* Pro Light Workstation */
+  --tulweb-bg-base: #f1f5f9;
+  --tulweb-bg-panel: rgba(255, 255, 255, 0.75);
+  --tulweb-bg-tab: rgba(248, 250, 252, 0.5);
+  --tulweb-bg-tab-active: rgba(255, 255, 255, 1);
+  --tulweb-bg-header: rgba(255, 255, 255, 0.8);
+  --tulweb-border: rgba(15, 23, 42, 0.06);
+  --tulweb-text-primary: #0f172a;
+  --tulweb-text-secondary: #475569;
+  --tulweb-accent: #2563eb;
+  /* Apple Blue */
+  --tulweb-accent-hover: #1d4ed8;
+  --tulweb-drop-zone: rgba(37, 99, 235, 0.15);
+  --tulweb-close-hover: #ef4444;
+
+  --tulweb-bg-editor: rgba(255, 255, 255, 0.9);
+  --tulweb-text-editor: #334155;
+  --tulweb-bg-console: rgba(30, 41, 59, 0.95);
+  --tulweb-text-console: #e2e8f0;
+
+  --tulweb-shadow-color: rgba(15, 23, 42, 0.05);
+  --tulweb-shadow-glow: rgba(37, 99, 235, 0.2);
+
+  --tulweb-tab-height: 44px;
+  --tulweb-splitter-size: 8px;
+  --tulweb-radius-panel: 14px;
+  --tulweb-radius-inner: 10px;
+
+  --tulweb-font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  --tulweb-blur: 32px;
+}
+
+body.theme-retro {
+  /* 90's Workstation / CDE Inspired */
+  --tulweb-bg-base: #a0a0a0;
+  --tulweb-bg-panel: #c0c0c0;
+  --tulweb-bg-tab: #b0b0b0;
+  --tulweb-bg-tab-active: #d0d0d0;
+  --tulweb-bg-header: #808080;
+  --tulweb-border: #404040;
+  --tulweb-text-primary: #000000;
+  --tulweb-text-secondary: #333333;
+  --tulweb-accent: #000080;
+  /* Classic Win95/CDE Navy Blue */
+  --tulweb-accent-hover: #0000ff;
+  --tulweb-drop-zone: rgba(0, 0, 128, 0.2);
+  --tulweb-close-hover: #ff0000;
+
+  --tulweb-bg-editor: #ffffff;
+  --tulweb-text-editor: #000000;
+  --tulweb-bg-console: #000000;
+  --tulweb-text-console: #00ff00;
+
+  --tulweb-shadow-color: rgba(0, 0, 0, 0.5);
+  --tulweb-shadow-glow: transparent;
+
+  --tulweb-tab-height: 32px;
+  --tulweb-splitter-size: 8px;
+  --tulweb-radius-panel: 0px;
+  --tulweb-radius-inner: 0px;
+
+  --tulweb-font-family: 'Courier New', Courier, monospace;
+  --tulweb-blur: 0px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--tulweb-font-family);
+  background: var(--tulweb-bg-base);
+  color: var(--tulweb-text-primary);
+  overflow: hidden;
+  /* Premium radial + linear blend */
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+  background-position: 0 0, -1px -1px, -1px -1px;
+}
+
+body.theme-cyber {
+  background-image:
+    linear-gradient(rgba(245, 158, 11, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 158, 11, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+body.theme-light {
+  background-image:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.8), transparent 40%),
+    radial-gradient(circle at bottom right, rgba(226, 232, 240, 0.8), transparent 40%);
+}
+
+body.theme-retro {
+  background-image:
+    linear-gradient(45deg, #a0a0a0 25%, transparent 25%),
+    linear-gradient(-45deg, #a0a0a0 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #a0a0a0 75%),
+    linear-gradient(-45deg, transparent 75%, #a0a0a0 75%);
+  background-size: 4px 4px;
+  background-color: #909090;
+}
+
+/* Base Layout Element */
+.tulweb-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Rows and Columns */
+.tulweb-row,
+.tulweb-column {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.tulweb-row {
+  flex-direction: row;
+}
+
+.tulweb-column {
+  flex-direction: column;
+}
+
+/* Splitters */
+.tulweb-splitter {
+  background-color: transparent;
+  transition: background-color 0.2s;
+  z-index: 10;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tulweb-row>.tulweb-splitter {
+  width: var(--tulweb-splitter-size);
+  height: 100%;
+  cursor: col-resize;
+}
+
+.tulweb-column>.tulweb-splitter {
+  height: var(--tulweb-splitter-size);
+  width: 100%;
+  cursor: row-resize;
+}
+
+.tulweb-splitter::after {
+  content: '';
+  background-color: var(--tulweb-text-secondary);
+  opacity: 0.3;
+  border-radius: 1px;
+  transition: opacity 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.tulweb-row>.tulweb-splitter::after {
+  width: 2px;
+  height: 24px;
+}
+
+.tulweb-column>.tulweb-splitter::after {
+  height: 2px;
+  width: 24px;
+}
+
+.tulweb-splitter:hover,
+.tulweb-splitter.active {
+  background-color: var(--tulweb-drop-zone);
+  /* very subtle backglow */
+}
+
+.tulweb-splitter:hover::after,
+.tulweb-splitter.active::after {
+  opacity: 1;
+  background-color: var(--tulweb-accent);
+  box-shadow: 0 0 8px var(--tulweb-accent);
+  /* glow */
+}
+
+/* Stack (Tabbed Container) */
+.tulweb-stack {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--tulweb-bg-panel);
+  border: 1px solid var(--tulweb-border);
+  border-radius: var(--tulweb-radius-panel);
+  overflow: hidden;
+  position: relative;
+  backdrop-filter: blur(var(--tulweb-blur));
+  -webkit-backdrop-filter: blur(var(--tulweb-blur));
+  box-shadow: 0 8px 32px var(--tulweb-shadow-color);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1);
+}
+
+/* Active panel styling */
+.tulweb-stack.maximized {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  z-index: 1000 !important;
+  margin: 0 !important;
+}
+
+.active-stack {
+  border-color: var(--tulweb-accent);
+  box-shadow: 0 0 0 1px var(--tulweb-accent) inset,
+    0 16px 48px var(--tulweb-shadow-color),
+    0 0 16px var(--tulweb-shadow-glow);
+}
+
+.tulweb-stack.maximized.active-stack {
+  box-shadow: none;
+  border-color: var(--tulweb-border);
+}
+
+.tulweb-stack.maximized {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 100;
+}
+
+/* Header / Tab Bar */
+.tulweb-header {
+  display: flex;
+  height: var(--tulweb-tab-height);
+  background: var(--tulweb-bg-header);
+  border-bottom: 1px solid var(--tulweb-border);
+  user-select: none;
+  min-width: 0;
+}
+
+.tulweb-tabs {
+  display: flex;
+  flex-grow: 1;
+  overflow: hidden;
+  padding-top: 4px;
+  padding-left: 8px;
+  min-width: 0;
+  /* visually separate tabs from top edge */
+}
+
+.tab-bottom .tulweb-tabs {
+  display: flex;
+  flex-grow: 1;
+  overflow: hidden;
+  padding-bottom: 3px;
+  padding-top: 0px;
+  padding-left: 8px;
+  min-width: 0;
+  height: var(--tulweb-tab-height);
+  /* visually separate tabs from top edge */
+}
+
+.tab-bottom .tulweb-tab {
+  margin-top: -1px;
+}
+
+.tulweb-tab {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  background-color: var(--tulweb-bg-tab);
+  border-top-left-radius: var(--tulweb-radius-inner);
+  border-top-right-radius: var(--tulweb-radius-inner);
+  margin-right: 2px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  color: var(--tulweb-text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.tulweb-tab:hover {
+  background-color: var(--tulweb-bg-tab-active);
+  color: var(--tulweb-text-primary);
+}
+
+.tulweb-tab.active {
+  background-color: var(--tulweb-bg-tab-active);
+  color: var(--tulweb-text-primary);
+  border-color: var(--tulweb-border);
+  box-shadow: inset 0 2px 0 var(--tulweb-accent);
+}
+
+body.theme-cyber .tulweb-tab.active {
+  color: var(--tulweb-accent);
+  text-shadow: 0 0 8px var(--tulweb-accent);
+  box-shadow: inset 0 2px 0 var(--tulweb-accent), inset 0 6px 12px var(--tulweb-shadow-glow);
+}
+
+body.theme-retro .tab-left .tulweb-tabs {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+body.theme-retro .tab-right .tulweb-tabs {
+  padding-right: 0px;
+  padding-left: 0px;
+}
+
+
+body.theme-retro .tab-left .tulweb-tab {
+  margin-right: 0px;
+  margin-left: 7px;
+}
+
+body.theme-retro .tab-right .tulweb-tab {
+  margin-left: -7px;
+  margin-right: 0px;
+}
+
+body.theme-retro .tab-bottom .tulweb-tab.active {
+  margin-top: -2px;
+}
+
+body.theme-retro .tab-bottom .tulweb-tabs {
+  padding-bottom: 8px;
+}
+
+body.theme-retro .tulweb-tab.active {
+  background-color: var(--tulweb-bg-tab-active);
+  color: var(--tulweb-text-primary);
+  border: 1px solid var(--tulweb-border);
+  box-shadow: inset 2px -2px 0 #ffffff, inset -1px 0 0 #404040;
+}
+
+
+body.theme-retro .tab-left .tulweb-tab.active {
+  background-color: var(--tulweb-bg-tab-active);
+  color: var(--tulweb-text-primary);
+  border: 1px solid var(--tulweb-border);
+  margin-right: 0;
+  margin-left: 3px;
+  box-shadow: inset 2px -2px 0 #ffffff, inset -1px 0 0 #404040;
+}
+
+body.theme-retro .tab-right .tulweb-tab.active {
+  background-color: var(--tulweb-bg-tab-active);
+  color: var(--tulweb-text-primary);
+  border: 1px solid var(--tulweb-border);
+  margin-left: -3px;
+  margin-right: 0;
+  box-shadow: inset -2px -2px 0 #ffffff, inset -1px 0 0 #404040;
+}
+
+body.theme-retro .tulweb-stack {
+  border: 2px solid #ffffff;
+  border-right-color: #404040;
+  border-bottom-color: #404040;
+  box-shadow: 2px 2px 0 #000000;
+}
+
+
+body.theme-retro .active-stack .tulweb-header {
+  background: var(--tulweb-bg-tab);
+  color: #ffffff;
+  font-weight: bold;
+}
+
+body.theme-retro .active-stack .tulweb-header {
+  background: var(--tulweb-accent);
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.tulweb-header {
+  border-radius: var(--tulweb-radius-panel) var(--tulweb-radius-panel) 0 0;
+}
+
+.tulweb-stack.minimized .tulweb-header {
+  border-radius: var(--tulweb-radius-panel);
+}
+
+/* tulweb-stack:not(.minimized) .tulweb-stack {
+  border-radius: var(--tulweb-radius-panel) var(--tulweb-radius-panel) 0 0;
+} */
+
+.tulweb-stack.tab-left:not(.minimized) .tulweb-header {
+  border-radius: var(--tulweb-radius-panel) 0 0 var(--tulweb-radius-panel);
+}
+
+.tulweb-stack.tab-right:not(.minimized) .tulweb-header {
+  border-radius: 0 var(--tulweb-radius-panel) var(--tulweb-radius-panel) 0;
+}
+
+.tulweb-stack.tab-left:not(.minimized) .tulweb-stack {
+  border-radius: var(--tulweb-radius-panel) 0 0 var(--tulweb-radius-panel);
+}
+
+.tulweb-stack.tab-right:not(.minimized) .tulweb-stack {
+  border-radius: 0 var(--tulweb-radius-panel) var(--tulweb-radius-panel) 0;
+}
+
+.tulweb-stack.tab-bottom:not(.minimized) .tulweb-header {
+  border-radius: 0 0 var(--tulweb-radius-panel) var(--tulweb-radius-panel);
+}
+
+.tulweb-stack.tab-bottom:not(.minimized) .tulweb-stack {
+  border-radius: 0 0 var(--tulweb-radius-panel) var(--tulweb-radius-panel);
+}
+
+body.theme-retro .tulweb-tab {
+  border: 1px solid #ffffff;
+  border-right-color: #404040;
+  border-bottom: none;
+  margin-top: 0px;
+  background: #c0c0c0;
+  color: #000000;
+}
+
+body.theme-retro .tulweb-tab.active {
+  background: #d0d0d0;
+  margin-top: 0;
+  height: calc(var(--tulweb-tab-height) + 2px);
+  width: auto;
+}
+
+body.theme-retro .tab-left .tulweb-tab {
+  width: calc(var(--tulweb-tab-height));
+  height: auto;
+}
+
+body.theme-retro .tab-right .tulweb-tab {
+  width: calc(var(--tulweb-tab-height));
+  height: auto;
+}
+
+body.theme-retro .tab-left .tulweb-tab.active {
+  width: calc(var(--tulweb-tab-height));
+  height: auto;
+}
+
+body.theme-retro .tab-right .tulweb-tab.active {
+  width: calc(var(--tulweb-tab-height));
+  height: auto;
+}
+
+.tulweb-tab-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 12px;
+  font-weight: 500;
+}
+
+.tulweb-tab-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0.5;
+  transition: opacity 0.2s, background-color 0.2s, color 0.2s;
+}
+
+.tulweb-tab-close:hover {
+  opacity: 1;
+  background-color: var(--tulweb-close-hover);
+  color: white;
+}
+
+/* Header Controls (Maximize, Close Stack) */
+.tulweb-header-controls {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  gap: 4px;
+  border-left: 1px solid var(--tulweb-border);
+}
+
+.tulweb-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.2s;
+}
+
+.tulweb-control:hover {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.tulweb-control svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+/* Content Area */
+.tulweb-content-area {
+  flex-grow: 1;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--tulweb-bg-panel);
+}
+
+.tulweb-component {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  overflow: auto;
+}
+
+/* Custom Scrollbars */
+.tulweb-component::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.tulweb-component::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tulweb-component::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 128, 0.3);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.tulweb-component::-webkit-scrollbar-thumb:hover {
+  background: rgba(128, 128, 128, 0.6);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Dragging / Proxies */
+.tulweb-drag-proxy {
+  position: absolute;
+  z-index: 1000;
+  pointer-events: none;
+  background-color: var(--tulweb-bg-panel);
+  border: 1px solid var(--tulweb-accent);
+  padding: 8px 16px;
+  border-radius: var(--tulweb-radius-inner);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.9;
+  color: var(--tulweb-accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tulweb-drag-proxy::before {
+  content: "≡";
+  font-size: 16px;
+}
+
+/* Drop Indicators */
+.tulweb-drop-indicator {
+  position: absolute;
+  z-index: 999;
+  background-color: var(--tulweb-drop-zone);
+  border: 2px solid var(--tulweb-accent);
+  border-radius: var(--tulweb-radius-inner);
+  pointer-events: none;
+  transition: all 0.15s ease-out;
+  opacity: 0;
+}
+
+.tulweb-drop-indicator.visible {
+  opacity: 1;
+}
+
+/* Tab Drop Indicator */
+.tulweb-tab-drop-indicator {
+  position: absolute;
+  z-index: 1000;
+  background-color: var(--tulweb-accent);
+  pointer-events: none;
+  transition: opacity 0.15s ease-out, left 0.1s ease-out, top 0.1s ease-out, width 0.1s ease-out, height 0.1s ease-out;
+  opacity: 0;
+  box-shadow: 0 0 8px var(--tulweb-accent);
+}
+
+.tulweb-tab-drop-indicator.visible {
+  opacity: 1;
+}
+
+/* Drag Sources */
+.tulweb-drag-source {
+  cursor: grab;
+  user-select: none;
+}
+
+.tulweb-drag-source:active {
+  cursor: grabbing;
+}
+
+/* Empty State */
+.tulweb-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--tulweb-text-secondary);
+  font-size: 15px;
+  text-align: center;
+}
+
+.tulweb-empty-state svg {
+  width: 48px;
+  height: 48px;
+  opacity: 0.3;
+  margin-bottom: 16px;
+}
+
+/* Toast Notifications */
+.tulweb-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.tulweb-toast {
+  background: var(--tulweb-bg-panel);
+  border-left: 4px solid var(--tulweb-accent);
+  color: var(--tulweb-text-primary);
+  padding: 14px 20px;
+  border-radius: var(--tulweb-radius-inner);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  font-size: 14px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  pointer-events: auto;
+  animation: tulweb-toast-slide-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  transition: opacity 0.3s, transform 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tulweb-toast.error {
+  border-left-color: var(--tulweb-close-hover);
+}
+
+.tulweb-toast.hiding {
+  opacity: 0;
+  transform: translateX(120%);
+}
+
+@keyframes tulweb-toast-slide-in {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Context Menu */
+.tulweb-context-menu {
+  position: fixed;
+  background: var(--tulweb-bg-panel);
+  border: 1px solid var(--tulweb-border);
+  border-radius: var(--tulweb-radius-inner);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  padding: 4px;
+  z-index: 10000;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  min-width: 150px;
+}
+
+.tulweb-context-item {
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--tulweb-text-primary);
+  border-radius: 4px;
+  transition: all 0.1s;
+}
+
+.tulweb-context-item:hover {
+  background: var(--tulweb-accent);
+  color: #000;
+  font-weight: 600;
+}
+
+/* Dropdown / Overflow */
+.tulweb-tab-overflow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: 0 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.tulweb-tab-overflow:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--tulweb-accent);
+}
+
+.tulweb-dropdown {
+  position: absolute;
+  top: 40px;
+  right: 10px;
+  background: var(--tulweb-bg-panel);
+  border: 1px solid var(--tulweb-border);
+  border-radius: var(--tulweb-radius-inner);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  padding: 4px;
+  z-index: 1000;
+  min-width: 150px;
+}
+
+.tulweb-dropdown-item {
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.1s;
+}
+
+.tulweb-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--tulweb-accent);
+}
+
+/* Theme Selector Radio List */
+.theme-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.theme-label {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--tulweb-bg-tab);
+  border: 1px solid var(--tulweb-border);
+  border-radius: var(--tulweb-radius-inner);
+  color: var(--tulweb-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.theme-label:hover {
+  background: var(--tulweb-bg-tab-active);
+  color: var(--tulweb-text-primary);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.theme-radio {
+  display: none;
+}
+
+.theme-label:has(.theme-radio:checked) {
+  background: var(--tulweb-bg-tab-active);
+  color: var(--tulweb-text-primary);
+  border-color: var(--tulweb-accent);
+  box-shadow: 0 4px 12px var(--tulweb-shadow-color), inset 0 0 0 1px var(--tulweb-accent);
+}
+
+.theme-name {
+  display: flex;
+  align-items: center;
+}
+
+.theme-name::before {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid var(--tulweb-text-secondary);
+  margin-right: 12px;
+  transition: all 0.2s;
+}
+
+.theme-label:has(.theme-radio:checked) .theme-name::before {
+  border-color: var(--tulweb-accent);
+  background: var(--tulweb-accent);
+  box-shadow: 0 0 8px var(--tulweb-accent);
+}
+
+/* --- Tab Positioning --- */
+
+.tulweb-stack.tab-bottom {
+  flex-direction: column-reverse;
+}
+
+.tulweb-stack.tab-left {
+  flex-direction: row;
+}
+
+.tulweb-stack.tab-right {
+  flex-direction: row-reverse;
+}
+
+/* Vertical Headers */
+.tulweb-stack.tab-left .tulweb-header,
+.tulweb-stack.tab-right .tulweb-header {
+  flex-direction: column;
+  height: 100%;
+  width: var(--tulweb-tab-height);
+  min-width: var(--tulweb-tab-height);
+  border-bottom: none;
+}
+
+.tulweb-stack.tab-left .tulweb-header {
+  border-right: 1px solid var(--tulweb-border);
+}
+
+.tulweb-stack.tab-right .tulweb-header {
+  border-left: 1px solid var(--tulweb-border);
+}
+
+/* Vertical Tabs container */
+.tulweb-stack.tab-left .tulweb-tabs,
+.tulweb-stack.tab-right .tulweb-tabs {
+  flex-direction: column;
+  padding-top: 8px;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+/* Individual tab for vertical */
+.tulweb-stack.tab-left .tulweb-tab,
+.tulweb-stack.tab-right .tulweb-tab {
+  margin-right: 0;
+  margin-bottom: 2px;
+  height: auto;
+  min-height: var(--tulweb-tab-height);
+  width: 100%;
+  border-radius: var(--tulweb-radius-inner);
+  padding: 16px 0;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.tulweb-stack.tab-left .tulweb-tab-title,
+.tulweb-stack.tab-right .tulweb-tab-title {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  margin-right: 0;
+  margin-bottom: 8px;
+}
+
+.tulweb-stack.tab-left .tulweb-tab-close,
+.tulweb-stack.tab-right .tulweb-tab-close {
+  margin: 0;
+}
+
+.tulweb-stack.tab-left .tulweb-tab.active {
+  box-shadow: inset 3px 0 0 var(--tulweb-accent);
+}
+
+.tulweb-stack.tab-right .tulweb-tab.active {
+  box-shadow: inset -3px 0 0 var(--tulweb-accent);
+}
+
+/* Tab bottom header/tab overrides */
+.tulweb-stack.tab-bottom .tulweb-header {
+  border-bottom: none;
+  border-top: 1px solid var(--tulweb-border);
+  height: calc(var(--tulweb-tab-height) + 7px);
+}
+
+.tulweb-stack.tab-bottom .tulweb-tab {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: var(--tulweb-radius-inner);
+  border-bottom-right-radius: var(--tulweb-radius-inner);
+  border-top: none;
+  border-bottom: 1px solid transparent;
+}
+
+.tulweb-stack.tab-bottom .tulweb-tab.active {
+  box-shadow: inset 0 -3px 0 var(--tulweb-accent);
+  border-bottom: 1px solid var(--tulweb-border);
+}
+
+/* Vertical Header Controls */
+.tulweb-stack.tab-left .tulweb-header-controls,
+.tulweb-stack.tab-right .tulweb-header-controls {
+  flex-direction: row;
+  justify-content: center;
+  padding: 8px 0;
+  border-left: none;
+  border-top: 1px solid var(--tulweb-border);
+  flex-wrap: wrap;
+}
+
+/* --- Minimize & Preview --- */
+
+.tulweb-stack.minimized {
+  flex: 0 0 auto !important;
+  transition: flex 0.2s ease, width 0.2s ease, height 0.2s ease;
+  overflow: visible;
+  /* Needed for preview popout */
+}
+
+.tulweb-stack.minimized .tulweb-content-area {
+  display: none;
+}
+
+/* Hover Preview State */
+.tulweb-stack.minimized.previewing {
+  z-index: 5000;
+}
+
+.tulweb-stack.minimized.previewing .tulweb-content-area {
+  display: block !important;
+  position: absolute !important;
+  z-index: 5001;
+  width: min(90vw, 450px);
+  height: min(70vh, 350px);
+  background: var(--tulweb-bg-panel);
+  border: 2px solid var(--tulweb-accent);
+  border-radius: var(--tulweb-radius-panel);
+  box-shadow: 0 24px 64px var(--tulweb-shadow-color),
+    0 0 20px var(--tulweb-shadow-glow),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(var(--tulweb-blur));
+  -webkit-backdrop-filter: blur(var(--tulweb-blur));
+  pointer-events: auto;
+  animation: tulweb-preview-fade-in 0.2s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+  overflow: hidden;
+}
+
+@keyframes tulweb-preview-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Positioning overrides for preview */
+
+/* Default (Top) */
+.tulweb-stack.minimized.previewing .tulweb-content-area {
+  top: calc(var(--tulweb-tab-height) + 2px);
+  left: 0;
+}
+
+.tulweb-stack.minimized.previewing.tab-bottom .tulweb-content-area {
+  bottom: calc(var(--tulweb-tab-height) + 7px);
+  top: auto;
+}
+
+.tulweb-stack.minimized.previewing.tab-left .tulweb-content-area {
+  left: calc(var(--tulweb-tab-height) + 2px);
+  top: 0;
+}
+
+.tulweb-stack.minimized.previewing.tab-right .tulweb-content-area {
+  right: calc(var(--tulweb-tab-height) + 2px);
+  left: auto;
+  top: 0;
+}
+
+.tulweb-stack.minimized.previewing .tulweb-component {
+  /* Make components inside preview looks slightly different? */
+  background: transparent;
+}
+
+/* --- Mobile / Touch Device Optimizations --- */
+@media (max-width: 768px) {
+  :root {
+    --tulweb-tab-height: 48px; /* Larger hit targets for thumbs */
+    --tulweb-splitter-size: 12px; /* Easier to grab splitters */
+  }
+
+  .tulweb-splitter::after {
+    opacity: 0.6; /* More visible by default on mobile */
+  }
+
+  /* Ensure the drag proxy is large enough on mobile */
+  .tulweb-drag-proxy {
+    padding: 12px 24px !important;
+    font-size: 15px !important;
+  }
+  
+  .tulweb-tab-title {
+    font-size: 14px;
+  }
+}
+
+/* Specific fix for draggable items to be more touch friendly */
+.sidebar-item {
+  min-height: 44px;
+  touch-action: none; /* Prevent scrolling when starting a drag */
+}
+
+.tulweb-tab {
+  touch-action: none;
+}
+
+.tulweb-splitter {
+  touch-action: none;
+}
+
+.tulweb-header {
+  touch-action: none;
+}
+
+
+</style>
+
+    <!-- App Specific Demo CSS -->
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar demo styling */
+        .app-sidebar {
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
+        }
+
+        .app-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .app-sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .app-sidebar::-webkit-scrollbar-thumb {
+            background: var(--tulweb-border);
+            border-radius: 4px;
+        }
+
+        .app-sidebar h1 {
+            font-size: 20px;
+            color: var(--tulweb-accent);
+            margin: 0 0 5px 0;
+            font-weight: 500;
+            letter-spacing: -0.5px;
+        }
+
+        .app-sidebar h2 {
+            font-size: 11px;
+            color: var(--tulweb-text-secondary);
+            margin: 0 0 12px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .sidebar-item {
+            background: var(--tulweb-bg-tab);
+            border: 1px solid var(--tulweb-border);
+            padding: 12px 14px;
+            border-radius: var(--tulweb-radius-inner);
+            color: var(--tulweb-text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: grab;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 2px 8px var(--tulweb-shadow-color);
+        }
+
+        .sidebar-item:hover {
+            background: var(--tulweb-bg-tab-active);
+            border-color: var(--tulweb-accent);
+            color: var(--tulweb-text-primary);
+            transform: translateX(4px) translateY(-2px);
+            box-shadow: 0 8px 16px var(--tulweb-shadow-color);
+        }
+
+        .actions {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn {
+            background: var(--tulweb-accent);
+            color: var(--tulweb-bg-base);
+            font-weight: 600;
+            border: none;
+            padding: 12px;
+            border-radius: var(--tulweb-radius-inner);
+            cursor: pointer;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 12px var(--tulweb-shadow-glow);
+        }
+
+        .btn:hover {
+            background: var(--tulweb-accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--tulweb-shadow-glow);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--tulweb-border);
+            color: var(--tulweb-text-primary);
+            font-weight: 500;
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background: var(--tulweb-bg-tab-active);
+            border-color: var(--tulweb-border);
+            color: var(--tulweb-text-primary);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--tulweb-shadow-color);
+        }
+
+        .btn-small {
+            padding: 8px;
+            font-size: 12px;
+            flex-grow: 1;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Container for Layout Manager */
+        #layout-container {
+            flex-grow: 1;
+            position: relative;
+            padding: 12px;
+            background: transparent;
+            min-width: 0;
+            min-height: 0;
+        }
+    </style>
+</head>
+
+<!-- Main Workspace Area -->
+<div id="layout-container" style="width: 100vw; height: 100vh;"></div>
+
+<script>
+(()=>{var m=class f{static createElement(e,t,i){let s=document.createElement(e);return t&&(s.className=t),i&&i.appendChild(s),s}static generateId(){return Math.random().toString(36).substr(2,9)}static getRelativePos(e,t){let i=e.touches&&e.touches.length>0,s=i?e.touches[0].clientX:e.clientX,c=i?e.touches[0].clientY:e.clientY,l=t.getBoundingClientRect();return{x:s-l.left,y:c-l.top,w:l.width,h:l.height,pointerX:s,pointerY:c}}static parseSize(e){if(typeof e=="number")return{value:e,unit:"weight"};if(typeof e!="string")return{value:0,unit:"weight"};let t=e.match(/^([\d.]+)([a-z%]*)$/);if(!t){let i=parseFloat(e);return isNaN(i)?{value:0,unit:"weight"}:{value:i,unit:"px"}}return{value:parseFloat(t[1]),unit:t[2]||"px"}}static resolveToPixels(e,t){if(typeof e=="number")return e;let i=f.parseSize(e);return i.unit==="px"?i.value:i.unit==="%"||i.unit==="weight"?i.value/100*t:i.value}},T=class{constructor(){this.isDragging=!1,this.dragItem=null,this.proxy=null,this.indicator=null,this.layoutManager=null,this.sourceType=null,this.sourceStack=null,this.isPendingDrag=!1,this.pendingStartPos=null,this.pendingArgs=null,this.currentDropZone=null}init(e){this.layoutManager=e,this.handleMouseMove=this.handleMouseMove.bind(this),this.handleMouseUp=this.handleMouseUp.bind(this),this.handlePendingMove=this.handlePendingMove.bind(this),this.handlePendingUp=this.handlePendingUp.bind(this),this.handleTouchMove=t=>{this.handleMouseMove(t),this.isDragging&&t.preventDefault()},this.handleTouchEnd=t=>this.handleMouseUp(t),this.handlePendingTouchMove=t=>this.handlePendingMove(t),this.handlePendingTouchEnd=t=>this.handlePendingUp(t),this.indicator=m.createElement("div","tulweb-drop-indicator",document.body),this.indicator.style.display="none",this.tabIndicator=m.createElement("div","tulweb-tab-drop-indicator",document.body),this.tabIndicator.style.display="none"}pendDrag(e,t,i,s,c){this.isPendingDrag=!0;let l=e.touches&&e.touches.length>0,r=l?e.touches[0].clientX:e.clientX,a=l?e.touches[0].clientY:e.clientY;this.pendingStartPos={x:r,y:a},this.pendingArgs={itemConfig:t,type:i,sourceStack:s,title:c},l?(document.addEventListener("touchmove",this.handlePendingTouchMove,{passive:!1}),document.addEventListener("touchend",this.handlePendingTouchEnd)):(document.addEventListener("mousemove",this.handlePendingMove),document.addEventListener("mouseup",this.handlePendingUp))}handlePendingMove(e){if(!this.isPendingDrag)return;let t=e.touches&&e.touches.length>0,i=t?e.touches[0].clientX:e.clientX,s=t?e.touches[0].clientY:e.clientY,c=i-this.pendingStartPos.x,l=s-this.pendingStartPos.y;if(Math.abs(c)>8||Math.abs(l)>8){this.isPendingDrag=!1,document.removeEventListener("mousemove",this.handlePendingMove),document.removeEventListener("mouseup",this.handlePendingUp),document.removeEventListener("touchmove",this.handlePendingTouchMove),document.removeEventListener("touchend",this.handlePendingTouchEnd);let r=this.pendingArgs;this.startDrag(e,r.itemConfig,r.type,r.sourceStack,r.title)}}handlePendingUp(e){this.isPendingDrag=!1,document.removeEventListener("mousemove",this.handlePendingMove),document.removeEventListener("mouseup",this.handlePendingUp),document.removeEventListener("touchmove",this.handlePendingTouchMove),document.removeEventListener("touchend",this.handlePendingTouchEnd)}startDrag(e,t,i,s,c){this.isDragging=!0,this.dragItem=t,this.sourceType=i,this.sourceStack=s,this.proxy=m.createElement("div","tulweb-drag-proxy",document.body),this.proxy.textContent=c||t.title||"Component",this.updateProxyPos(e),e.touches?(document.addEventListener("touchmove",this.handleTouchMove,{passive:!1}),document.addEventListener("touchend",this.handleTouchEnd)):(document.addEventListener("mousemove",this.handleMouseMove),document.addEventListener("mouseup",this.handleMouseUp))}updateProxyPos(e){if(this.proxy){let t=e.touches&&e.touches.length>0,i=t?e.touches[0].clientX:e.clientX,s=t?e.touches[0].clientY:e.clientY;this.proxy.style.left=i+10+"px",this.proxy.style.top=s+10+"px"}}handleMouseMove(e){this.isDragging&&(e.preventDefault(),this.updateProxyPos(e),this.findDropZone(e))}handleMouseUp(e){this.isDragging&&(this.isDragging=!1,document.removeEventListener("mousemove",this.handleMouseMove),document.removeEventListener("mouseup",this.handleMouseUp),document.removeEventListener("touchmove",this.handleTouchMove),document.removeEventListener("touchend",this.handleTouchEnd),this.proxy&&(document.body.removeChild(this.proxy),this.proxy=null),this.indicator&&(this.indicator.style.display="none",this.indicator.classList.remove("visible")),this.tabIndicator&&(this.tabIndicator.style.display="none",this.tabIndicator.classList.remove("visible")),this.currentDropZone?this.executeDrop():this.sourceType==="tab"&&this.sourceStack&&this.dragItem,this.currentDropZone=null,this.dragItem=null,this.sourceStack=null)}findDropZone(e){let t=e.touches&&e.touches.length>0,i=t?e.touches[0].clientX:e.clientX,s=t?e.touches[0].clientY:e.clientY,c=document.elementFromPoint(i,s);if(!c)return this.hideIndicator();let l=null,r=c;for(;r&&r!==document.body;){if(r.tulwebItem){l=r.tulwebItem;break}r=r.parentElement}if(!l){if(this.layoutManager.rootElement.contains(c)&&!this.layoutManager.root){this.currentDropZone={target:"root",edge:"center"},this.showIndicator(this.layoutManager.rootElement,"center");return}return this.hideIndicator()}if(l instanceof E&&l.parent instanceof x&&(l=l.parent),l===this.sourceStack&&l.children.length===1&&this.sourceType==="tab")return this.hideIndicator();let a=m.getRelativePos(e,l.element),h="center";if(l instanceof x)if(l.headerEl.contains(c)){h="tab_insert";let n=Array.from(l.tabsEl.querySelectorAll(".tulweb-tab")),u=n.length,d=0,p=0,y=0,b=0,z=l.tabPosition==="left"||l.tabPosition==="right";if(n.length>0){for(let v=0;v<n.length;v++){let g=n[v],w=g.getBoundingClientRect();if(g.style.display!=="none"){if(z){if(s<w.top+w.height/2){u=v,d=w.left,p=w.top,b=w.width,y=2;break}}else if(i<w.left+w.width/2){u=v,d=w.left,p=w.top,b=2,y=w.height;break}}}if(u===n.length){let v=null;for(let g=n.length-1;g>=0;g--)if(n[g].style.display!=="none"){v=n[g],u=g+1;break}if(v){let g=v.getBoundingClientRect();z?(d=g.left,p=g.bottom,b=g.width,y=2):(d=g.right,p=g.top,b=2,y=g.height)}else{let g=l.tabsEl.getBoundingClientRect();z?(d=g.left+4,p=g.top+8,b=g.width-8,y=2):(d=g.left+8,p=g.top+4,b=2,y=g.height-8)}}}else{let v=l.tabsEl.getBoundingClientRect();z?(d=v.left+4,p=v.top+8,b=v.width-8,y=2):(d=v.left+8,p=v.top+4,b=2,y=v.height-8)}this.currentDropZone={target:l,edge:h,insertIndex:u},this.showTabIndicator(d,p,b,y);return}else{let n=a.w/2,u=a.h/2;if(Math.abs(a.x-n)<a.w*.25&&Math.abs(a.y-u)<a.h*.25)h="center";else{let d=a.x*(a.h/a.w),p=a.h-a.x*(a.h/a.w);a.y<d&&a.y<p?h="top":a.y>d&&a.y>p?h="bottom":a.y>d&&a.y<p?h="left":a.y<d&&a.y>p&&(h="right")}}else return this.hideIndicator();this.currentDropZone={target:l,edge:h},this.showIndicator(l.element,h)}showTabIndicator(e,t,i,s){this.indicator.style.display="none",this.indicator.classList.remove("visible"),this.tabIndicator.style.top=t+"px",this.tabIndicator.style.left=e+"px",this.tabIndicator.style.width=i+"px",this.tabIndicator.style.height=s+"px",this.tabIndicator.style.display="block",setTimeout(()=>this.tabIndicator.classList.add("visible"),10)}showIndicator(e,t){this.tabIndicator&&(this.tabIndicator.style.display="none",this.tabIndicator.classList.remove("visible"));let i=e.getBoundingClientRect(),s=i.top,c=i.left,l=i.width,r=i.height;t==="top"&&(r=r/2),t==="bottom"&&(s=i.bottom-r/2,r=r/2),t==="left"&&(l=l/2),t==="right"&&(c=i.right-l/2,l=l/2),this.indicator.style.top=s+"px",this.indicator.style.left=c+"px",this.indicator.style.width=l+"px",this.indicator.style.height=r+"px",this.indicator.style.display="block",setTimeout(()=>this.indicator.classList.add("visible"),10)}hideIndicator(){this.indicator.style.display="none",this.indicator.classList.remove("visible"),this.tabIndicator&&(this.tabIndicator.style.display="none",this.tabIndicator.classList.remove("visible")),this.currentDropZone=null}executeDrop(){let{target:e,edge:t}=this.currentDropZone,i=this.dragItem,s=!1;if(this.sourceType==="tab"){let l=this.sourceStack.children.find(r=>r.config===i);if(l){let r=this.sourceStack.children.indexOf(l);this.sourceStack===e&&t==="tab_insert"&&r<this.currentDropZone.insertIndex&&(s=!0),this.sourceStack.removeChild(l),this.sourceStack.children.length===0&&this.layoutManager._cleanupEmptyStack(this.sourceStack)}}let c;if(e==="root"){let l=new M({type:"row"},this.layoutManager),r=new x({type:"stack",tabPosition:i.tabPosition},this.layoutManager);c=new E(i,this.layoutManager),r.addChild(c),l.addChild(r),this.layoutManager.root=l,this.layoutManager.rootElement.innerHTML="",this.layoutManager.rootElement.appendChild(l.element),this.layoutManager.updateLayout()}else if(t==="center")c=new E(i,this.layoutManager),e.addChild(c);else if(t==="tab_insert"){c=new E(i,this.layoutManager);let l=this.currentDropZone.insertIndex;s&&l--,e.addChild(c,l)}else{let l=t==="left"||t==="right",r=t==="left"||t==="top",a=e.parent,h=new x({type:"stack",tabPosition:i.tabPosition},this.layoutManager);if(c=new E(i,this.layoutManager),h.addChild(c),a instanceof M&&l){let o=a.children.indexOf(e),n=e.size??50;if(typeof n=="number")e.size=n/2,h.size=n/2;else{let u=m.parseSize(n);e.size=u.value/2+u.unit,h.size=u.value/2+u.unit}a.addChild(h,r?o:o+1)}else if(a instanceof C&&!l){let o=a.children.indexOf(e),n=e.size??50;if(typeof n=="number")e.size=n/2,h.size=n/2;else{let u=m.parseSize(n);e.size=u.value/2+u.unit,h.size=u.value/2+u.unit}a.addChild(h,r?o:o+1)}else{let o=l?M:C,n=new o({type:l?"row":"column"},this.layoutManager),u=a.children.indexOf(e);n.size=e.size,e.size=50,h.size=50,a.replaceChild(e,n,u),n.addChild(r?h:e),n.addChild(r?e:h)}this.layoutManager.updateLayout()}this.sourceType==="tab"&&c&&c.emit("move")}},H=new T,I=class{constructor(e,t,i){this.element=e,this.itemConfig=t,this.layoutManager=i,this.element.classList.add("tulweb-drag-source");let s=c=>{let l=JSON.parse(JSON.stringify(this.itemConfig));H.pendDrag(c,l,"external",null,this.itemConfig.title)};this.element.addEventListener("mousedown",s),this.element.addEventListener("touchstart",s,{passive:!0})}},D=class{constructor(e,t,i,s){this.isVertical=e,this.prevItem=t,this.nextItem=i,this.parentContainer=s,this.element=m.createElement("div","tulweb-splitter",s),this.isDragging=!1,this._onMouseDown=this._onMouseDown.bind(this),this._onMouseMove=this._onMouseMove.bind(this),this._onMouseUp=this._onMouseUp.bind(this),this._onDblClick=this._onDblClick.bind(this),this.element.addEventListener("mousedown",this._onMouseDown),this.element.addEventListener("touchstart",this._onMouseDown,{passive:!1}),this.element.addEventListener("dblclick",this._onDblClick)}_onDblClick(e){e.preventDefault(),this.prevItem.size=50,this.nextItem.size=50,this.parentContainer.tulwebItem?this.parentContainer.tulwebItem.updateLayout():(this.prevItem.updateFlex(),this.nextItem.updateFlex())}_onMouseDown(e){e.type!=="touchstart"&&e.preventDefault();let t=e.touches&&e.touches.length>0,i=t?e.touches[0].clientX:e.clientX,s=t?e.touches[0].clientY:e.clientY;this.isDragging=!0,this.element.classList.add("active"),this.startPos=this.isVertical?i:s,this.startPrevSize=this.prevItem.size??50,this.startNextSize=this.nextItem.size??50,this.prevType=typeof this.startPrevSize=="number"?"weight":"fixed",this.nextType=typeof this.startNextSize=="number"?"weight":"fixed";let c=this.parentContainer.getBoundingClientRect();this.pixelsPerPercent=(this.isVertical?c.width:c.height)/100,document.addEventListener("mousemove",this._onMouseMove),document.addEventListener("mouseup",this._onMouseUp),document.addEventListener("touchmove",this._onMouseMove,{passive:!1}),document.addEventListener("touchend",this._onMouseUp)}_onMouseMove(e){if(!this.isDragging)return;let t=e.touches&&e.touches.length>0,i=t?e.touches[0].clientX:e.clientX,s=t?e.touches[0].clientY:e.clientY;t&&e.preventDefault();let c=this.isVertical?i:s,l=c-this.startPos,r=this.isVertical?this.prevItem.getMinWidthPx()||40:this.prevItem.getMinHeightPx()||40,a=this.isVertical?this.nextItem.getMinWidthPx()||40:this.nextItem.getMinHeightPx()||40;if(this.prevType==="weight"&&this.nextType==="weight"){let h=l/this.pixelsPerPercent,o=this.startPrevSize+h,n=this.startNextSize-h,u=this.startPrevSize+this.startNextSize,d=r/this.pixelsPerPercent,p=a/this.pixelsPerPercent;o<d?(o=d,n=u-d):n<p&&(n=p,o=u-p),this.prevItem.size=o,this.nextItem.size=n}else{if(this.prevType==="fixed"){let h=m.parseSize(this.startPrevSize);if(h.unit==="px"||h.unit==="%"){let o=h.value+(h.unit==="%"?l/this.pixelsPerPercent:l),n=h.unit==="%"?r/this.pixelsPerPercent:r;o<n&&(o=n),this.prevItem.size=o+h.unit}else{let n=(this.isVertical?this.prevItem.element.offsetWidth:this.prevItem.element.offsetHeight)+l;n<r&&(n=r),this.prevItem.size=n+"px",this.startPrevSize=this.prevItem.size,this.startPos=c}}if(this.nextType==="fixed"){let h=m.parseSize(this.startNextSize);if(h.unit==="px"||h.unit==="%"){let o=h.value-(h.unit==="%"?l/this.pixelsPerPercent:l),n=h.unit==="%"?a/this.pixelsPerPercent:a;o<n&&(o=n),this.nextItem.size=o+h.unit}else{let n=(this.isVertical?this.nextItem.element.offsetWidth:this.nextItem.element.offsetHeight)-l;n<a&&(n=a),this.nextItem.size=n+"px",this.startNextSize=this.nextItem.size,this.startPos=c}}}this.prevItem.updateFlex(),this.nextItem.updateFlex()}_onMouseUp(e){this.isDragging&&(this.isDragging=!1,this.element.classList.remove("active"),document.removeEventListener("mousemove",this._onMouseMove),document.removeEventListener("mouseup",this._onMouseUp),document.removeEventListener("touchmove",this._onMouseMove),document.removeEventListener("touchend",this._onMouseUp))}destroy(){this.element.removeEventListener("mousedown",this._onMouseDown),this.element.removeEventListener("dblclick",this._onDblClick),this.element.parentElement&&this.element.parentElement.removeChild(this.element)}},k=class{constructor(){this._listeners={}}on(e,t){this._listeners[e]||(this._listeners[e]=[]),this._listeners[e].push(t)}off(e,t){this._listeners[e]&&(this._listeners[e]=this._listeners[e].filter(i=>i!==t))}emit(e,...t){this._listeners[e]&&this._listeners[e].forEach(i=>i(...t))}},L=class extends k{constructor(e,t){super(),this.config=e||{},this.layoutManager=t,this.parent=null,this.children=[],this.element=null,this.size=this.config.size||null,this.minWidth=this.config.minWidth??0,this.minHeight=this.config.minHeight??0,this.id=m.generateId(),this._isActive=!1,this._isFocused=!1,this.createDOM(),this.element&&(this.element.tulwebItem=this)}createDOM(){}addChild(e,t,i=!1){e.parent=this,typeof t=="number"?this.children.splice(t,0,e):this.children.push(e),this._appendDOMChild(e,t),i||this.updateLayout()}removeChild(e){let t=this.children.indexOf(e);t>-1&&(this.children.splice(t,1),e.parent=null,this._removeDOMChild(e),this.updateLayout())}replaceChild(e,t,i){this.children[i]=t,t.parent=this,e.parent=null,this._replaceDOMChild(e,t),this.updateLayout()}_appendDOMChild(e,t){}_removeDOMChild(e){}_replaceDOMChild(e,t){}updateLayout(){}getMinWidthPx(){if(this.isMinimized)return 0;let e=this.parent?this.parent.element.offsetWidth:this.layoutManager?this.layoutManager.rootElement.offsetWidth:window.innerWidth;return m.resolveToPixels(this.minWidth,e)}getMinHeightPx(){if(this.isMinimized)return 0;let e=this.parent?this.parent.element.offsetHeight:this.layoutManager?this.layoutManager.rootElement.offsetHeight:window.innerHeight;return m.resolveToPixels(this.minHeight,e)}updateFlex(){if(!this.element)return;let e=this.size;this.element.style.minWidth=this.isMinimized?"":typeof this.minWidth=="number"?`${this.minWidth}px`:this.minWidth,this.element.style.minHeight=this.isMinimized?"":typeof this.minHeight=="number"?`${this.minHeight}px`:this.minHeight,typeof e=="number"?(this.element.style.flex=`${e} 1 0%`,this.element.style.width="",this.element.style.height=""):typeof e=="string"?(this.element.style.flex=`0 0 ${e}`,this.parent&&this.parent.config.type==="row"?(this.element.style.width=e,this.element.style.height=""):(this.element.style.height=e,this.element.style.width="")):(this.element.style.flex="1 1 auto",this.element.style.width="",this.element.style.height=""),this.emit("resize")}destroy(){this._isFocused&&(this._isFocused=!1,this.emit("defocus")),this._isActive&&(this._isActive=!1,this.emit("inactive")),this.emit("destroy"),[...this.children].forEach(t=>t.destroy()),this.parent?(this.parent.children.length===0&&this.parent.layoutManager&&this.parent.layoutManager._cleanupEmptyStack(this.parent),this.parent.removeChild(this)):this.element&&this.element.parentElement&&this.element.parentElement.removeChild(this.element)}toConfig(){let e={type:this.config.type,size:this.size,minWidth:this.minWidth,minHeight:this.minHeight};return this.children.length>0&&(e.content=this.children.map(t=>t.toConfig())),e}},E=class extends L{constructor(e,t){super(e,t),this.type="component",this.isCloseable=e.closeable!==!1}createDOM(){this.element=document.createElement("div"),this.element.className="tulweb-component",this.element.setAttribute("data-component",this.config.componentName),this.isCloseable||this.element.setAttribute("data-closeable","false"),this.layoutManager.emit("componentCreated",this)}renderAppContent(){let e=this.layoutManager.componentFactories[this.config.componentName];if(e){this.element.innerHTML="";try{let t=typeof e=="function"&&/^\s*class\s+/.test(e.toString()),i;if(t){let s=new e(this.config.componentState,this);i=s.element||(typeof s.render=="function"?s.render():s)}else i=e(this.config.componentState,this);i instanceof Node&&this.element.appendChild(i),this.emit("init")}catch(t){this.element.innerHTML=`<div style="color:red; padding:10px;">Error rendering component: ${t.message}</div>`,console.error("Component Render Error:",t)}}else this.element.innerHTML=`<div style="color:red; padding:10px;">Unknown component: ${this.config.componentName}</div>`}toConfig(){let e={type:"component",title:this.config.title,componentName:this.config.componentName,componentState:this.config.componentState};return this.config.closeable===!1&&(e.closeable=!1),e}},x=class extends L{constructor(e,t){super(e,t),this.type="stack",this.activeChildIndex=0,this.isMaximized=!1,this.controlsEl=null,this.hiddenTabs=[]}createDOM(){this.tabPosition=this.config.tabPosition||"top",this.isMinimized=!!this.config.minimized,this.displayMinimizeButton=this.config.displayMinimizeButton!==!1,this.displayMaximizeButton=this.config.displayMaximizeButton!==!1,this.displayCloseButton=this.config.displayCloseButton!==!1,this.preventEmptyClosure=!!this.config.preventEmptyClosure,this.element=document.createElement("div"),this.element.className="tulweb-stack",this.preventEmptyClosure&&this.element.setAttribute("data-persistent","true"),this.isMinimized&&this.element.classList.add("minimized"),this.tabPosition&&this.tabPosition!=="top"&&this.element.classList.add("tab-"+this.tabPosition),this.element.addEventListener("mousedown",()=>{this.layoutManager.setActiveStack(this)}),this.headerEl=m.createElement("div","tulweb-header",this.element),this.tabsEl=m.createElement("div","tulweb-tabs",this.headerEl);let e=this.displayMinimizeButton&&this.layoutManager.settings.enableMinimize!==!1,t=this.displayMaximizeButton,i=this.displayCloseButton;(e||t||i)&&(this.controlsEl=m.createElement("div","tulweb-header-controls",this.headerEl),e&&(this.minBtn=m.createElement("div","tulweb-control",this.controlsEl),this.minBtn.innerHTML='<svg viewBox="0 0 24 24"><path d="M6 19h12v2H6z"/></svg>',this.minBtn.addEventListener("click",s=>{s.stopPropagation(),this.toggleMinimize()})),t&&(this.maxBtn=m.createElement("div","tulweb-control",this.controlsEl),this.maxBtn.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6z"/></svg>',this.maxBtn.addEventListener("click",()=>this.toggleMaximize())),i&&(this.closeBtn=m.createElement("div","tulweb-control",this.controlsEl),this.closeBtn.innerHTML='<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>',this.closeBtn.addEventListener("click",()=>{this.closeAll(),this.children.length===0&&this.destroy()}))),this.contentAreaEl=m.createElement("div","tulweb-content-area",this.element),this.layoutManager.settings.enablePreview&&(this.element.addEventListener("mouseenter",()=>{this.isMinimized&&this.element.classList.add("previewing")}),this.element.addEventListener("mouseleave",()=>{this.isMinimized&&this.element.classList.remove("previewing")})),window.ResizeObserver&&(this.resizeObserver=new ResizeObserver(()=>{this.children&&this.children.length>0&&this.updateOverflow()}),this.resizeObserver.observe(this.headerEl))}_appendDOMChild(e,t){this.contentAreaEl.appendChild(e.element),e.renderAppContent(),this.activeChildIndex=typeof t=="number"?t:this.children.length-1}_removeDOMChild(e){e.element&&e.element.parentElement===this.contentAreaEl&&this.contentAreaEl.removeChild(e.element),this.activeChildIndex>=this.children.length&&(this.activeChildIndex=Math.max(0,this.children.length-1))}updateLayout(){this.renderTabs(),this.showActiveChild(),this.updateFlex(),this.updateOverflow()}renderTabs(){this.tabsEl.innerHTML="",this.children.forEach((e,t)=>{let i=m.createElement("div","tulweb-tab",this.tabsEl);t===this.activeChildIndex&&i.classList.add("active");let s=m.createElement("div","tulweb-tab-title",i);s.textContent=e.config.title||e.config.componentName||"Tab",this.updateOverflow();let c=null;e.isCloseable&&(c=m.createElement("div","tulweb-tab-close",i),c.textContent="\xD7",c.addEventListener("click",a=>{a.stopPropagation(),this.removeChild(e),this.children.length===0&&this.layoutManager._cleanupEmptyStack(this)}),i.addEventListener("mousedown",a=>{a.target})),i.addEventListener("mousedown",a=>{a.target!==c&&a.button===0&&this.setActive(t)}),i.addEventListener("dblclick",a=>{a.target!==c&&this.toggleMaximize()}),i.addEventListener("contextmenu",a=>{a.preventDefault(),this.setActive(t),this.layoutManager.showContextMenu(a,this,e,t)});let r=a=>{a.target!==c&&this.children.length>0&&(a.type==="touchstart"||a.button===0)&&H.pendDrag(a,e.config,"tab",this,e.config.title)};i.addEventListener("mousedown",r),i.addEventListener("touchstart",r,{passive:!0})})}updateOverflow(){let e=Array.from(this.tabsEl.querySelectorAll(".tulweb-tab"));if(e.forEach(l=>l.style.display=""),this.overflowBtn&&(this.overflowBtn.style.display="none"),this.dropdownEl&&(this.dropdownEl.style.display="none"),e.length<=1)return;let t=this.tabPosition==="left"||this.tabPosition==="right",i=e.reduce((l,r)=>l+(t?r.offsetHeight:r.offsetWidth)+2,0)+8,s=t?this.tabsEl.clientHeight:this.tabsEl.clientWidth;if(i<=s)return;this.overflowBtn||(this.overflowBtn=m.createElement("div","tulweb-tab-overflow"),this.overflowBtn.innerHTML="\u2039\u203A",this.headerEl.insertBefore(this.overflowBtn,this.tabsEl.nextSibling),this.dropdownEl=m.createElement("div","tulweb-dropdown",this.element),this.dropdownEl.style.display="none",this.overflowBtn.addEventListener("click",l=>{l.stopPropagation();let r=this.dropdownEl.style.display==="none";this.dropdownEl.style.display=r?"block":"none",r&&this.renderDropdown()}),document.addEventListener("mousedown",l=>{this.dropdownEl&&!this.dropdownEl.contains(l.target)&&l.target!==this.overflowBtn&&(this.dropdownEl.style.display="none")})),this.overflowBtn.style.display="flex",this.hiddenTabs=[];let c=s-30;for(let l=e.length-1;l>=0&&!(i<=c);l--)l!==this.activeChildIndex&&(e[l].style.display="none",i-=(t?e[l].offsetHeight:e[l].offsetWidth)+2,this.hiddenTabs.push(this.children[l]));this.hiddenTabs.reverse()}renderDropdown(){this.dropdownEl.innerHTML="",this.hiddenTabs.forEach(e=>{let t=m.createElement("div","tulweb-dropdown-item",this.dropdownEl);t.textContent=e.config.title||e.config.componentName||"Tab";let i=()=>{let s=this.children.indexOf(e);this.setActive(s),this.dropdownEl.style.display="none"};t.addEventListener("click",i),t.addEventListener("touchstart",i,{passive:!0})})}setActive(e){this.activeChildIndex=e,this.isMinimized?this.toggleMinimize():(this.renderTabs(),this.showActiveChild())}showActiveChild(){let e=this.layoutManager.activeStack===this;this.children.forEach((t,i)=>{let s=i===this.activeChildIndex,c=s&&e;s?t.element.style.display="block":t.element.style.display="none",s!==t._isActive&&(t._isActive=s,s?(t.emit("active"),this.layoutManager.settings&&this.layoutManager.settings.onlyResizeActiveTabs&&t.emit("resize")):t.emit("inactive")),c!==t._isFocused&&(t._isFocused=c,c?t.emit("focus"):t.emit("defocus"))})}updateFlex(){super.updateFlex(),this.isMinimized?(this.element.style.flex="0 0 auto",this.tabPosition==="left"||this.tabPosition==="right"?(this.element.style.width="calc(var(--tulweb-tab-height) + 2px)",this.element.style.height=""):(this.element.style.height="calc(var(--tulweb-tab-height) + 2px)",this.element.style.width="")):(this.element.style.width="",this.element.style.height="");let e=this.layoutManager.settings&&this.layoutManager.settings.onlyResizeActiveTabs;this.children.forEach((t,i)=>{e&&i!==this.activeChildIndex||t.emit("resize")})}toggleMinimize(){this.isMinimized=!this.isMinimized,this.isMinimized?this.element.classList.add("minimized"):(this.element.classList.remove("minimized"),this.element.classList.remove("previewing")),this.updateFlex(),this.parent&&this.parent.updateLayout()}toggleMaximize(){this.isMaximized=!this.isMaximized,this.isMaximized?(this.element.classList.add("maximized"),this.maxBtn&&(this.maxBtn.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 4h4v2H6v4H4V4zm16 0h-4v2h2v4h2V4zM4 20h4v-2H6v-4H4v6zm16 0h-4v-2h2v-4h2v6z"/></svg>')):(this.element.classList.remove("maximized"),this.maxBtn&&(this.maxBtn.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6z"/></svg>'))}closeAll(){this.children.filter(t=>t.config.closeable!==!1).forEach(t=>t.destroy()),this.children.length===0&&this.layoutManager._cleanupEmptyStack(this)}toConfig(){let e=super.toConfig();return e.activeChildIndex=this.activeChildIndex,this.tabPosition!=="top"&&(e.tabPosition=this.tabPosition),this.isMinimized&&(e.minimized=!0),this.displayMinimizeButton||(e.displayMinimizeButton=!1),this.displayMaximizeButton||(e.displayMaximizeButton=!1),this.displayCloseButton||(e.displayCloseButton=!1),this.preventEmptyClosure&&(e.preventEmptyClosure=!0),e}},P=class extends L{constructor(e,t){super(e,t),this.splitters=[]}destroy(){this.splitters.forEach(e=>e.destroy()),this.splitters=[],super.destroy()}updateFlex(){super.updateFlex(),this.children.forEach(e=>{e.updateFlex&&e.updateFlex()})}createDOM(){this.element=document.createElement("div"),this.element.className=this.config.type==="row"?"tulweb-row":"tulweb-column"}_appendDOMChild(e,t){}_removeDOMChild(e){}_replaceDOMChild(e,t){}updateLayout(){if(this.children.length>0){let t=this.children.filter(i=>typeof i.size=="number");if(t.length>0){let i=t.reduce((s,c)=>s+(c.size||0),0);if(i===0){let s=100/t.length;t.forEach(c=>c.size=s)}else Math.abs(i-100)>1&&t.forEach(s=>s.size=s.size/i*100)}}this.element.innerHTML="",this.splitters.forEach(t=>t.destroy()),this.splitters=[];let e=this.config.type==="row";this.children.forEach((t,i)=>{if(this.element.appendChild(t.element),t.updateLayout(),i<this.children.length-1){let s=new D(e,t,this.children[i+1],this.element);this.splitters.push(s)}}),this.updateFlex()}},M=class extends P{},C=class extends P{},_=class{constructor(e,t,i="info"){this.element=m.createElement("div","tulweb-toast",e),i==="error"&&this.element.classList.add("error");let s=i==="error"?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>':'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';this.element.innerHTML=s+"<span>"+t+"</span>",setTimeout(()=>{this.element.classList.add("hiding"),setTimeout(()=>this.destroy(),300)},3e3)}destroy(){this.element&&this.element.parentElement&&this.element.parentElement.removeChild(this.element)}},B=class{constructor(e,t,i,s,c){this.layoutManager=e,this.element=m.createElement("div","tulweb-context-menu",document.body),this.element.style.left=t.clientX+"px",this.element.style.top=t.clientY+"px",this._closeHandler=this._closeHandler.bind(this),s.config.closeable!==!1&&this.addOption("Close Tab",()=>s.destroy()),this.addOption("Close Other Tabs",()=>{i.children.filter(r=>r.id!==s.id&&r.config.closeable!==!1).forEach(r=>r.destroy())}),this.addOption("Close All Tabs",()=>{i.children.filter(r=>r.config.closeable!==!1).forEach(r=>r.destroy()),i.children.length===0&&i.layoutManager._cleanupEmptyStack(i)}),setTimeout(()=>document.addEventListener("mousedown",this._closeHandler),0)}addOption(e,t){let i=m.createElement("div","tulweb-context-item",this.element);i.textContent=e,i.addEventListener("mousedown",s=>s.stopPropagation()),i.addEventListener("click",s=>{s.stopPropagation(),t(),this.destroy()})}_closeHandler(e){this.element&&!this.element.contains(e.target)&&this.destroy()}destroy(){this.element&&this.element.parentElement&&this.element.parentElement.removeChild(this.element),document.removeEventListener("mousedown",this._closeHandler),this.layoutManager.contextMenu===this&&(this.layoutManager.contextMenu=null)}},S=class extends k{constructor(e,t,i={}){super(),this.container=t,this.componentFactories={},this.root=null,this.settings=Object.assign({onlyResizeActiveTabs:!0,enableMinimize:!0,enablePreview:!1},e&&e.settings?e.settings:{},i),this.rootElement=m.createElement("div","tulweb-root",t),this.toastContainer=m.createElement("div","tulweb-toast-container",document.body),this.activeStack=null,H.init(this),e&&this.loadLayout(e),window.addEventListener("resize",()=>{this.updateLayout()}),this.initShortcuts()}registerComponent(e,t){this.componentFactories[e]=t}createDragSource(e,t){return new I(e,t,this)}loadLayout(e){if(this.rootElement.innerHTML="",e&&e.settings&&(this.settings=Object.assign(this.settings,e.settings)),!e||!e.content||e.content.length===0){this.root=null,this.renderEmptyState();return}this.root=this._buildObjectTree(e.content[0]),this.rootElement.appendChild(this.root.element),this.root.updateLayout()}_buildObjectTree(e){let t;if(e.type==="row")t=new M(e,this);else if(e.type==="column")t=new C(e,this);else if(e.type==="stack")t=new x(e,this);else if(e.type==="component")t=new E(e,this);else throw new Error("Unknown type: "+e.type);return e.content&&e.content.forEach(i=>{t.addChild(this._buildObjectTree(i),void 0,!0)}),t}showContextMenu(e,t,i,s){this.contextMenu&&this.contextMenu.destroy(),this.contextMenu=new B(this,e,t,i,s)}initShortcuts(){document.addEventListener("keydown",e=>{if(e.ctrlKey||e.metaKey){if(e.key.toLowerCase()==="s"){e.preventDefault();let t=document.getElementById("btn-save");t&&t.click()}if(e.key.toLowerCase()==="w"){let t=this.activeStack;if(!t){let i=Array.from(this.rootElement.querySelectorAll(".tulweb-stack")).map(s=>s.tulwebItem).filter(s=>s&&s instanceof x&&s.children.length>0);i.length>0&&(t=i[0])}if(t&&t.children.length>0){e.preventDefault();let i=t.activeChildIndex;t.children[i].destroy()}}}e.altKey&&["ArrowRight","ArrowLeft","ArrowUp","ArrowDown"].includes(e.key)&&(e.preventDefault(),this.navigateFocus(e.key))})}navigateFocus(e){if(!this.activeStack||!this.activeStack.element)return;let t=Array.from(this.rootElement.querySelectorAll(".tulweb-stack")).map(a=>a.tulwebItem).filter(a=>a&&a instanceof x),i=this.activeStack.element.getBoundingClientRect(),s=i.left+i.width/2,c=i.top+i.height/2,l=null,r=1/0;t.forEach(a=>{if(a===this.activeStack)return;let h=a.element.getBoundingClientRect(),o=h.left+h.width/2,n=h.top+h.height/2,u=!1;if(e==="ArrowRight"&&o>s&&(u=!0),e==="ArrowLeft"&&o<s&&(u=!0),e==="ArrowDown"&&n>c&&(u=!0),e==="ArrowUp"&&n<c&&(u=!0),u){let d=Math.pow(o-s,2)+Math.pow(n-c,2);d<r&&(r=d,l=a)}}),l&&this.setActiveStack(l)}updateLayout(){this.root&&this.root.updateLayout(),this.emit("stateChanged")}toConfig(){return{settings:{hasHeaders:!0},dimensions:{},content:this.root?[this.root.toConfig()]:[]}}_cleanupEmptyStack(e){if(e.type==="stack"&&e.preventEmptyClosure)return;this.activeStack===e&&this.setActiveStack(null);let t=e.parent;if(!t){e.children.length===0&&(this.rootElement.innerHTML="",this.root=null,this.renderEmptyState());return}if(t.removeChild(e),t.children.length===0)this._cleanupEmptyStack(t);else if(t.children.length===1&&t!==this.root){let i=t.children[0],s=t.parent;if(s){let c=s.children.indexOf(t);i.size=t.size,s.replaceChild(t,i,c)}else this.root=i,this.root.parent=null,this.rootElement.innerHTML="",this.rootElement.appendChild(this.root.element),this.root.updateLayout()}}showToast(e,t="info"){new _(this.toastContainer,e,t)}renderEmptyState(){this.root||(this.rootElement.innerHTML=`
+                <div class="tulweb-empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                        <path d="M14 8h5"></path>
+                        <path d="M14 12h5"></path>
+                    </svg>
+                    <div>Workspace is empty</div>
+                    <div style="font-size: 13px; margin-top: 8px; opacity: 0.5;">Drag a component from the sidebar to get started</div>
+                </div>
+            `)}setActiveStack(e){if(this.activeStack!==e){if(this.activeStack&&this.activeStack.element&&(this.activeStack.element.classList.remove("active-stack"),this.activeStack.children)){let t=this.activeStack.children[this.activeStack.activeChildIndex];t&&t._isFocused&&(t._isFocused=!1,t.emit("defocus"))}if(this.activeStack=e,this.activeStack&&this.activeStack.element&&this.activeStack.children){this.activeStack.element.classList.add("active-stack");let t=this.activeStack.children[this.activeStack.activeChildIndex];t&&t._isActive&&!t._isFocused&&(t._isFocused=!0,t.emit("focus"))}}}};document.addEventListener("DOMContentLoaded",function(){function f(a={},h=null){let o=document.createElement("div");o.style.height="100%",o.style.display="flex",o.style.flexDirection="column";let n=document.createElement("textarea");return n.style.flexGrow="1",n.style.width="100%",n.style.background="var(--tulweb-bg-editor)",n.style.color="var(--tulweb-text-editor)",n.style.border="none",n.style.padding="16px",n.style.resize="none",n.style.fontFamily="monospace",n.style.outline="none",n.style.borderRadius="4px",n.value=a.text||`// Write your code here...
+function hello() {
+  console.log('world')
+}`,o.appendChild(n),h&&h.on("resize",()=>{}),o}function e(a={},h=null){let o=document.createElement("div");o.style.height="100%",o.style.background="var(--tulweb-bg-console)",o.style.color="var(--tulweb-text-console)",o.style.fontFamily="monospace",o.style.padding="16px",o.style.overflowY="auto";let n=["TulWEB v1.0 initialized.","Loading modules...","[OK] Layout Manager Events","[OK] Drag & Drop System","System ready. Listening for resize."];return o.innerHTML=n.map(u=>`<div>> ${u}</div>`).join(""),h&&(h.on("resize",()=>{let u=o.getBoundingClientRect();o.innerHTML+=`<div style="color: var(--tulweb-text-secondary)">> Pane resized to ${u.width.toFixed(0)}x${u.height.toFixed(0)}</div>`,o.scrollTop=o.scrollHeight}),h.on("init",()=>{o.innerHTML+='<div style="color: var(--tulweb-text-primary)">> Component Lifecycle: init() fired</div>',o.scrollTop=o.scrollHeight}),window.tulWebLogger=(u,d="var(--tulweb-text-secondary)")=>{o.innerHTML+=`<div style="color: ${d}">> ${u}</div>`,o.scrollTop=o.scrollHeight}),o}function t(a={},h=null){let o=document.createElement("div");o.style.height="100%",o.style.overflow="auto",o.style.background="var(--tulweb-bg-panel)";let n=document.createElement("table");n.style.width="100%",n.style.borderCollapse="collapse",n.style.color="var(--tulweb-text-primary)",n.style.fontSize="13px";let u=document.createElement("thead");u.style.background="var(--tulweb-bg-tab)",u.innerHTML=`<tr>
+          <th style="padding: 10px; text-align: left; border-bottom: 1px solid var(--tulweb-border);">ID</th>
+          <th style="padding: 10px; text-align: left; border-bottom: 1px solid var(--tulweb-border);">Name</th>
+          <th style="padding: 10px; text-align: left; border-bottom: 1px solid var(--tulweb-border);">Status</th>
+          <th style="padding: 10px; text-align: left; border-bottom: 1px solid var(--tulweb-border);">Metric</th>
+      </tr>`,n.appendChild(u);let d=document.createElement("tbody");for(let p=1;p<=20;p++){let y=document.createElement("tr");y.style.borderBottom="1px solid var(--tulweb-border)";let b=p%3===0?'<span style="color: #ff5555">Error</span>':p%2===0?'<span style="color: #50fa7b">Active</span>':'<span style="color: #f1fa8c">Pending</span>';y.innerHTML=`
+              <td style="padding: 8px 10px;">#${1e3+p}</td>
+              <td style="padding: 8px 10px;">Process_${p}</td>
+              <td style="padding: 8px 10px;">${b}</td>
+              <td style="padding: 8px 10px;">${(Math.random()*100).toFixed(2)}%</td>
+          `,y.addEventListener("mouseover",()=>y.style.background="var(--tulweb-bg-tab-active)"),y.addEventListener("mouseout",()=>y.style.background="transparent"),d.appendChild(y)}return n.appendChild(d),o.appendChild(n),o}function i(a={},h=null){let o=document.createElement("div");o.style.height="100%",o.style.display="flex",o.style.alignItems="center",o.style.justifyContent="center",o.style.background="var(--tulweb-bg-panel)",o.style.overflow="hidden";let n=document.createElement("img");return n.src=a.url||"https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=1200&auto=format&fit=crop",n.style.maxWidth="100%",n.style.maxHeight="100%",n.style.objectFit="contain",o.appendChild(n),o}function s(a={},h=null){let o=document.createElement("div");o.style.padding="20px",o.style.color="var(--tulweb-text-secondary)";let n=document.createElement("div");n.innerHTML=`<h3 style="color:var(--tulweb-text-primary); margin-top:0;">${a.name||"Panel"}</h3><p>Use the toolbar to drag new components into the layout.</p>`,o.appendChild(n);let u=document.createElement("div");if(u.style.marginTop="15px",u.style.marginBottom="15px",u.style.fontFamily="monospace",u.style.color="var(--tulweb-accent)",o.appendChild(u),h){let d=document.createElement("button");d.style.background="var(--tulweb-bg-tab)",d.style.color="var(--tulweb-text-primary)",d.style.border="1px solid var(--tulweb-border)",d.style.padding="8px 12px",d.style.borderRadius="var(--tulweb-radius-inner)",d.style.cursor="pointer",d.textContent="Programmatic Close",h.on("init",()=>{d.addEventListener("click",()=>{h.destroy()}),h.emit("resize")}),h.on("resize",()=>{let p=h.element.getBoundingClientRect();u.innerText=`Dimensions: ${p.width.toFixed(0)}w x ${p.height.toFixed(0)}h`}),o.appendChild(d)}return o}function c(a={},h=null){let o=document.createElement("div");if(o.className="app-sidebar",o.style.width="100%",o.style.height="100%",o.style.borderRight="none",o.style.boxShadow="none",o.style.background="transparent",o.innerHTML=`
+        <div>
+            <h1>TulWEB</h1>
+            <h2 style="margin-bottom: 0;">Windowing Toolkit</h2>
+            <p style="color: var(--tulweb-text-secondary); font-size: 12px; margin-top: 4px;">Drag & Drop into layout</p>
+        </div>
+
+        <div>
+            <h2>Components</h2>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div class="sidebar-item" data-type="editor">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Code Editor
+                </div>
+                <div class="sidebar-item" data-type="console">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="4 17 10 11 4 5"></polyline>
+                        <line x1="12" y1="19" x2="20" y2="19"></line>
+                    </svg>
+                    Terminal Console
+                </div>
+                <div class="sidebar-item" data-type="datagrid">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                        <line x1="9" y1="21" x2="9" y2="9"></line>
+                    </svg>
+                    Data Grid
+                </div>
+                <div class="sidebar-item" data-type="image">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    Image Viewer
+                </div>
+                <div class="sidebar-item" data-type="generic">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
+                    Generic Panel
+                </div>
+                <div class="sidebar-item" data-type="stackL">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
+                    Left Stack
+                </div>
+                <div class="sidebar-item" data-type="stackR">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
+                    Right Stack
+                </div>
+                <div class="sidebar-item" data-type="stackB">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
+                    Bottom Stack
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h2>Theme</h2>
+            <div id="theme-selector" class="theme-selector">
+                <label class="theme-label">
+                    <input type="radio" name="theme" class="theme-radio" value="theme-nordic" checked>
+                    <span class="theme-name">Industrial Graphite</span>
+                </label>
+                <label class="theme-label">
+                    <input type="radio" name="theme" class="theme-radio" value="theme-cyber">
+                    <span class="theme-name">Phosphor Terminal</span>
+                </label>
+                <label class="theme-label">
+                    <input type="radio" name="theme" class="theme-radio" value="theme-light">
+                    <span class="theme-name">Pro Light</span>
+                </label>
+                <label class="theme-label">
+                    <input type="radio" name="theme" class="theme-radio" value="theme-retro">
+                    <span class="theme-name">90's Workstation</span>
+                </label>
+            </div>
+        </div>
+
+        <div>
+            <h2>Presets</h2>
+            <div class="btn-group">
+                <button id="btn-layout-ide" class="btn btn-outline btn-small">IDE</button>
+                <button id="btn-layout-dash" class="btn btn-outline btn-small">Dash</button>
+                <button id="btn-layout-grid" class="btn btn-outline btn-small">Grid</button>
+            </div>
+        </div>
+
+        <div>
+            <h2>Actions API</h2>
+            <button id="btn-add-tab" class="btn btn-outline"
+                style="width: 100%; text-align: left; padding: 10px; font-size: 13px;">+ Add Tab via API</button>
+        </div>
+
+        <div class="actions">
+            <h2>State</h2>
+            <div class="btn-group">
+                <button id="btn-save" class="btn btn-small">Save</button>
+                <button id="btn-load" class="btn btn-outline btn-small">Load</button>
+            </div>
+            <button id="btn-reset" class="btn btn-outline" style="font-size: 12px; padding: 8px;">Reset Default</button>
+        </div>
+        `,h){let n=h.layoutManager;o.querySelectorAll(".sidebar-item").forEach(d=>{let p=d.getAttribute("data-type"),y;p==="editor"?y={type:"component",componentName:"editor",title:"Code Editor",componentState:{}}:p==="console"?y={type:"component",componentName:"console",title:"Terminal Console",componentState:{}}:p==="datagrid"?y={type:"component",componentName:"datagrid",title:"Data Grid",componentState:{}}:p==="image"?y={type:"component",componentName:"image",title:"Image Viewer",componentState:{}}:p==="stackL"?y={type:"component",componentName:"generic",title:"Left Stack",componentState:{name:"New Panel"},tabPosition:"left"}:p==="stackR"?y={type:"component",componentName:"generic",title:"Right Stack",componentState:{name:"New Panel"},tabPosition:"right"}:p==="stackB"?y={type:"component",componentName:"generic",title:"Bottom Stack",componentState:{name:"New Panel"},tabPosition:"bottom"}:y={type:"component",componentName:"generic",title:"Generic Panel",componentState:{name:"New Panel"}},n.createDragSource(d,y)}),o.querySelector("#btn-save").addEventListener("click",()=>{let d=n.toConfig();localStorage.setItem("tulweb_saved_state_v2",JSON.stringify(d)),n.showToast("Layout saved to workspace")}),o.querySelector("#btn-load").addEventListener("click",()=>{let d=localStorage.getItem("tulweb_saved_state_v2");d?(n.loadLayout(JSON.parse(d)),n.showToast("Layout loaded successfully")):n.showToast("No saved layout found","error")}),o.querySelector("#btn-reset").addEventListener("click",()=>{n.loadLayout(window.tulwebLayouts.ide),n.showToast("Layout reset to IDE Default")}),o.querySelector("#btn-layout-ide").addEventListener("click",()=>n.loadLayout(window.tulwebLayouts.ide)),o.querySelector("#btn-layout-dash").addEventListener("click",()=>n.loadLayout(window.tulwebLayouts.dashboard)),o.querySelector("#btn-layout-grid").addEventListener("click",()=>n.loadLayout(window.tulwebLayouts.grid)),o.querySelector("#btn-add-tab").addEventListener("click",()=>{if(n.activeStack){let d=n._buildObjectTree({type:"component",componentName:"generic",title:"New API Tab",componentState:{name:"API Generated"}});n.activeStack.addChild(d),n.showToast("Tab added to active stack")}else n.showToast("Click a tab stack to focus it first","error")}),o.querySelector("#theme-selector").addEventListener("change",d=>{d.target.name==="theme"&&(document.body.className=d.target.value)})}return o}window.tulwebLayouts={ide:{content:[{type:"row",content:[{type:"stack",size:"300px",minWidth:"300px",tabPosition:"left",displayMaximizeButton:!1,displayCloseButton:!1,preventEmptyClosure:!0,content:[{type:"component",componentName:"sidebar",title:"Toolkit",closeable:!1}]},{type:"column",size:80,content:[{type:"stack",size:70,content:[{type:"component",componentName:"editor",title:"main.js",componentState:{text:"console.log('IDE Mode');"}},{type:"component",componentName:"editor",title:"index.html"}]},{type:"stack",size:30,tabPosition:"bottom",preventEmptyClosure:!0,content:[{type:"component",componentName:"console",title:"Terminal",closeable:!1}]}]},{type:"stack",size:20,tabPosition:"right",minimized:!0,displayCloseButton:!1,preventEmptyClosure:!0,content:[{type:"component",componentName:"generic",title:"Assistant",componentState:{name:"Assistant"}},{type:"component",componentName:"datagrid",title:"Database",componentState:{name:"Database"}}]}]}]},dashboard:{content:[{type:"row",content:[{type:"stack",size:30,preventEmptyClosure:!0,content:[{type:"component",componentName:"generic",title:"Persistent Area",componentState:{name:"This area will NOT vanish even if you close all tabs."}}]},{type:"column",size:70,content:[{type:"stack",size:50,content:[{type:"component",componentName:"generic",title:"Stats",componentState:{name:"Stats"}}]},{type:"row",size:50,content:[{type:"stack",size:50,content:[{type:"component",componentName:"datagrid",title:"Live Metrics"}]},{type:"stack",size:50,tabPosition:"right",content:[{type:"component",componentName:"image",title:"Network Topology",componentState:{url:"https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1200&auto=format"}}]}]},{type:"row",size:50,content:[{type:"stack",size:30,content:[{type:"component",componentName:"console",title:"System Logs"}]},{type:"stack",size:70,content:[{type:"component",componentName:"datagrid",title:"User List"}]}]}]}]}]},grid:{content:[{type:"row",content:[{type:"stack",size:20,minWidth:260,tabPosition:"left",content:[{type:"component",componentName:"sidebar",title:"Toolkit"}]},{type:"column",size:80,content:[{type:"row",content:[{type:"column",size:33.33,content:[{type:"stack",size:50,content:[{type:"component",componentName:"generic",title:"Panel 1"}]},{type:"stack",size:50,content:[{type:"component",componentName:"image",title:"Panel 2"}]}]},{type:"column",size:33.33,content:[{type:"stack",size:50,content:[{type:"component",componentName:"console",title:"Panel 3"}]},{type:"stack",size:50,content:[{type:"component",componentName:"editor",title:"Panel 4"}]}]},{type:"column",size:33.33,content:[{type:"stack",size:50,content:[{type:"component",componentName:"datagrid",title:"Panel 5"}]},{type:"stack",size:50,content:[{type:"component",componentName:"generic",title:"Panel 6"}]}]}]}]}]}]}};let l=document.getElementById("layout-container"),r=new S(null,l);window.layout=r,r.on("stateChanged",()=>{window.tulWebLogger&&window.tulWebLogger("Event: stateChanged","#8be9fd")}),r.on("componentCreated",a=>{window.tulWebLogger&&window.tulWebLogger("Event: componentCreated","#50fa7b");let h=()=>a.config.title||a.config.componentName||"Component";a.on("active",()=>r.showToast(`${h()} Active`)),a.on("inactive",()=>r.showToast(`${h()} Inactive`)),a.on("focus",()=>r.showToast(`${h()} Focused`)),a.on("defocus",()=>r.showToast(`${h()} Unfocused`)),a.on("move",()=>r.showToast(`${h()} Moved`,"info")),a.on("resize",()=>console.log(`${h()} Resized`))}),r.registerComponent("sidebar",c),r.registerComponent("editor",f),r.registerComponent("console",e),r.registerComponent("generic",s),r.registerComponent("datagrid",t),r.registerComponent("image",i),r.loadLayout(window.tulwebLayouts.ide)});})();
+
+</script>
+</body>
+
+</html>

@@ -11,7 +11,7 @@ TulWEB is a lightweight, zero-dependency windowing toolkit designed for building
 
 - **Multi-Directional Tabs**: Support for Top, Bottom, Left, and Right tab placements per stack.
 - **Stack Minimization**: Collapse stacks to their tab bars with an ultra-sleek hover-based component preview.
-- **Minimum Constraints**: Set `minWidth` and `minHeight` in pixels to prevent panels from becoming unreadable during resize.
+- **Minimum Constraints**: Set `size`, `minWidth`, and `minHeight` using pixels or CSS units (e.g., `"300px"`, `"20%"`) to prevent panels from becoming unreadable during resize. Constraints are automatically bypassed during stack minimization.
 - **Pure JavaScript**: No dependencies (no jQuery, no React/Angular required, but easily integrable).
 - **Flexible Layouts**: Nested rows and columns for complex interfaces.
 - **Tab Stacking**: Group components into stacks with efficient tab management and overflow support.
