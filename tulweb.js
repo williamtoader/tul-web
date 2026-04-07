@@ -39,12 +39,12 @@ class Utils {
     }
 
     static resolveToPixels(size, totalPixels) {
-        if (typeof size === 'number') return size; 
+        if (typeof size === 'number') return size;
         const parsed = Utils.parseSize(size);
         if (parsed.unit === 'px') return parsed.value;
         if (parsed.unit === '%') return (parsed.value / 100) * totalPixels;
         if (parsed.unit === 'weight') return (parsed.value / 100) * totalPixels; // Optional but consistent
-        return parsed.value; 
+        return parsed.value;
     }
 }
 
@@ -1268,6 +1268,9 @@ class StackItem extends ContentItem {
     }
 
     toggleMaximize() {
+        if (this.isMinimized) {
+            this.toggleMinimize()
+        }
         this.isMaximized = !this.isMaximized
         if (this.isMaximized) {
             this.element.classList.add('maximized')
@@ -1276,6 +1279,7 @@ class StackItem extends ContentItem {
             this.element.classList.remove('maximized')
             if (this.maxBtn) this.maxBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6z"/></svg>'
         }
+
     }
 
     closeAll() {

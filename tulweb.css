@@ -977,6 +977,13 @@ body.theme-retro .tab-right .tulweb-tab.active {
   border-bottom: none;
   border-top: 1px solid var(--tulweb-border);
   height: calc(var(--tulweb-tab-height) + 7px);
+  padding-left: 10px;
+}
+
+.tulweb-stack.tab-bottom.minimized .tulweb-header {
+  border-bottom: none;
+  border-top: 1px solid var(--tulweb-border);
+  height: calc(var(--tulweb-tab-height));
 }
 
 .tulweb-stack.tab-bottom .tulweb-tab {
@@ -1085,12 +1092,15 @@ body.theme-retro .tab-right .tulweb-tab.active {
 /* --- Mobile / Touch Device Optimizations --- */
 @media (max-width: 768px) {
   :root {
-    --tulweb-tab-height: 48px; /* Larger hit targets for thumbs */
-    --tulweb-splitter-size: 12px; /* Easier to grab splitters */
+    --tulweb-tab-height: 48px;
+    /* Larger hit targets for thumbs */
+    --tulweb-splitter-size: 12px;
+    /* Easier to grab splitters */
   }
 
   .tulweb-splitter::after {
-    opacity: 0.6; /* More visible by default on mobile */
+    opacity: 0.6;
+    /* More visible by default on mobile */
   }
 
   /* Ensure the drag proxy is large enough on mobile */
@@ -1098,7 +1108,7 @@ body.theme-retro .tab-right .tulweb-tab.active {
     padding: 12px 24px !important;
     font-size: 15px !important;
   }
-  
+
   .tulweb-tab-title {
     font-size: 14px;
   }
@@ -1107,7 +1117,8 @@ body.theme-retro .tab-right .tulweb-tab.active {
 /* Specific fix for draggable items to be more touch friendly */
 .sidebar-item {
   min-height: 44px;
-  touch-action: none; /* Prevent scrolling when starting a drag */
+  touch-action: none;
+  /* Prevent scrolling when starting a drag */
 }
 
 .tulweb-tab {
@@ -1121,4 +1132,3 @@ body.theme-retro .tab-right .tulweb-tab.active {
 .tulweb-header {
   touch-action: none;
 }
-
