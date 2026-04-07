@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TulWM - Documentation</title>
+    <title>TulWEB - Documentation</title>
 
     <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
     <!-- Core Toolkit CSS -->
-    <link rel="stylesheet" href="tulwm.css">
+    <link rel="stylesheet" href="tulweb.css">
 
     <!-- App Specific Demo CSS -->
     <style>
@@ -24,22 +24,22 @@
         /* Sidebar demo styling */
         .app-sidebar {
             width: 280px;
-            background: var(--tulwm-bg-panel);
-            border-right: 1px solid var(--tulwm-border);
+            background: var(--tulweb-bg-panel);
+            border-right: 1px solid var(--tulweb-border);
             padding: 30px 24px;
             display: flex;
             flex-direction: column;
             gap: 28px;
             z-index: 200;
-            backdrop-filter: blur(var(--tulwm-blur));
-            -webkit-backdrop-filter: blur(var(--tulwm-blur));
-            box-shadow: 0 0 40px var(--tulwm-shadow-color);
+            backdrop-filter: blur(var(--tulweb-blur));
+            -webkit-backdrop-filter: blur(var(--tulweb-blur));
+            box-shadow: 0 0 40px var(--tulweb-shadow-color);
             transition: background 0.3s, border-color 0.3s;
         }
 
         .app-sidebar h1 {
             font-size: 22px;
-            color: var(--tulwm-accent);
+            color: var(--tulweb-accent);
             margin: 0 0 8px 0;
             font-weight: 600;
             letter-spacing: -0.5px;
@@ -47,7 +47,7 @@
 
         .app-sidebar h2 {
             font-size: 11px;
-            color: var(--tulwm-text-secondary);
+            color: var(--tulweb-text-secondary);
             margin: 0 0 16px 0;
             text-transform: uppercase;
             letter-spacing: 1.2px;
@@ -64,8 +64,8 @@
             background: transparent;
             border: 1px solid transparent;
             padding: 8px 12px;
-            border-radius: var(--tulwm-radius-inner);
-            color: var(--tulwm-text-secondary);
+            border-radius: var(--tulweb-radius-inner);
+            color: var(--tulweb-text-secondary);
             font-size: 14px;
             font-weight: 500;
             display: flex;
@@ -76,11 +76,11 @@
         }
 
         .sidebar-item:hover {
-            background: var(--tulwm-bg-tab);
-            border-color: var(--tulwm-border);
-            color: var(--tulwm-text-primary);
+            background: var(--tulweb-bg-tab);
+            border-color: var(--tulweb-border);
+            color: var(--tulweb-text-primary);
             transform: translateX(4px);
-            box-shadow: 0 4px 12px var(--tulwm-shadow-color);
+            box-shadow: 0 4px 12px var(--tulweb-shadow-color);
         }
 
         .sidebar-item svg {
@@ -90,7 +90,7 @@
 
         .sidebar-item:hover svg {
             opacity: 1;
-            color: var(--tulwm-accent);
+            color: var(--tulweb-accent);
         }
 
         /* Container for Layout Manager */
@@ -105,7 +105,7 @@
 
         .nav-links {
             margin-top: auto;
-            border-top: 1px solid var(--tulwm-border);
+            border-top: 1px solid var(--tulweb-border);
             padding-top: 20px;
         }
 
@@ -114,7 +114,7 @@
             align-items: center;
             gap: 8px;
             text-decoration: none;
-            color: var(--tulwm-accent);
+            color: var(--tulweb-accent);
             font-size: 14px;
             font-weight: 500;
             transition: opacity 0.2s, transform 0.2s;
@@ -149,8 +149,8 @@
     <!-- Sidebar with Drag Sources -->
     <div class="app-sidebar">
         <div>
-            <h1>TulWM Docs</h1>
-            <p style="color: var(--tulwm-text-secondary); font-size: 13px; margin: 0; line-height: 1.4;">Drag chapters
+            <h1>TulWEB Docs</h1>
+            <p style="color: var(--tulweb-text-secondary); font-size: 13px; margin: 0; line-height: 1.4;">Drag chapters
                 into the workspace to read side-by-side.</p>
         </div>
 
@@ -281,7 +281,7 @@
     <div id="layout-container"></div>
 
     <!-- Load Engine and Docs App -->
-    <script src="tulwm.js"></script>
+    <script src="tulweb.js"></script>
     <script src="docs.js"></script>
 </body>
 
