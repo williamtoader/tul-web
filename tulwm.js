@@ -171,7 +171,15 @@ const TulWM = (function () {
                 currentEl = currentEl.parentElement;
             }
 
-            if (!targetItem) return this.hideIndicator();
+            if (!targetItem) {
+                // If it's a drag over the root and root is empty, allow dropping
+                if (this.layoutManager.rootElement.contains(el) && !this.layoutManager.root) {
+                    this.currentDropZone = { target: 'root', edge: 'center' };
+                    this.showIndicator(this.layoutManager.rootElement, 'center');
+                    return;
+                }
+                return this.hideIndicator();
+            }
 
             // If hovering over a component inside a stack, we want to target the stack
             if (targetItem instanceof ComponentItem && targetItem.parent instanceof StackItem) {
@@ -344,7 +352,17 @@ const TulWM = (function () {
 
             let newComp;
 
-            if (edge === 'center') {
+            if (target === 'root') {
+                const row = new RowItem({ type: 'row' }, this.layoutManager);
+                const newStack = new StackItem({ type: 'stack' }, this.layoutManager);
+                newComp = new ComponentItem(newItemConfig, this.layoutManager);
+                newStack.addChild(newComp);
+                row.addChild(newStack);
+                this.layoutManager.root = row;
+                this.layoutManager.rootElement.innerHTML = '';
+                this.layoutManager.rootElement.appendChild(row.element);
+                this.layoutManager.updateLayout();
+            } else if (edge === 'center') {
                 // Add tab to existing stack
                 newComp = new ComponentItem(newItemConfig, this.layoutManager);
                 target.addChild(newComp);
