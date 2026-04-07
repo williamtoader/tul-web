@@ -274,6 +274,12 @@ document.addEventListener("DOMContentLoaded", function () {
   });
   layout.on('componentCreated', (comp) => {
       if (window.tulWmLogger) window.tulWmLogger(`Event: componentCreated (id: ${comp.id})`, '#50fa7b');
+      
+      const getName = () => comp.config.title || comp.config.componentName || 'Component';
+      comp.on('active', () => layout.showToast(`${getName()} Active`));
+      comp.on('inactive', () => layout.showToast(`${getName()} Inactive`));
+      comp.on('focus', () => layout.showToast(`${getName()} Focused`));
+      comp.on('defocus', () => layout.showToast(`${getName()} Unfocused`));
   });
 
   // 2. Register Components

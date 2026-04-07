@@ -547,6 +547,9 @@ const TulWM = (function() {
             this.size = this.config.size || null; 
             this.id = Utils.generateId();
             
+            this._isActive = false;
+            this._isFocused = false;
+            
             this.createDOM();
             if (this.element) {
                 this.element.tulwmItem = this; // Link back from DOM
@@ -555,7 +558,7 @@ const TulWM = (function() {
 
         createDOM() { /* Override */ }
 
-        addChild(child, index) {
+        addChild(child, index, skipLayout = false) {
             child.parent = this;
             if (typeof index === 'number') {
                 this.children.splice(index, 0, child);
@@ -563,7 +566,9 @@ const TulWM = (function() {
                 this.children.push(child);
             }
             this._appendDOMChild(child, index);
-            this.updateLayout();
+            if (!skipLayout) {
+                this.updateLayout();
+            }
         }
 
         removeChild(child) {
@@ -600,6 +605,14 @@ const TulWM = (function() {
         }
 
         destroy() {
+            if (this._isFocused) {
+                this._isFocused = false;
+                this.emit('defocus');
+            }
+            if (this._isActive) {
+                this._isActive = false;
+                this.emit('inactive');
+            }
             this.emit('destroy');
             const kids = [...this.children];
             kids.forEach(c => c.destroy());
@@ -853,11 +866,28 @@ const TulWM = (function() {
         }
 
         showActiveChild() {
+             const isStackFocused = this.layoutManager.activeStack === this;
+             
              this.children.forEach((child, index) => {
-                 if (index === this.activeChildIndex) {
+                 const shouldBeActive = index === this.activeChildIndex;
+                 const shouldBeFocused = shouldBeActive && isStackFocused;
+
+                 if (shouldBeActive) {
                      child.element.style.display = 'block';
                  } else {
                      child.element.style.display = 'none';
+                 }
+                 
+                 if (shouldBeActive !== child._isActive) {
+                     child._isActive = shouldBeActive;
+                     if (shouldBeActive) child.emit('active');
+                     else child.emit('inactive');
+                 }
+
+                 if (shouldBeFocused !== child._isFocused) {
+                     child._isFocused = shouldBeFocused;
+                     if (shouldBeFocused) child.emit('focus');
+                     else child.emit('defocus');
                  }
              });
         }
@@ -1006,7 +1036,7 @@ const TulWM = (function() {
 
             if (itemConfig.content) {
                 itemConfig.content.forEach(childConfig => {
-                    item.addChild(this._buildObjectTree(childConfig));
+                    item.addChild(this._buildObjectTree(childConfig), undefined, true);
                 });
             }
             return item;
@@ -1139,6 +1169,10 @@ const TulWM = (function() {
 
         // Helper: cleans up stacks when empty, or simplifies tree
         _cleanupEmptyStack(stackItem) {
+            if (this.activeStack === stackItem) {
+                this.setActiveStack(null);
+            }
+            
             const parent = stackItem.parent;
             if (!parent) {
                 // It's the root. If it's a stack and empty, clear root
@@ -1213,12 +1247,28 @@ const TulWM = (function() {
         }
 
         setActiveStack(stack) {
+            if (this.activeStack === stack) return;
+            
             if (this.activeStack && this.activeStack.element) {
                 this.activeStack.element.classList.remove('active-stack');
+                if (this.activeStack.children) {
+                    const oldActive = this.activeStack.children[this.activeStack.activeChildIndex];
+                    if (oldActive && oldActive._isFocused) {
+                        oldActive._isFocused = false;
+                        oldActive.emit('defocus');
+                    }
+                }
             }
+            
             this.activeStack = stack;
-            if (this.activeStack && this.activeStack.element) {
+            
+            if (this.activeStack && this.activeStack.element && this.activeStack.children) {
                 this.activeStack.element.classList.add('active-stack');
+                const newActive = this.activeStack.children[this.activeStack.activeChildIndex];
+                if (newActive && newActive._isActive && !newActive._isFocused) {
+                    newActive._isFocused = true;
+                    newActive.emit('focus');
+                }
             }
         }
     }
