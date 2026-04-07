@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Clicking close button on tab stack now destroys it.
 - Fixed context menu actions for tab stacks not triggering.
 - Fixed layout manager not cleaning up empty stacks when closing all tabs.
+- Dragging a component to the empty root element now creates a new row with the component in a stack.
+
 ### Added
 - New "90's Workstation" (IRIX/CDE style) theme.
 
