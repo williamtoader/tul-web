@@ -1,0 +1,765 @@
+:root,
+body.theme-nordic {
+  /* Industrial Graphite */
+  --tulweb-bg-base: #0f1115;
+  --tulweb-bg-panel: rgba(22, 25, 30, 0.65);
+  --tulweb-bg-tab: rgba(18, 20, 24, 0.5);
+  --tulweb-bg-tab-active: rgba(30, 34, 40, 0.9);
+  --tulweb-bg-header: rgba(16, 18, 22, 0.7);
+  --tulweb-border: rgba(255, 255, 255, 0.08);
+  --tulweb-text-primary: #e6e8ec;
+  --tulweb-text-secondary: #9ca3af;
+  --tulweb-accent: #0cbaba; /* Glowing Teal */
+  --tulweb-accent-hover: #15f0f0;
+  --tulweb-drop-zone: rgba(12, 186, 186, 0.2);
+  --tulweb-close-hover: rgba(244, 63, 94, 0.9);
+  
+  --tulweb-bg-editor: rgba(12, 13, 16, 0.8);
+  --tulweb-text-editor: #e2e8f0;
+  --tulweb-bg-console: rgba(7, 8, 10, 0.8);
+  --tulweb-text-console: #94a3b8;
+
+  --tulweb-shadow-color: rgba(0, 0, 0, 0.4);
+  --tulweb-shadow-glow: rgba(12, 186, 186, 0.3);
+
+  /* Spacing & Sizes */
+  --tulweb-tab-height: 40px;
+  --tulweb-splitter-size: 6px;
+  --tulweb-radius-panel: 12px;
+  --tulweb-radius-inner: 8px;
+
+  /* Typography & Effects */
+  --tulweb-font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --tulweb-blur: 24px;
+}
+body.theme-cyber {
+  /* Phosphor Terminal */
+  --tulweb-bg-base: #020202;
+  --tulweb-bg-panel: rgba(8, 8, 8, 0.85);
+  --tulweb-bg-tab: rgba(4, 4, 4, 0.9);
+  --tulweb-bg-tab-active: rgba(20, 20, 20, 1);
+  --tulweb-bg-header: rgba(5, 5, 5, 0.9);
+  --tulweb-border: rgba(245, 158, 11, 0.3);
+  --tulweb-text-primary: #fcd34d;
+  --tulweb-text-secondary: #d97706;
+  --tulweb-accent: #f59e0b; /* Amber Glow */
+  --tulweb-accent-hover: #fbbf24;
+  --tulweb-drop-zone: rgba(245, 158, 11, 0.25);
+  --tulweb-close-hover: rgba(239, 68, 68, 0.9);
+  
+  --tulweb-bg-editor: rgba(0, 0, 0, 0.9);
+  --tulweb-text-editor: #facc15;
+  --tulweb-bg-console: rgba(0, 0, 0, 0.9);
+  --tulweb-text-console: #fbbf24;
+
+  --tulweb-shadow-color: rgba(245, 158, 11, 0.1);
+  --tulweb-shadow-glow: rgba(245, 158, 11, 0.4);
+  
+  --tulweb-tab-height: 36px;
+  --tulweb-splitter-size: 4px;
+  --tulweb-radius-panel: 0px;
+  --tulweb-radius-inner: 0px;
+  
+  --tulweb-font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --tulweb-blur: 10px;
+}
+
+body.theme-light {
+  /* Pro Light Workstation */
+  --tulweb-bg-base: #f1f5f9;
+  --tulweb-bg-panel: rgba(255, 255, 255, 0.75);
+  --tulweb-bg-tab: rgba(248, 250, 252, 0.5);
+  --tulweb-bg-tab-active: rgba(255, 255, 255, 1);
+  --tulweb-bg-header: rgba(255, 255, 255, 0.8);
+  --tulweb-border: rgba(15, 23, 42, 0.06);
+  --tulweb-text-primary: #0f172a;
+  --tulweb-text-secondary: #475569;
+  --tulweb-accent: #2563eb; /* Apple Blue */
+  --tulweb-accent-hover: #1d4ed8;
+  --tulweb-drop-zone: rgba(37, 99, 235, 0.15);
+  --tulweb-close-hover: #ef4444;
+  
+  --tulweb-bg-editor: rgba(255, 255, 255, 0.9);
+  --tulweb-text-editor: #334155;
+  --tulweb-bg-console: rgba(30, 41, 59, 0.95);
+  --tulweb-text-console: #e2e8f0;
+
+  --tulweb-shadow-color: rgba(15, 23, 42, 0.05);
+  --tulweb-shadow-glow: rgba(37, 99, 235, 0.2);
+
+  --tulweb-tab-height: 44px;
+  --tulweb-splitter-size: 8px;
+  --tulweb-radius-panel: 14px;
+  --tulweb-radius-inner: 10px;
+
+  --tulweb-font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  --tulweb-blur: 32px;
+}
+
+body.theme-retro {
+  /* 90's Workstation / CDE Inspired */
+  --tulweb-bg-base: #a0a0a0;
+  --tulweb-bg-panel: #c0c0c0;
+  --tulweb-bg-tab: #b0b0b0;
+  --tulweb-bg-tab-active: #d0d0d0;
+  --tulweb-bg-header: #808080;
+  --tulweb-border: #404040;
+  --tulweb-text-primary: #000000;
+  --tulweb-text-secondary: #333333;
+  --tulweb-accent: #000080; /* Classic Win95/CDE Navy Blue */
+  --tulweb-accent-hover: #0000ff;
+  --tulweb-drop-zone: rgba(0, 0, 128, 0.2);
+  --tulweb-close-hover: #ff0000;
+  
+  --tulweb-bg-editor: #ffffff;
+  --tulweb-text-editor: #000000;
+  --tulweb-bg-console: #000000;
+  --tulweb-text-console: #00ff00;
+
+  --tulweb-shadow-color: rgba(0, 0, 0, 0.5);
+  --tulweb-shadow-glow: transparent;
+
+  --tulweb-tab-height: 32px;
+  --tulweb-splitter-size: 8px;
+  --tulweb-radius-panel: 0px;
+  --tulweb-radius-inner: 0px;
+
+  --tulweb-font-family: 'Courier New', Courier, monospace;
+  --tulweb-blur: 0px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--tulweb-font-family);
+  background: var(--tulweb-bg-base);
+  color: var(--tulweb-text-primary);
+  overflow: hidden;
+  /* Premium radial + linear blend */
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,0.03) 0%, transparent 50%),
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+  background-position: 0 0, -1px -1px, -1px -1px;
+}
+
+body.theme-cyber {
+  background-image: 
+    linear-gradient(rgba(245, 158, 11, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 158, 11, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+body.theme-light {
+  background-image: 
+    radial-gradient(circle at top left, rgba(255,255,255,0.8), transparent 40%),
+    radial-gradient(circle at bottom right, rgba(226, 232, 240, 0.8), transparent 40%);
+}
+
+body.theme-retro {
+  background-image: 
+    linear-gradient(45deg, #a0a0a0 25%, transparent 25%), 
+    linear-gradient(-45deg, #a0a0a0 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #a0a0a0 75%), 
+    linear-gradient(-45deg, transparent 75%, #a0a0a0 75%);
+  background-size: 4px 4px;
+  background-color: #909090;
+}
+
+/* Base Layout Element */
+.tulweb-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Rows and Columns */
+.tulweb-row,
+.tulweb-column {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.tulweb-row {
+  flex-direction: row;
+}
+
+.tulweb-column {
+  flex-direction: column;
+}
+
+/* Splitters */
+.tulweb-splitter {
+  background-color: transparent;
+  transition: background-color 0.2s;
+  z-index: 10;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tulweb-row>.tulweb-splitter {
+  width: var(--tulweb-splitter-size);
+  height: 100%;
+  cursor: col-resize;
+}
+
+.tulweb-column>.tulweb-splitter {
+  height: var(--tulweb-splitter-size);
+  width: 100%;
+  cursor: row-resize;
+}
+
+.tulweb-splitter::after {
+  content: '';
+  background-color: var(--tulweb-text-secondary);
+  opacity: 0.3;
+  border-radius: 1px;
+  transition: opacity 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.tulweb-row>.tulweb-splitter::after {
+  width: 2px;
+  height: 24px;
+}
+
+.tulweb-column>.tulweb-splitter::after {
+  height: 2px;
+  width: 24px;
+}
+
+.tulweb-splitter:hover,
+.tulweb-splitter.active {
+  background-color: var(--tulweb-drop-zone);
+  /* very subtle backglow */
+}
+
+.tulweb-splitter:hover::after,
+.tulweb-splitter.active::after {
+  opacity: 1;
+  background-color: var(--tulweb-accent);
+  box-shadow: 0 0 8px var(--tulweb-accent);
+  /* glow */
+}
+
+/* Stack (Tabbed Container) */
+.tulweb-stack {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--tulweb-bg-panel);
+  border: 1px solid var(--tulweb-border);
+  border-radius: var(--tulweb-radius-panel);
+  overflow: hidden;
+  position: relative;
+  backdrop-filter: blur(var(--tulweb-blur));
+  -webkit-backdrop-filter: blur(var(--tulweb-blur));
+  box-shadow: 0 8px 32px var(--tulweb-shadow-color);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1);
+}
+
+/* Active panel styling */
+.tulweb-stack.maximized {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  z-index: 1000 !important;
+  margin: 0 !important;
+}
+
+.active-stack {
+  border-color: var(--tulweb-accent);
+  box-shadow: 0 0 0 1px var(--tulweb-accent) inset, 
+              0 16px 48px var(--tulweb-shadow-color),
+              0 0 16px var(--tulweb-shadow-glow);
+}
+
+.tulweb-stack.maximized.active-stack {
+  box-shadow: none;
+  border-color: var(--tulweb-border);
+}
+
+.tulweb-stack.maximized {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 100;
+}
+
+/* Header / Tab Bar */
+.tulweb-header {
+  display: flex;
+  height: var(--tulweb-tab-height);
+  background: var(--tulweb-bg-header);
+  border-bottom: 1px solid var(--tulweb-border);
+  user-select: none;
+  min-width: 0;
+}
+
+.tulweb-tabs {
+  display: flex;
+  flex-grow: 1;
+  overflow: hidden;
+  padding-top: 4px;
+  padding-left: 8px;
+  min-width: 0;
+  /* visually separate tabs from top edge */
+}
+
+.tulweb-tab {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  background-color: var(--tulweb-bg-tab);
+  border-top-left-radius: var(--tulweb-radius-inner);
+  border-top-right-radius: var(--tulweb-radius-inner);
+  margin-right: 2px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  color: var(--tulweb-text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.tulweb-tab:hover {
+  background-color: var(--tulweb-bg-tab-active);
+  color: var(--tulweb-text-primary);
+}
+
+.tulweb-tab.active {
+  background-color: var(--tulweb-bg-tab-active);
+  color: var(--tulweb-text-primary);
+  border-color: var(--tulweb-border);
+  box-shadow: inset 0 2px 0 var(--tulweb-accent);
+}
+
+body.theme-cyber .tulweb-tab.active {
+  color: var(--tulweb-accent);
+  text-shadow: 0 0 8px var(--tulweb-accent);
+  box-shadow: inset 0 2px 0 var(--tulweb-accent), inset 0 6px 12px var(--tulweb-shadow-glow);
+}
+
+body.theme-retro .tulweb-tab.active {
+  background-color: var(--tulweb-bg-tab-active);
+  color: var(--tulweb-text-primary);
+  border: 1px solid var(--tulweb-border);
+  border-bottom: none;
+  box-shadow: inset 2px 2px 0 #ffffff, inset -1px 0 0 #404040;
+}
+
+body.theme-retro .tulweb-stack {
+  border: 2px solid #ffffff;
+  border-right-color: #404040;
+  border-bottom-color: #404040;
+  box-shadow: 2px 2px 0 #000000;
+}
+
+body.theme-retro .tulweb-header {
+  background: var(--tulweb-accent);
+  color: #ffffff;
+  font-weight: bold;
+}
+
+body.theme-retro .tulweb-tab {
+  border: 1px solid #ffffff;
+  border-right-color: #404040;
+  border-bottom: none;
+  margin-top: 2px;
+  background: #c0c0c0;
+  color: #000000;
+}
+
+body.theme-retro .tulweb-tab.active {
+  background: #d0d0d0;
+  margin-top: 0;
+  height: calc(var(--tulweb-tab-height) + 2px);
+}
+
+.tulweb-tab-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 12px;
+  font-weight: 500;
+}
+
+.tulweb-tab-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0.5;
+  transition: opacity 0.2s, background-color 0.2s, color 0.2s;
+}
+
+.tulweb-tab-close:hover {
+  opacity: 1;
+  background-color: var(--tulweb-close-hover);
+  color: white;
+}
+
+/* Header Controls (Maximize, Close Stack) */
+.tulweb-header-controls {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  gap: 4px;
+  border-left: 1px solid var(--tulweb-border);
+}
+
+.tulweb-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.2s;
+}
+
+.tulweb-control:hover {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.tulweb-control svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+/* Content Area */
+.tulweb-content-area {
+  flex-grow: 1;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--tulweb-bg-panel);
+}
+
+.tulweb-component {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  overflow: auto;
+}
+
+/* Custom Scrollbars */
+.tulweb-component::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.tulweb-component::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tulweb-component::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 128, 0.3);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.tulweb-component::-webkit-scrollbar-thumb:hover {
+  background: rgba(128, 128, 128, 0.6);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Dragging / Proxies */
+.tulweb-drag-proxy {
+  position: absolute;
+  z-index: 1000;
+  pointer-events: none;
+  background-color: var(--tulweb-bg-panel);
+  border: 1px solid var(--tulweb-accent);
+  padding: 8px 16px;
+  border-radius: var(--tulweb-radius-inner);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.9;
+  color: var(--tulweb-accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tulweb-drag-proxy::before {
+  content: "≡";
+  font-size: 16px;
+}
+
+/* Drop Indicators */
+.tulweb-drop-indicator {
+  position: absolute;
+  z-index: 999;
+  background-color: var(--tulweb-drop-zone);
+  border: 2px solid var(--tulweb-accent);
+  border-radius: var(--tulweb-radius-inner);
+  pointer-events: none;
+  transition: all 0.15s ease-out;
+  opacity: 0;
+}
+
+.tulweb-drop-indicator.visible {
+  opacity: 1;
+}
+
+/* Tab Drop Indicator */
+.tulweb-tab-drop-indicator {
+  position: absolute;
+  z-index: 1000;
+  width: 2px;
+  background-color: var(--tulweb-accent);
+  pointer-events: none;
+  transition: opacity 0.15s ease-out, left 0.1s ease-out, top 0.1s ease-out;
+  opacity: 0;
+  box-shadow: 0 0 8px var(--tulweb-accent);
+}
+
+.tulweb-tab-drop-indicator.visible {
+  opacity: 1;
+}
+
+/* Drag Sources */
+.tulweb-drag-source {
+  cursor: grab;
+  user-select: none;
+}
+
+.tulweb-drag-source:active {
+  cursor: grabbing;
+}
+
+/* Empty State */
+.tulweb-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--tulweb-text-secondary);
+  font-size: 15px;
+  text-align: center;
+}
+
+.tulweb-empty-state svg {
+  width: 48px;
+  height: 48px;
+  opacity: 0.3;
+  margin-bottom: 16px;
+}
+
+/* Toast Notifications */
+.tulweb-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.tulweb-toast {
+  background: var(--tulweb-bg-panel);
+  border-left: 4px solid var(--tulweb-accent);
+  color: var(--tulweb-text-primary);
+  padding: 14px 20px;
+  border-radius: var(--tulweb-radius-inner);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  font-size: 14px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  pointer-events: auto;
+  animation: tulweb-toast-slide-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  transition: opacity 0.3s, transform 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tulweb-toast.error {
+  border-left-color: var(--tulweb-close-hover);
+}
+
+.tulweb-toast.hiding {
+  opacity: 0;
+  transform: translateX(120%);
+}
+
+@keyframes tulweb-toast-slide-in {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Context Menu */
+.tulweb-context-menu {
+  position: fixed;
+  background: var(--tulweb-bg-panel);
+  border: 1px solid var(--tulweb-border);
+  border-radius: var(--tulweb-radius-inner);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  padding: 4px;
+  z-index: 10000;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  min-width: 150px;
+}
+
+.tulweb-context-item {
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--tulweb-text-primary);
+  border-radius: 4px;
+  transition: all 0.1s;
+}
+
+.tulweb-context-item:hover {
+  background: var(--tulweb-accent);
+  color: #000;
+  font-weight: 600;
+}
+
+/* Dropdown / Overflow */
+.tulweb-tab-overflow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: 0 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.tulweb-tab-overflow:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--tulweb-accent);
+}
+
+.tulweb-dropdown {
+  position: absolute;
+  top: 40px;
+  right: 10px;
+  background: var(--tulweb-bg-panel);
+  border: 1px solid var(--tulweb-border);
+  border-radius: var(--tulweb-radius-inner);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  padding: 4px;
+  z-index: 1000;
+  min-width: 150px;
+}
+
+.tulweb-dropdown-item {
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.1s;
+}
+
+.tulweb-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--tulweb-accent);
+}
+
+/* Theme Selector Radio List */
+.theme-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.theme-label {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--tulweb-bg-tab);
+  border: 1px solid var(--tulweb-border);
+  border-radius: var(--tulweb-radius-inner);
+  color: var(--tulweb-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.theme-label:hover {
+  background: var(--tulweb-bg-tab-active);
+  color: var(--tulweb-text-primary);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.theme-radio {
+  display: none;
+}
+
+.theme-label:has(.theme-radio:checked) {
+  background: var(--tulweb-bg-tab-active);
+  color: var(--tulweb-text-primary);
+  border-color: var(--tulweb-accent);
+  box-shadow: 0 4px 12px var(--tulweb-shadow-color), inset 0 0 0 1px var(--tulweb-accent);
+}
+
+.theme-name {
+  display: flex;
+  align-items: center;
+}
+
+.theme-name::before {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--tulweb-text-secondary);
+  margin-right: 12px;
+  transition: all 0.2s;
+}
+
+.theme-label:has(.theme-radio:checked) .theme-name::before {
+  border-color: var(--tulweb-accent);
+  background: var(--tulweb-accent);
+  box-shadow: 0 0 8px var(--tulweb-accent);
+}
