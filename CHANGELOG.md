@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ## [0.6.0] - 2026-04-07
 ### Fixed
+- Clicking close button on tab stack now destroys it.
 - Fixed context menu actions for tab stacks not triggering.
 
 ### Added
