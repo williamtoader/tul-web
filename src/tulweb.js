@@ -53,12 +53,12 @@ class Utils {
 class DragManager {
     constructor(layoutManager) {
         this.isDragging = false
-        this.dragItem = null 
+        this.dragItem = null
         this.proxy = null
         this.indicator = null
         this.layoutManager = layoutManager
-        this.sourceType = null 
-        this.sourceStack = null 
+        this.sourceType = null
+        this.sourceStack = null
 
         this.isPendingDrag = false
         this.pendingStartPos = null
@@ -643,15 +643,15 @@ class Splitter {
             this.prevItem.size = newPrev
             this.nextItem.size = newNext
         } else {
-             // Simplified fixed resize for keyboard
-             if (prevType === 'fixed') {
-                 const parsed = Utils.parseSize(startPrevSize)
-                 this.prevItem.size = (parsed.value + diffPx) + parsed.unit
-             }
-             if (nextType === 'fixed') {
-                 const parsed = Utils.parseSize(startNextSize)
-                 this.nextItem.size = (parsed.value - diffPx) + parsed.unit
-             }
+            // Simplified fixed resize for keyboard
+            if (prevType === 'fixed') {
+                const parsed = Utils.parseSize(startPrevSize)
+                this.prevItem.size = (parsed.value + diffPx) + parsed.unit
+            }
+            if (nextType === 'fixed') {
+                const parsed = Utils.parseSize(startNextSize)
+                this.nextItem.size = (parsed.value - diffPx) + parsed.unit
+            }
         }
         this.prevItem.updateFlex()
         this.nextItem.updateFlex()
@@ -870,10 +870,10 @@ class ContentItem extends EventEmitter {
 
             this.children.splice(index, 1)
             child.parent = null
-            
+
             // Perform actual destruction after removal from array
             child.destroy()
-            
+
             this.updateLayout()
             this.emit('stateChanged')
             if (this.layoutManager) {
@@ -940,7 +940,7 @@ class ContentItem extends EventEmitter {
 
     destroy() {
         if (this.emit('beforeClose') === false) return false
-        
+
         if (this._isFocused) {
             this._isFocused = false
             this.emit('defocus')
@@ -1003,7 +1003,7 @@ class ComponentItem extends ContentItem {
         if (ComponentClassOrFactory) {
             this.element.innerHTML = '' // Clear
             try {
-                const isClass = typeof ComponentClassOrFactory === 'function' && 
+                const isClass = typeof ComponentClassOrFactory === 'function' &&
                     (ComponentClassOrFactory.isClass || (ComponentClassOrFactory.prototype && ComponentClassOrFactory.prototype.constructor.toString().includes('class')))
 
                 let contentNode
@@ -1072,17 +1072,20 @@ class StackItem extends ContentItem {
     createDOM() {
         this.tabPosition = this.config.tabPosition || 'top'
         this.isMinimized = !!this.config.minimized
+        this.isMaximized = !!this.config.isMaximized
 
         // Per-stack control button visibility
         this.displayMinimizeButton = this.config.displayMinimizeButton !== false
         this.displayMaximizeButton = this.config.displayMaximizeButton !== false
         this.displayCloseButton = this.config.displayCloseButton !== false
+        this.displayPopoutButton = this.config.displayPopoutButton !== false
         this.preventEmptyClosure = !!this.config.preventEmptyClosure
 
         this.element = document.createElement('div')
         this.element.className = 'tulweb-stack'
         if (this.preventEmptyClosure) this.element.setAttribute('data-persistent', 'true')
         if (this.isMinimized) this.element.classList.add('minimized')
+        if (this.isMaximized) this.element.classList.add('maximized')
 
         if (this.tabPosition && this.tabPosition !== 'top') {
             this.element.classList.add('tab-' + this.tabPosition)
@@ -1097,12 +1100,24 @@ class StackItem extends ContentItem {
         this.tabsEl.setAttribute('role', 'tablist')
         this.tabsEl.setAttribute('aria-label', 'Layout Stacks')
 
-        const showMin = this.displayMinimizeButton && this.layoutManager.settings.enableMinimize !== false
-        const showMax = this.displayMaximizeButton
-        const showClose = this.displayCloseButton
+        const isPopout = !!this.config.isPopoutChild
+        const showMin = this.displayMinimizeButton && this.layoutManager.settings.enableMinimize !== false && !isPopout
+        const showMax = this.displayMaximizeButton && !isPopout
+        const showClose = this.displayCloseButton && !isPopout
+        const showPopout = this.displayPopoutButton && this.layoutManager.settings.enablePopout === true
 
-        if (showMin || showMax || showClose) {
+        if (showMin || showMax || showClose || showPopout) {
             this.controlsEl = Utils.createElement('div', 'tulweb-header-controls', this.headerEl)
+
+            if (showPopout) {
+                this.popoutBtn = Utils.createElement('div', 'tulweb-control tulweb-popout-btn', this.controlsEl)
+                this.popoutBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/><path d="M5 5v14h14v-7h-2v5H7V7h5V5H5z"/></svg>'
+                this.popoutBtn.title = 'Pop out to new window'
+                this.popoutBtn.addEventListener('click', (e) => {
+                    e.stopPropagation()
+                    this.layoutManager.popoutStack(this)
+                })
+            }
 
             if (showMin) {
                 this.minBtn = Utils.createElement('div', 'tulweb-control', this.controlsEl)
@@ -1167,7 +1182,7 @@ class StackItem extends ContentItem {
     removeChild(child) {
         const index = this.children.indexOf(child);
         const wasActive = index === this.activeChildIndex;
-        
+
         if (super.removeChild(child)) {
             if (this.children.length === 0) {
                 this.activeChildIndex = 0;
@@ -1176,7 +1191,7 @@ class StackItem extends ContentItem {
             } else if (index === this.activeChildIndex) {
                 this.activeChildIndex = Math.min(this.activeChildIndex, this.children.length - 1);
             }
-            
+
             // Re-render is handled by ContentItem calling updateLayout() 
             // which is overridden in StackItem to call renderTabs()
             return true;
@@ -1454,14 +1469,14 @@ class StackItem extends ContentItem {
         const containerRect = this.tabsEl.getBoundingClientRect()
         const tabRect = tab.getBoundingClientRect()
         const isVertical = this.tabPosition === 'left' || this.tabPosition === 'right'
-        
+
         const buffer = 20 // Slightly larger buffer for better visibility
 
         if (isVertical) {
             // Check top overflow
             if (tabRect.top < containerRect.top + buffer) {
                 this.tabsEl.scrollBy({ top: tabRect.top - containerRect.top - buffer, behavior: 'smooth' })
-            } 
+            }
             // Check bottom overflow
             else if (tabRect.bottom > containerRect.bottom - buffer) {
                 this.tabsEl.scrollBy({ top: tabRect.bottom - containerRect.bottom + buffer, behavior: 'smooth' })
@@ -1470,7 +1485,7 @@ class StackItem extends ContentItem {
             // Check left overflow
             if (tabRect.left < containerRect.left + buffer) {
                 this.tabsEl.scrollBy({ left: tabRect.left - containerRect.left - buffer, behavior: 'smooth' })
-            } 
+            }
             // Check right overflow
             else if (tabRect.right > containerRect.right - buffer) {
                 this.tabsEl.scrollBy({ left: tabRect.right - containerRect.right + buffer, behavior: 'smooth' })
@@ -1587,9 +1602,13 @@ class StackItem extends ContentItem {
         if (this.isMinimized) {
             res.minimized = true
         }
+        if (this.isMaximized) {
+            res.isMaximized = true
+        }
         if (!this.displayMinimizeButton) res.displayMinimizeButton = false
         if (!this.displayMaximizeButton) res.displayMaximizeButton = false
         if (!this.displayCloseButton) res.displayCloseButton = false
+        if (!this.displayPopoutButton) res.displayPopoutButton = false
         if (this.preventEmptyClosure) res.preventEmptyClosure = true
         res.content = this.children.map(c => c.toConfig())
         return res
@@ -1737,6 +1756,13 @@ class ContextMenu {
             }
         })
 
+        // Popout option (only when enabled)
+        if (layoutManager.settings.enablePopout && stack.displayPopoutButton !== false) {
+            this.addOption('Popout Stack', () => {
+                layoutManager.popoutStack(stack)
+            })
+        }
+
         document.addEventListener('mousedown', this._closeHandler)
     }
 
@@ -1772,6 +1798,574 @@ class ContextMenu {
 }
 
 
+// --- Popout Manager ---
+
+class PopoutManager {
+    constructor(layoutManager) {
+        this.layoutManager = layoutManager
+        this.openPopouts = new Map() // popoutId -> { window, channel, stackConfig }
+        this._channelName = 'tulweb-popout-' + Utils.generateId()
+
+        // Master channel listens for messages from child windows
+        if (typeof BroadcastChannel !== 'undefined') {
+            this.masterChannel = new BroadcastChannel(this._channelName)
+            this.masterChannel.onmessage = (e) => this._handleChildMessage(e.data)
+        }
+
+        // Close all popouts when parent unloads
+        this._onBeforeUnload = () => this.closeAll()
+        window.addEventListener('beforeunload', this._onBeforeUnload)
+    }
+
+    /**
+     * Pop a stack out into a new browser window.
+     * The stack's config (with all children) is serialized, sent to the child window,
+     * which recreates it using the same registered component factories.
+     */
+    popout(stack) {
+        if (!stack || stack.children.length === 0) return null
+
+        const popoutId = 'popout-' + Utils.generateId()
+        const stackConfig = stack.toConfig()
+
+        // Calculate window dimensions from the stack's current size
+        const rect = stack.element.getBoundingClientRect()
+        const width = Math.max(400, Math.round(rect.width))
+        let height = Math.max(300, Math.round(rect.height))
+        if (stack.isMinimized) height = 500
+        const left = Math.round(window.screenX + rect.left)
+        const top = Math.round(window.screenY + rect.top)
+
+        // Build styles string from all <link> and <style> tags in parent
+        const styles = this._collectStyles()
+        const bodyClass = document.body.className || ''
+
+        // Build the child window HTML
+        const html = this._buildPopoutHTML(popoutId, stackConfig, styles, bodyClass)
+
+        // Open the window
+        const features = `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=no,status=no,toolbar=no,menubar=no,location=no`
+        const childWindow = window.open('', popoutId, features)
+
+        if (!childWindow) {
+            this.layoutManager.showToast('Popup blocked. Please allow popups for this site.', 'error')
+            return null
+        }
+
+        childWindow.document.open()
+        childWindow.document.write(html)
+        childWindow.document.close()
+
+        // Store reference and location for re-integration
+        const parent = stack.parent
+        const index = parent ? parent.children.indexOf(stack) : 0
+        const parentId = parent ? parent.id : null
+
+        const entry = { 
+            window: childWindow, 
+            stackConfig, 
+            popoutId,
+            location: {
+                parentId,
+                index
+            }
+        }
+        this.openPopouts.set(popoutId, entry)
+
+        // Setup child window communication
+        this._setupChildWindow(childWindow, popoutId, stackConfig)
+
+        // Remove the stack from the parent layout
+        // We remove each child component from the stack, then cleanup
+        const parentStack = stack
+        const childConfigs = stackConfig.content || []
+
+        // Remove the stack from the parent tree
+        if (stack.parent) {
+            stack.parent.removeChild(stack)
+            if (stack.parent && stack.parent.children && stack.parent.children.length === 0) {
+                this.layoutManager._cleanupEmptyStack(stack.parent)
+            }
+        } else {
+            // Stack was root
+            this.layoutManager.rootElement.innerHTML = ''
+            this.layoutManager.root = null
+            this.layoutManager.renderEmptyState()
+        }
+
+        this.layoutManager.emit('popoutCreated', { popoutId, stackConfig })
+        this.layoutManager.emit('stateChanged')
+
+        // Monitor child window closure
+        const intervalId = setInterval(() => {
+            if (childWindow.closed) {
+                clearInterval(intervalId)
+                this._handlePopoutClosed(popoutId, stackConfig)
+            }
+        }, 500)
+
+        entry.intervalId = intervalId
+
+        return popoutId
+    }
+
+    _collectStyles() {
+        const parts = []
+
+        // Collect <link rel="stylesheet"> hrefs
+        document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+            parts.push(`<link rel="stylesheet" href="${link.href}">`)
+        })
+
+        // Collect inline <style> tags
+        document.querySelectorAll('style').forEach(style => {
+            parts.push(`<style>${style.textContent}</style>`)
+        })
+
+        return parts.join('\n')
+    }
+
+    _buildPopoutHTML(popoutId, stackConfig, stylesHTML, bodyClass) {
+        // We embed the entire tulweb.js module inline via import from the same origin.
+        // The child window needs access to LayoutManager + component factories.
+        // We use BroadcastChannel to pass factory registration instructions.
+
+        // Use import.meta.url if available (wrapped in eval to avoid parser errors in non-ESM environments like Jest)
+        let tulwebModulePath = '';
+        try {
+            tulwebModulePath = eval('import.meta.url');
+        } catch (e) {}
+
+        // Fallback 1: try to find the module path from script tags
+        if (!tulwebModulePath) {
+            const scriptEls = document.querySelectorAll('script');
+            for (const s of scriptEls) {
+                if (s.src && (s.src.includes('tulweb.js') || s.src.includes('bundle.js'))) {
+                    tulwebModulePath = s.src;
+                    break;
+                }
+            }
+        }
+        // Fallback 2: If we are in the demo, tries to guess the path relative to app.js
+        if (!tulwebModulePath) {
+            const appScript = document.querySelector('script[src*="app.js"]');
+            if (appScript) {
+                try {
+                    // Try to guess based on standard project structure
+                    const base = new URL(appScript.src, window.location.href).href;
+                    if (base.includes('/demo/')) {
+                        tulwebModulePath = new URL('../src/tulweb.js', base).href;
+                    } else {
+                        tulwebModulePath = new URL('src/tulweb.js', base).href;
+                    }
+                } catch (e) {}
+            }
+        }
+
+        // Fallback 3: try common paths relative to current page
+        if (!tulwebModulePath) {
+            try {
+                const base = new URL('.', window.location.href).href;
+                if (base.includes('/demo/')) {
+                    tulwebModulePath = new URL('../src/tulweb.js', base).href;
+                } else {
+                    tulwebModulePath = new URL('src/tulweb.js', base).href;
+                }
+            } catch (e) {}
+        }
+
+        // Serialize the component factory names so the child can request them
+        const factoryNames = Object.keys(this.layoutManager.componentFactories)
+
+        // Clone stack config and ensure it takes full space in child window
+        const stackConfigForChild = JSON.parse(JSON.stringify(stackConfig))
+        stackConfigForChild.size = 100
+        stackConfigForChild.isPopoutChild = true
+        stackConfigForChild.isMaximized = true
+        stackConfigForChild.minimized = false
+
+        // The child window layout config wraps the stack config in a minimal layout
+        const childLayoutConfig = {
+            settings: Object.assign({}, this.layoutManager.settings, {
+                enablePopout: false, // No nesting of popouts
+                hasHeaders: true
+            }),
+            content: [stackConfigForChild]
+        }
+
+        return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${this._getPopoutTitle(stackConfig)}</title>
+    ${stylesHTML}
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        #tulweb-popout-root {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="${bodyClass}">
+    <div id="tulweb-popout-root"></div>
+    <script>
+        // Store config and popout metadata for the initialization script
+        window.__tulweb_popout__ = {
+            popoutId: ${JSON.stringify(popoutId)},
+            channelName: ${JSON.stringify(this._channelName)},
+            layoutConfig: ${JSON.stringify(childLayoutConfig)},
+            factoryNames: ${JSON.stringify(factoryNames)}
+        };
+
+        // Error reporting back to parent
+        window.onerror = function(msg, url, line, col, error) {
+            try {
+                const bc = new BroadcastChannel(window.__tulweb_popout__.channelName);
+                bc.postMessage({
+                    type: 'popoutError',
+                    popoutId: window.__tulweb_popout__.popoutId,
+                    message: msg + (line ? ' at ' + url + ':' + line : '')
+                });
+                bc.close();
+            } catch(e) {}
+            return false;
+        };
+    <\/script>
+    <script type="module">
+        import { LayoutManager } from ${JSON.stringify(tulwebModulePath)};
+
+        const popoutData = window.__tulweb_popout__;
+        const channel = new BroadcastChannel(popoutData.channelName);
+        const container = document.getElementById('tulweb-popout-root');
+
+        // Request component factories from parent
+        channel.postMessage({
+            type: 'requestFactories',
+            popoutId: popoutData.popoutId,
+            factoryNames: popoutData.factoryNames
+        });
+
+        // Mock dependencies that might be used by demo factories
+        window.tulWebLogger = (msg, color) => {
+            console.log('[Parent Logger Proxy] %c' + msg, color ? 'color: ' + color : '');
+        };
+
+        // Wait for parent to confirm factory source transfer
+        channel.onmessage = function initHandler(e) {
+            if (e.data.type === 'factorySources' && e.data.popoutId === popoutData.popoutId) {
+                channel.onmessage = null;
+
+                const layout = new LayoutManager(null, container);
+                window.__tulweb_layout__ = layout;
+
+                // Register component factories from source code strings
+                const sources = e.data.sources;
+                for (const [name, source] of Object.entries(sources)) {
+                    try {
+                        // Reconstruct the factory function from its source
+                        const fn = new Function('return ' + source)();
+                        layout.registerComponent(name, fn);
+                    } catch (err) {
+                        console.warn('Could not reconstruct factory for ' + name + ':', err);
+                        // Register a fallback
+                        layout.registerComponent(name, (state, comp) => {
+                            const el = document.createElement('div');
+                            el.style.padding = '24px';
+                            el.style.color = 'var(--tulweb-text-secondary)';
+                            el.innerHTML = '<p>Component: ' + name + '</p><p style="font-size:12px;opacity:0.6">Could not transfer factory to popout window.</p>';
+                            return el;
+                        });
+                    }
+                }
+
+                // Load the layout
+                layout.loadLayout(popoutData.layoutConfig);
+
+                // Forward state changes back to parent
+                layout.on('stateChanged', () => {
+                    channel.postMessage({
+                        type: 'stateChanged',
+                        popoutId: popoutData.popoutId,
+                        config: layout.toConfig()
+                    });
+                });
+
+                // Listen for parent-initiated updates
+                channel.onmessage = function(e) {
+                    if (e.data.popoutId !== popoutData.popoutId) return;
+                    if (e.data.type === 'themeChanged') {
+                        document.body.className = e.data.bodyClass;
+                    } else if (e.data.type === 'closePopout') {
+                        window.close();
+                    }
+                };
+
+                // Notify parent we're ready
+                channel.postMessage({
+                    type: 'popoutReady',
+                    popoutId: popoutData.popoutId
+                });
+            }
+        };
+
+        // On close, notify parent
+        window.addEventListener('beforeunload', () => {
+            channel.postMessage({
+                type: 'popoutClosing',
+                popoutId: popoutData.popoutId,
+                config: window.__tulweb_layout__ ? window.__tulweb_layout__.toConfig() : null
+            });
+        });
+    <\/script>
+</body>
+</html>`;
+    }
+
+    _getPopoutTitle(stackConfig) {
+        if (stackConfig.content && stackConfig.content.length > 0) {
+            const first = stackConfig.content[0]
+            return (first.title || first.componentName || 'Panel') + ' — TulWEB Popout'
+        }
+        return 'TulWEB Popout'
+    }
+
+    _setupChildWindow(childWindow, popoutId, stackConfig) {
+        // Nothing extra needed; communication is via BroadcastChannel
+    }
+
+    _handleChildMessage(data) {
+        if (!data || !data.popoutId) return
+
+        const entry = this.openPopouts.get(data.popoutId)
+        if (!entry && data.type !== 'popoutClosing') return
+
+        switch (data.type) {
+            case 'requestFactories': {
+                // Send component factory sources to child
+                const sources = {}
+                for (const name of data.factoryNames) {
+                    const factory = this.layoutManager.componentFactories[name]
+                    if (factory) {
+                        sources[name] = factory.toString()
+                    }
+                }
+                this.masterChannel.postMessage({
+                    type: 'factorySources',
+                    popoutId: data.popoutId,
+                    sources
+                })
+                break
+            }
+
+            case 'stateChanged': {
+                // Child state changed - emit event so parent can react
+                this.layoutManager.emit('popoutStateChanged', {
+                    popoutId: data.popoutId,
+                    config: data.config
+                })
+                break
+            }
+
+            case 'popoutReady': {
+                this.layoutManager.emit('popoutReady', { popoutId: data.popoutId })
+                break
+            }
+
+            case 'popoutClosing': {
+                // The child is about to close - re-integrate its content
+                this._handlePopoutClosed(data.popoutId, data.config)
+                break
+            }
+
+            case 'popoutError': {
+                console.error(`[Popout Error ${data.popoutId}]: ${data.message}`)
+                this.layoutManager.emit('popoutError', { popoutId: data.popoutId, message: data.message })
+                break
+            }
+        }
+    }
+
+    _handlePopoutClosed(popoutId, returnedConfig) {
+        const entry = this.openPopouts.get(popoutId)
+        if (!entry) return
+
+        if (entry.intervalId) clearInterval(entry.intervalId)
+        this.openPopouts.delete(popoutId)
+
+        // Re-integrate the stack content into the parent layout
+        const configToRestore = returnedConfig || entry.stackConfig
+
+        if (configToRestore && configToRestore.content) {
+            // Extract stack config from returned layout, or use directly
+            let stackConfig = configToRestore
+            if (configToRestore.content && configToRestore.content[0]) {
+                const top = configToRestore.content[0]
+                // The returned config may be a full layout config wrapping the stack
+                if (top.type === 'stack') {
+                    stackConfig = top
+                } else if (top.content) {
+                    // Could be row/col wrapping - find first stack
+                    const findStack = (item) => {
+                        if (item.type === 'stack') return item
+                        if (item.content) {
+                            for (const child of item.content) {
+                                const found = findStack(child)
+                                if (found) return found
+                            }
+                        }
+                        return null
+                    }
+                    stackConfig = findStack(top) || configToRestore
+                }
+            }
+
+            // Add the stack back to the layout
+            try {
+                const builtStack = this.layoutManager._buildObjectTree(stackConfig)
+                let restored = false
+
+                // Try to restore to previous location
+                if (entry.location && entry.location.parentId) {
+                    let parent = this.layoutManager.getItemById(entry.location.parentId)
+                    
+                    // If the direct parent is gone, try to find an ancestor
+                    if (!parent) {
+                        // This happens if a row/column was destroyed because it became empty
+                        // Fallback: use root if available
+                        parent = this.layoutManager.root
+                    }
+
+                    if (parent && (parent instanceof RowItem || parent instanceof ColumnItem)) {
+                        const targetIndex = Math.min(entry.location.index, parent.children.length)
+                        parent.addChild(builtStack, targetIndex)
+                        restored = true
+                    }
+                }
+
+                if (!restored) {
+                    // Fallback: original re-integration logic
+                    if (!this.layoutManager.root) {
+                        // Layout is empty, create the stack as root
+                        const row = this.layoutManager._buildObjectTree({
+                            type: 'row',
+                            content: [stackConfig]
+                        })
+                        this.layoutManager.root = row
+                        this.layoutManager.rootElement.innerHTML = ''
+                        this.layoutManager.rootElement.appendChild(row.element)
+                        this.layoutManager.root.updateLayout()
+                    } else {
+                        // Find the best stack to add to, or create a new split
+                        const root = this.layoutManager.root
+
+                        if (root instanceof RowItem) {
+                            builtStack.size = 50
+                            // Reduce existing children proportionally
+                            root.children.forEach(c => { if (typeof c.size === 'number') c.size *= 0.8 })
+                            root.addChild(builtStack)
+                        } else if (root instanceof ColumnItem) {
+                            builtStack.size = 50
+                            root.children.forEach(c => { if (typeof c.size === 'number') c.size *= 0.8 })
+                            root.addChild(builtStack)
+                        } else {
+                            // Root is a stack - wrap in row
+                            const wrapper = new RowItem({ type: 'row' }, this.layoutManager)
+                            const oldRoot = root
+                            oldRoot.size = 50
+                            builtStack.size = 50
+
+                            this.layoutManager.rootElement.innerHTML = ''
+                            oldRoot.parent = null
+                            wrapper.addChild(oldRoot, undefined, true)
+                            wrapper.addChild(builtStack, undefined, true)
+
+                            this.layoutManager.root = wrapper
+                            this.layoutManager.rootElement.appendChild(wrapper.element)
+                            wrapper.updateLayout()
+                        }
+                    }
+                }
+
+                this.layoutManager.updateLayout()
+                this.layoutManager.showToast('Popout returned to workspace')
+            } catch (err) {
+                console.error('Failed to re-integrate popout:', err)
+                this.layoutManager.showToast('Failed to restore popout content', 'error')
+            }
+        }
+
+        this.layoutManager.emit('popoutClosed', { popoutId })
+        this.layoutManager.emit('stateChanged')
+    }
+
+    /**
+     * Send a theme change to all open popouts
+     */
+    broadcastThemeChange(bodyClass) {
+        this.openPopouts.forEach((entry, popoutId) => {
+            if (this.masterChannel) {
+                this.masterChannel.postMessage({
+                    type: 'themeChanged',
+                    popoutId,
+                    bodyClass
+                })
+            }
+        })
+    }
+
+    /**
+     * Close a specific popout
+     */
+    closePopout(popoutId) {
+        const entry = this.openPopouts.get(popoutId)
+        if (entry) {
+            if (this.masterChannel) {
+                this.masterChannel.postMessage({
+                    type: 'closePopout',
+                    popoutId
+                })
+            }
+            // Also try to close directly
+            try { entry.window.close() } catch (e) { /* cross-origin safety */ }
+        }
+    }
+
+    /**
+     * Close all open popouts
+     */
+    closeAll() {
+        this.openPopouts.forEach((entry, popoutId) => {
+            this.closePopout(popoutId)
+        })
+    }
+
+    /**
+     * Get the number of open popouts
+     */
+    get count() {
+        return this.openPopouts.size
+    }
+
+    destroy() {
+        this.closeAll()
+        window.removeEventListener('beforeunload', this._onBeforeUnload)
+        if (this.masterChannel) {
+            this.masterChannel.close()
+            this.masterChannel = null
+        }
+        this.openPopouts.clear()
+    }
+}
+
+
 // --- Public Layout Manager ---
 
 class LayoutManager extends EventEmitter {
@@ -1783,7 +2377,8 @@ class LayoutManager extends EventEmitter {
         this.settings = Object.assign({
             onlyResizeActiveTabs: true,
             enableMinimize: true,
-            enablePreview: false
+            enablePreview: false,
+            enablePopout: false
         }, config && config.settings ? config.settings : {}, options)
 
         // Create root DOM element
@@ -1795,6 +2390,9 @@ class LayoutManager extends EventEmitter {
         this.activeStack = null
 
         this.dragManager = new DragManager(this)
+
+        // Initialize popout manager
+        this.popoutManager = new PopoutManager(this)
 
         if (config) {
             this.loadLayout(config)
@@ -1819,6 +2417,9 @@ class LayoutManager extends EventEmitter {
     destroy() {
         window.removeEventListener('resize', this._onWindowResize)
         document.removeEventListener('keydown', this._onKeyDown)
+        if (this.popoutManager) {
+            this.popoutManager.destroy()
+        }
         if (this.root) this.root.destroy()
         if (this.rootElement && this.rootElement.parentElement) {
             this.rootElement.parentElement.removeChild(this.rootElement)
@@ -1844,7 +2445,7 @@ class LayoutManager extends EventEmitter {
 
     loadLayout(config) {
         if (!config) throw new Error("Layout config is required")
-        
+
         // Basic Validation (Tier 3)
         if (config.content && !Array.isArray(config.content)) {
             throw new Error("Invalid config: 'content' must be an array")
@@ -2085,6 +2686,10 @@ class LayoutManager extends EventEmitter {
         return this._findInTree(this.root, item => item.type === 'stack' && item.id === id)
     }
 
+    getItemById(id) {
+        return this._findInTree(this.root, item => item.id === id)
+    }
+
     getAllStacks() {
         const stacks = []
         this._traverseTree(this.root, item => {
@@ -2131,12 +2736,52 @@ class LayoutManager extends EventEmitter {
             item.children.forEach(child => this._traverseTree(child, callback))
         }
     }
+
+    // --- Popout API ---
+
+    /**
+     * Pop a stack out to a new browser window.
+     * Requires enablePopout: true in settings.
+     * @param {StackItem} stack - The stack to pop out
+     * @returns {string|null} The popout ID, or null if blocked
+     */
+    popoutStack(stack) {
+        if (!this.settings.enablePopout) {
+            console.warn('Popout is disabled. Set enablePopout: true in settings.')
+            return null
+        }
+        return this.popoutManager.popout(stack)
+    }
+
+    /**
+     * Close all open popout windows.
+     */
+    closeAllPopouts() {
+        this.popoutManager.closeAll()
+    }
+
+    /**
+     * Close a specific popout by ID.
+     * @param {string} popoutId
+     */
+    closePopout(popoutId) {
+        this.popoutManager.closePopout(popoutId)
+    }
+
+    /**
+     * Broadcast a theme change to all open popout windows.
+     * @param {string} bodyClass - The CSS class(es) to apply to body
+     */
+    broadcastThemeToPopouts(bodyClass) {
+        this.popoutManager.broadcastThemeChange(bodyClass)
+    }
 }
 
 
 // Expose API
 export {
     LayoutManager,
+    PopoutManager,
     DragSource,
     Utils as utils,
     ContentItem,

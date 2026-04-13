@@ -428,6 +428,10 @@ document.addEventListener("DOMContentLoaded", function () {
             themeSelector.addEventListener("change", (e) => {
                 if (e.target.name === 'theme-app') {
                     document.body.className = e.target.value;
+                    // Broadcast theme to any open popout windows
+                    if (layout.broadcastThemeToPopouts) {
+                        layout.broadcastThemeToPopouts(e.target.value);
+                    }
                 }
             });
 
@@ -487,12 +491,12 @@ document.addEventListener("DOMContentLoaded", function () {
                                 displayCloseButton: false,
                                 displayMinimizeButton: false,
                                 content: [
-                                    { 
-                                        type: 'component', 
-                                        componentName: 'generic', 
-                                        title: 'How to use', 
-                                        componentState: { 
-                                            name: 'How to use the Demo', 
+                                    {
+                                        type: 'component',
+                                        componentName: 'generic',
+                                        title: 'How to use',
+                                        componentState: {
+                                            name: 'How to use the Demo',
                                             explanation: `
                                                 <div style="line-height: 1.6; font-family: 'Inter', sans-serif;">
                                                     <p>Welcome to the <strong>TulWEB</strong> interactive demo. This toolkit allows you to create complex, responsive layouts with ease.</p>
@@ -522,20 +526,20 @@ document.addEventListener("DOMContentLoaded", function () {
                                                         </div>
                                                     </div>
 
-                                                    <div style="margin-top: 16px; background: var(--tulweb-bg-console); padding: 12px; border-radius: 8px; border-left: 4px solid var(--tulweb-accent);">
+                                                    <div style="margin-top: 16px; background: var(--tulweb-bg-tab); padding: 12px; border-radius: 8px; border-left: 4px solid var(--tulweb-accent);">
                                                         <h4 style="margin: 0 0 4px 0; color: var(--tulweb-text-primary); font-size: 13px;">💡 Live Editing</h4>
                                                         <p style="font-size: 12px; margin: 0;">Check the <code>layout.json</code> tab in this stack. Edit the JSON and click <strong>Apply Changes</strong> to see the layout engine update in real-time!</p>
                                                     </div>
                                                 </div>
                                             `
-                                        } 
+                                        }
                                     },
-                                    { 
-                                        type: 'component', 
-                                        componentName: 'generic', 
-                                        title: 'README.md', 
-                                        componentState: { 
-                                            name: 'Welcome to TulWEB Demo', 
+                                    {
+                                        type: 'component',
+                                        componentName: 'generic',
+                                        title: 'README.md',
+                                        componentState: {
+                                            name: 'Welcome to TulWEB Demo',
                                             explanation: `
                                                 <div style="line-height: 1.6;">
                                                     <p>This is a live demonstration of the <strong>TulWEB Layout Manager</strong>.</p>
@@ -549,7 +553,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                                     </ul>
                                                 </div>
                                             `
-                                        } 
+                                        }
                                     },
                                     { type: 'component', componentName: 'editor', title: 'main.js', componentState: { text: "console.log('IDE Mode');" } },
                                     { type: 'component', componentName: 'editor', title: 'layout.json', componentState: { isLayoutEditor: true, text: "" } }
@@ -686,7 +690,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 1. Initialize Layout Manager
     const containerWrapper = document.getElementById("layout-container");
-    const layout = new LayoutManager(null, containerWrapper);
+    const layout = new LayoutManager(null, containerWrapper, { enablePopout: true });
 
     // Make layout globally accessible for the demo buttons
     window.layout = layout;
@@ -710,6 +714,20 @@ document.addEventListener("DOMContentLoaded", function () {
         comp.on('defocus', () => window.tulWebLogger(`${getName()} Unfocused`, '#6272a4'));
         comp.on('move', () => window.tulWebLogger(`${getName()} Moved`, '#8be9fd'));
         comp.on('resize', () => window.tulWebLogger(`${getName()} Resized`, 'var(--tulweb-text-secondary)'));
+    });
+
+    // Popout lifecycle events
+    layout.on('popoutCreated', (data) => {
+        if (window.tulWebLogger) window.tulWebLogger(`Popout created: ${data.popoutId}`, '#ff79c6');
+    });
+    layout.on('popoutReady', (data) => {
+        if (window.tulWebLogger) window.tulWebLogger(`Popout ready: ${data.popoutId}`, '#50fa7b');
+    });
+    layout.on('popoutStateChanged', (data) => {
+        if (window.tulWebLogger) window.tulWebLogger(`Popout state changed: ${data.popoutId}`, '#8be9fd');
+    });
+    layout.on('popoutClosed', (data) => {
+        if (window.tulWebLogger) window.tulWebLogger(`Popout closed & restored: ${data.popoutId}`, '#f1fa8c');
     });
 
     // 2. Register Components
