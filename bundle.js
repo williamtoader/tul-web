@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import { execSync } from 'child_process';
 
 function bundlePage(sourceHtml, sourceJs, outputHtml) {
@@ -18,10 +19,13 @@ function bundlePage(sourceHtml, sourceJs, outputHtml) {
             const fullTag = match[0];
             const cssFileName = match[1];
             
+            // Resolve path relative to the HTML file
+            const cssPath = path.join(path.dirname(sourceHtml), cssFileName);
+            
             // Only handle local files
-            if (!cssFileName.startsWith('http') && fs.existsSync(cssFileName)) {
+            if (!cssFileName.startsWith('http') && fs.existsSync(cssPath)) {
                 console.log(`  - Inlining ${cssFileName}...`);
-                const cssContent = fs.readFileSync(cssFileName, 'utf8');
+                const cssContent = fs.readFileSync(cssPath, 'utf8');
                 bundledHtml = bundledHtml.replace(fullTag, `<style>\n${cssContent}\n</style>`);
             }
         }
@@ -32,7 +36,9 @@ function bundlePage(sourceHtml, sourceJs, outputHtml) {
 
         // Replace JS tag - Note: we remove type="module" because it's now a bundled IIFE
         // Use a more robust regex for the script tag
-        const scriptRegExp = new RegExp(`<script type="module" src="${sourceJs}"></script>`, 'g');
+        // Get the filename of the source JS for regex
+        const jsFileName = path.basename(sourceJs);
+        const scriptRegExp = new RegExp(`<script type="module" src="${jsFileName}"></script>`, 'g');
         bundledHtml = bundledHtml.replace(scriptRegExp, `<script>\n${bundledJs}\n</script>`);
 
         fs.writeFileSync(outputHtml, bundledHtml);
@@ -46,12 +52,12 @@ function bundlePage(sourceHtml, sourceJs, outputHtml) {
 
 try {
     // Bundle Documentation
-    bundlePage('docs.html', 'docs.js', 'docs-bundle.html');
+    bundlePage('docs/docs.html', 'docs/docs.js', 'docs-bundle.html');
     
     console.log(''); // New line
     
     // Bundle Index
-    bundlePage('index.html', 'app.js', 'index-bundle.html');
+    bundlePage('demo/index.html', 'demo/app.js', 'index-bundle.html');
 
 } catch (error) {
     process.exit(1);

@@ -6,7 +6,7 @@ async function waitForLayout(page) {
 
 test.describe('Stack Controls', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/demo/');
     await waitForLayout(page);
   });
 

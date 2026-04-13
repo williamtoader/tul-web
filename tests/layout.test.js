@@ -9,7 +9,7 @@ async function waitForLayout(page) {
 
 test.describe('Initial Load', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/demo/');
     await waitForLayout(page);
   });
 

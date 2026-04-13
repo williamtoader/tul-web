@@ -6,7 +6,7 @@ async function waitForLayout(page) {
 
 test.describe('Drag and Drop', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/demo/');
     await waitForLayout(page);
   });
 
@@ -63,7 +63,7 @@ test.describe('Drag and Drop', () => {
 
 test.describe('Splitter Resizing', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/demo/');
     await waitForLayout(page);
   });
 

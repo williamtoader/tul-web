@@ -6,7 +6,7 @@ async function waitForLayout(page) {
 
 test.describe('LayoutManager API', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/demo/');
     await waitForLayout(page);
   });
 
@@ -130,20 +130,33 @@ test.describe('LayoutManager API', () => {
   });
 
   test('beforeClose hook can cancel tab closure', async ({ page }) => {
+    // Load a simple controlled layout
+    await page.evaluate(() => {
+      window.layout.loadLayout({
+        content: [{
+          type: 'stack',
+          content: [
+            { type: 'component', componentName: 'editor', title: 'CancelMe' },
+            { type: 'component', componentName: 'editor', title: 'KeepMe' }
+          ]
+        }]
+      });
+    });
+    await waitForLayout(page);
     const initialCount = await page.locator('.tulweb-tab').count();
 
     await page.evaluate(() => {
-      const stacks = window.layout.getAllStacks();
-      const tab = stacks[0].children[0];
+      const tab = window.layout.getAllStacks()[0].children.find(c => c.config.title === 'CancelMe');
       tab.on('beforeClose', () => {
+        window.beforeCloseCalled = true;
         return false; // Cancel closure
       });
     });
 
-    // Try to click the close btn
-    const closeBtn = page.locator('.tulweb-tab-close').first();
-    await closeBtn.click();
-
+    // Try to click the close btn for 'CancelMe' tab
+    const targetTab = page.locator('.tulweb-tab', { hasText: 'CancelMe' });
+    await targetTab.locator('.tulweb-tab-close').click();
+    
     // Still there
     await expect(page.locator('.tulweb-tab')).toHaveCount(initialCount);
   });

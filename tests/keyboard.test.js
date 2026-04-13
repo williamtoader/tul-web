@@ -6,7 +6,7 @@ async function waitForLayout(page) {
 
 test.describe('Keyboard Shortcuts', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/demo/');
     await waitForLayout(page);
     // Click on layout area to ensure keyboard focus is in the page
     await page.locator('.tulweb-root').click();

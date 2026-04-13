@@ -1,8 +1,8 @@
 {
   "name": "tulweb",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "Pure JS Windowing Toolkit",
-  "main": "tulweb.js",
+  "main": "src/tulweb.js",
   "type": "module",
   "scripts": {
     "start": "npx -y http-server ./ -c-1",

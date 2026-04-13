@@ -1164,10 +1164,47 @@ class StackItem extends ContentItem {
         super.destroy()
     }
 
+    removeChild(child) {
+        const index = this.children.indexOf(child);
+        const wasActive = index === this.activeChildIndex;
+        
+        if (super.removeChild(child)) {
+            if (this.children.length === 0) {
+                this.activeChildIndex = 0;
+            } else if (index < this.activeChildIndex) {
+                this.activeChildIndex--;
+            } else if (index === this.activeChildIndex) {
+                this.activeChildIndex = Math.min(this.activeChildIndex, this.children.length - 1);
+            }
+            
+            // Re-render is handled by ContentItem calling updateLayout() 
+            // which is overridden in StackItem to call renderTabs()
+            return true;
+        }
+        return false;
+    }
+
     _appendDOMChild(child, index) {
         this.contentAreaEl.appendChild(child.element)
         child.renderAppContent() // Lazy render when added
         this.activeChildIndex = typeof index === 'number' ? index : this.children.length - 1 // Activate new
+    }
+
+    _closeTab(child, index, shouldFocus = true) {
+        const wasActive = index === this.activeChildIndex;
+        if (this.removeChild(child)) {
+            if (this.children.length === 0) {
+                this.layoutManager._cleanupEmptyStack(this);
+            } else if (wasActive && shouldFocus) {
+                // Wait for DOM to update then focus the new active tab
+                setTimeout(() => {
+                    const tabs = this.tabsEl.querySelectorAll('.tulweb-tab');
+                    if (tabs[this.activeChildIndex]) {
+                        tabs[this.activeChildIndex].focus();
+                    }
+                }, 0);
+            }
+        }
     }
 
     _removeDOMChild(child) {
@@ -1201,16 +1238,7 @@ class StackItem extends ContentItem {
                 close.textContent = '×'
                 close.addEventListener('click', (e) => {
                     e.stopPropagation()
-                    const wasActive = index === this.activeChildIndex
-                    if (this.removeChild(child)) {
-                        if (this.children.length === 0) {
-                            this.layoutManager._cleanupEmptyStack(this)
-                        } else if (wasActive) {
-                            // Focus the new active tab
-                            const tabs = this.tabsEl.querySelectorAll('.tulweb-tab')
-                            if (tabs[this.activeChildIndex]) tabs[this.activeChildIndex].focus()
-                        }
-                    }
+                    this._closeTab(child, index)
                 })
 
                 // Tab drag (allow only if closeable target wasn't clicked, though we check that later)
@@ -1244,7 +1272,7 @@ class StackItem extends ContentItem {
                     this.tabsEl.querySelectorAll('.tulweb-tab')[this.children.length - 1].focus()
                 } else if (e.key === 'Delete' && isCloseable) {
                     e.preventDefault()
-                    this.removeChild(child)
+                    this._closeTab(child, index, true)
                 }
                 if (e.key === 'Enter' || e.key === ' ') {
                     this.setActive(index)

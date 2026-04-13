@@ -1,4 +1,4 @@
-import { LayoutManager } from './tulweb.js';
+import { LayoutManager } from '../src/tulweb.js';
 
 document.addEventListener("DOMContentLoaded", function () {
 

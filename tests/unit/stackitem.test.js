@@ -1,4 +1,4 @@
-import { StackItem, ComponentItem, LayoutManager } from '../../tulweb.js';
+import { StackItem, ComponentItem, LayoutManager } from '../../src/tulweb.js';
 
 describe('StackItem', () => {
     let container;

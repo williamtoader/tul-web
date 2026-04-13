@@ -13,7 +13,7 @@ const docsTopics = {
                 <div class="code-block">
 <pre><code>&lt;link rel="stylesheet" href="tulweb.css"&gt;
 &lt;script type="module"&gt;
-  import { LayoutManager } from './tulweb.js';
+  import { LayoutManager } from '../src/tulweb.js';
   const layout = new LayoutManager(null, document.body);
 &lt;/script&gt;</code></pre>
                 </div>
@@ -400,7 +400,7 @@ npm run test:unit</pre>
     }
 };
 
-import { LayoutManager } from './tulweb.js';
+import { LayoutManager } from '../src/tulweb.js';
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -692,7 +692,7 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
 
         <div class="nav-links">
-            <a href="index.html" class="nav-link">
+            <a href="../demo/index.html" class="nav-link">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="19" y1="12" x2="5" y2="12"></line>
                     <polyline points="12 19 5 12 12 5"></polyline>

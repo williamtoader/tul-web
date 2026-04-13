@@ -6,7 +6,7 @@ async function waitForLayout(page) {
 
 test.describe('Accessibility (a11y)', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/demo/');
     await waitForLayout(page);
     
     // Load a simple test layout to ensure stability

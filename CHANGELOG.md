@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2026-04-13
+### Added
+- **Project Reorganization**: Standardized directory structure into `src`, `demo`, `docs`, and `assets` for improved maintainability.
+- **Root Portal**: Professional landing page at the project root with high-aesthetic design and quick links to the demo and documentation.
+- **Enhanced Bundler**: Refactored `bundle.js` with relative path mapping, enabling seamless self-contained builds from nested source directories.
+
+### Changed
+- Moved core library files to `src/` and application/documentation files to their respective `demo/` and `docs/` folders.
+- Optimized Playwright E2E configuration and `baseURL` to support modular pathing without breaking test stability.
+
+### Fixed
+- **API State Consistency**: Implemented `StackItem.removeChild` to correctly adjust `activeChildIndex` when manipulating tabs programmatically.
+- **Keyboard Focus Management**: Unified tab closure logic via `_closeTab` helper, ensuring the "Delete" key correctly shifts focus and manages stack cleanup, mirroring mouse interactions.
+- **DOM Race Conditions**: Standardized focus transitions to use asynchronous scheduling, ensuring reliable focus management during rapid tab operations across all environments.
+
 ## [2.3.0] - 2026-04-13
 ### Added
 - **Production Readiness**: Refactored `DragManager` to use per-instance state, enabling multiple `LayoutManager` instances on the same page.

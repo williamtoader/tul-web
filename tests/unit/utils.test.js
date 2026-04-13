@@ -1,4 +1,4 @@
-import { utils as Utils } from '../../tulweb.js';
+import { utils as Utils } from '../../src/tulweb.js';
 
 describe('Utils', () => {
     describe('createElement', () => {
