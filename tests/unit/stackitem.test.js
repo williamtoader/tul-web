@@ -102,4 +102,52 @@ describe('StackItem', () => {
         expect(tabs[0].textContent).toContain('Tab 1');
         expect(tabs[1].textContent).toContain('Tab 2');
     });
+
+    test('updateOverflow detects horizontal overflow and shows button', () => {
+        const stack = new StackItem({ type: 'stack' }, layoutManager);
+        stack.addChild(new ComponentItem({ type: 'component', title: 'T1' }, layoutManager));
+        
+        // Mock overflow
+        Object.defineProperty(stack.tabsEl, 'scrollWidth', { value: 200, configurable: true });
+        Object.defineProperty(stack.tabsEl, 'clientWidth', { value: 100, configurable: true });
+        
+        stack.updateOverflow();
+        expect(stack.overflowBtn.style.display).toBe('flex');
+    });
+
+    test('updateOverflow detects vertical overflow for side positions', () => {
+        const stack = new StackItem({ type: 'stack', tabPosition: 'left' }, layoutManager);
+        stack.addChild(new ComponentItem({ type: 'component', title: 'T1' }, layoutManager));
+        
+        // Mock overflow
+        Object.defineProperty(stack.tabsEl, 'scrollHeight', { value: 200, configurable: true });
+        Object.defineProperty(stack.tabsEl, 'clientHeight', { value: 100, configurable: true });
+        
+        stack.updateOverflow();
+        expect(stack.overflowBtn.style.display).toBe('flex');
+    });
+
+    test('scrollTabIntoView calls scrollTo on tabs container', () => {
+        const stack = new StackItem({ type: 'stack' }, layoutManager);
+        stack.addChild(new ComponentItem({ type: 'component', title: 'T1' }, layoutManager));
+        stack.addChild(new ComponentItem({ type: 'component', title: 'T2' }, layoutManager));
+        stack.renderTabs();
+
+        const scrollToMock = jest.fn();
+        stack.tabsEl.scrollTo = scrollToMock;
+
+        // Mock tab positions
+        const tabs = stack.tabsEl.querySelectorAll('.tulweb-tab');
+        Object.defineProperty(tabs[1], 'offsetLeft', { value: 150 });
+        Object.defineProperty(tabs[1], 'offsetWidth', { value: 50 });
+        Object.defineProperty(stack.tabsEl, 'clientWidth', { value: 100 });
+        Object.defineProperty(stack.tabsEl, 'scrollLeft', { value: 0 });
+
+        stack.scrollTabIntoView(1);
+        expect(scrollToMock).toHaveBeenCalledWith(expect.objectContaining({
+            left: expect.any(Number),
+            behavior: 'smooth'
+        }));
+    });
 });
+

@@ -1315,58 +1315,48 @@ class StackItem extends ContentItem {
     }
 
     updateOverflow() {
-        let tabs = Array.from(this.tabsEl.querySelectorAll('.tulweb-tab'))
-        tabs.forEach(t => t.style.display = '')
-
-        if (this.overflowBtn) this.overflowBtn.style.display = 'none'
-        if (this.dropdownEl) this.dropdownEl.style.display = 'none'
-
-        if (tabs.length <= 1) return
+        if (!this.tabsEl) return
 
         const isVertical = this.tabPosition === 'left' || this.tabPosition === 'right'
+        let hasOverflow = false
 
-        // Add 8px to account for the container's padding-left/top 
-        let totalSize = tabs.reduce((w, t) => w + (isVertical ? t.offsetHeight : t.offsetWidth) + 2, 0) + 8
-        let maxSize = isVertical ? this.tabsEl.clientHeight : this.tabsEl.clientWidth
-
-        if (totalSize <= maxSize) return
-
-        if (!this.overflowBtn) {
-            this.overflowBtn = Utils.createElement('div', 'tulweb-tab-overflow')
-            this.overflowBtn.innerHTML = '‹›'
-            // Insert after tabsEl (before whatever comes next, like controlsEl)
-            this.headerEl.insertBefore(this.overflowBtn, this.tabsEl.nextSibling)
-
-            this.dropdownEl = Utils.createElement('div', 'tulweb-dropdown', this.element)
-            this.dropdownEl.style.display = 'none'
-
-            this.overflowBtn.addEventListener('click', (e) => {
-                e.stopPropagation()
-                const show = this.dropdownEl.style.display === 'none'
-                if (show) {
-                    this.updateDropdownPosition()
-                    this.renderDropdown()
-                }
-                this.dropdownEl.style.display = show ? 'block' : 'none'
-            })
-
-            document.addEventListener('mousedown', this._onDocumentClick)
+        if (isVertical) {
+            hasOverflow = this.tabsEl.scrollHeight > this.tabsEl.clientHeight
+        } else {
+            hasOverflow = this.tabsEl.scrollWidth > this.tabsEl.clientWidth
         }
 
-        this.overflowBtn.style.display = 'flex'
-        this.hiddenTabs = []
+        if (hasOverflow) {
+            if (!this.overflowBtn) {
+                this.overflowBtn = Utils.createElement('div', 'tulweb-tab-overflow')
+                this.overflowBtn.innerHTML = '‹›'
+                this.headerEl.insertBefore(this.overflowBtn, this.tabsEl.nextSibling)
 
-        const maxW = maxSize - 30 // space for btn
-        for (let i = tabs.length - 1; i >= 0; i--) {
-            if (totalSize <= maxW) break
-            if (i === this.activeChildIndex) continue
+                this.dropdownEl = Utils.createElement('div', 'tulweb-dropdown', this.element)
+                this.dropdownEl.style.display = 'none'
 
-            tabs[i].style.display = 'none'
-            totalSize -= ((isVertical ? tabs[i].offsetHeight : tabs[i].offsetWidth) + 2)
-            this.hiddenTabs.push(this.children[i])
+                this.overflowBtn.addEventListener('click', (e) => {
+                    e.stopPropagation()
+                    const show = this.dropdownEl.style.display === 'none'
+                    if (show) {
+                        this.updateDropdownPosition()
+                        this.renderDropdown()
+                    }
+                    this.dropdownEl.style.display = show ? 'block' : 'none'
+                })
+
+                document.addEventListener('mousedown', this._onDocumentClick)
+            }
+            this.overflowBtn.style.display = 'flex'
+        } else {
+            if (this.overflowBtn) this.overflowBtn.style.display = 'none'
+            if (this.dropdownEl) this.dropdownEl.style.display = 'none'
         }
-        this.hiddenTabs.reverse()
+
+        // Keep all tabs in dropdown for convenience jumping
+        this.hiddenTabs = this.children
     }
+
 
     _onDocumentClick(e) {
         if (this.dropdownEl && !this.dropdownEl.contains(e.target) && e.target !== this.overflowBtn) {
@@ -1417,6 +1407,7 @@ class StackItem extends ContentItem {
             item.textContent = child.config.title || child.config.componentName || 'Tab'
             const selectTab = () => {
                 const index = this.children.indexOf(child)
+                this.layoutManager.setActiveStack(this)
                 this.setActive(index)
                 this.dropdownEl.style.display = 'none'
             }
@@ -1429,22 +1420,65 @@ class StackItem extends ContentItem {
         const hadFocus = document.activeElement && this.tabsEl && this.tabsEl.contains(document.activeElement)
         const oldIndex = this.activeChildIndex
         this.activeChildIndex = index
-        
+
         if (this.isMinimized) {
             this.toggleMinimize()
         } else {
             this.renderTabs()
             this.showActiveChild()
-            
+
             if (hadFocus || oldIndex !== index) {
-                // If we switched tabs via keyboard, or had focus in the tab bar, ensure new tab is focused
                 setTimeout(() => {
                     const tabs = this.tabsEl.querySelectorAll('.tulweb-tab')
-                    if (tabs[this.activeChildIndex]) tabs[this.activeChildIndex].focus()
+                    if (tabs[this.activeChildIndex]) {
+                        tabs[this.activeChildIndex].focus()
+                    }
                 }, 0)
+            }
+            // Ensure we scroll only after the browser has laid out the new content
+            setTimeout(() => {
+                this.scrollTabIntoView(index)
+            }, 50)
+        }
+
+        this.layoutManager.emit('stackChanged', this)
+        this.layoutManager.emit('stateChanged')
+    }
+
+    scrollTabIntoView(index) {
+        if (!this.tabsEl) return
+        const tabs = this.tabsEl.querySelectorAll('.tulweb-tab')
+        const tab = tabs[index]
+        if (!tab) return
+
+        const containerRect = this.tabsEl.getBoundingClientRect()
+        const tabRect = tab.getBoundingClientRect()
+        const isVertical = this.tabPosition === 'left' || this.tabPosition === 'right'
+        
+        const buffer = 20 // Slightly larger buffer for better visibility
+
+        if (isVertical) {
+            // Check top overflow
+            if (tabRect.top < containerRect.top + buffer) {
+                this.tabsEl.scrollBy({ top: tabRect.top - containerRect.top - buffer, behavior: 'smooth' })
+            } 
+            // Check bottom overflow
+            else if (tabRect.bottom > containerRect.bottom - buffer) {
+                this.tabsEl.scrollBy({ top: tabRect.bottom - containerRect.bottom + buffer, behavior: 'smooth' })
+            }
+        } else {
+            // Check left overflow
+            if (tabRect.left < containerRect.left + buffer) {
+                this.tabsEl.scrollBy({ left: tabRect.left - containerRect.left - buffer, behavior: 'smooth' })
+            } 
+            // Check right overflow
+            else if (tabRect.right > containerRect.right - buffer) {
+                this.tabsEl.scrollBy({ left: tabRect.right - containerRect.right + buffer, behavior: 'smooth' })
             }
         }
     }
+
+
 
     showActiveChild() {
         const isStackFocused = this.layoutManager.activeStack === this
