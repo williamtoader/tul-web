@@ -642,21 +642,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
         <div>
             <h2>Select Theme</h2>
-            <div id="theme-selector" class="theme-selector">
+            <div class="theme-selector">
                 <label class="theme-label">
-                    <input type="radio" name="theme" class="theme-radio" value="theme-nordic" checked>
+                    <input type="radio" name="theme-docs" class="theme-radio" value="theme-nordic" ${document.body.classList.contains('theme-nordic') ? 'checked' : ''}>
                     <span class="theme-name">Industrial Graphite</span>
                 </label>
                 <label class="theme-label">
-                    <input type="radio" name="theme" class="theme-radio" value="theme-cyber">
+                    <input type="radio" name="theme-docs" class="theme-radio" value="theme-cyber" ${document.body.classList.contains('theme-cyber') ? 'checked' : ''}>
                     <span class="theme-name">Phosphor Terminal</span>
                 </label>
                 <label class="theme-label">
-                    <input type="radio" name="theme" class="theme-radio" value="theme-light">
+                    <input type="radio" name="theme-docs" class="theme-radio" value="theme-light" ${document.body.classList.contains('theme-light') ? 'checked' : ''}>
                     <span class="theme-name">Pro Light</span>
                 </label>
                 <label class="theme-label">
-                    <input type="radio" name="theme" class="theme-radio" value="theme-retro">
+                    <input type="radio" name="theme-docs" class="theme-radio" value="theme-retro" ${document.body.classList.contains('theme-retro') ? 'checked' : ''}>
                     <span class="theme-name">90's Workstation</span>
                 </label>
             </div>
@@ -689,9 +689,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
 
-            const themeSelector = el.querySelector("#theme-selector");
+            const themeSelector = el.querySelector(".theme-selector");
             themeSelector.addEventListener("change", (e) => {
-                if (e.target.name === 'theme') {
+                if (e.target.name === 'theme-docs') {
                     document.body.className = e.target.value;
                 }
             });

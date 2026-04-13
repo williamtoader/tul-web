@@ -134,6 +134,69 @@
             background: rgba(128, 128, 128, 0.3);
             border-radius: 4px;
         }
+
+        /* Theme Selector Widget */
+        .theme-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .theme-label {
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            background: var(--tulweb-bg-tab);
+            border: 1px solid var(--tulweb-border);
+            border-radius: var(--tulweb-radius-inner);
+            color: var(--tulweb-text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .theme-label:hover {
+            background: var(--tulweb-bg-tab-active);
+            color: var(--tulweb-text-primary);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(4px);
+        }
+
+        .theme-radio {
+            display: none;
+        }
+
+        .theme-label:has(.theme-radio:checked) {
+            background: var(--tulweb-bg-tab-active);
+            color: var(--tulweb-text-primary);
+            border-color: var(--tulweb-accent);
+            box-shadow: 0 4px 12px var(--tulweb-shadow-color), inset 0 0 0 1px var(--tulweb-accent);
+        }
+
+        .theme-name {
+            display: flex;
+            align-items: center;
+        }
+
+        .theme-name::before {
+            content: '';
+            display: block;
+            width: 10px;
+            height: 10px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            border: 2px solid var(--tulweb-text-secondary);
+            margin-right: 12px;
+            transition: all 0.2s;
+        }
+
+        .theme-label:has(.theme-radio:checked) .theme-name::before {
+            border-color: var(--tulweb-accent);
+            background: var(--tulweb-accent);
+            box-shadow: 0 0 8px var(--tulweb-accent);
+        }
     </style>
 </head>
 
