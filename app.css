@@ -1,0 +1,219 @@
+/*
+ * app.css — Demo application styles
+ *
+ * This file contains styles for the TulWEB demo application UI only.
+ * It is NOT part of the tulweb.js library. Library styles live in tulweb.css.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Layout Container                                                    */
+/* ------------------------------------------------------------------ */
+
+body {
+    display: flex;
+    height: 100vh;
+}
+
+#layout-container {
+    flex-grow: 1;
+    position: relative;
+    padding: 12px;
+    background: transparent;
+    min-width: 0;
+    min-height: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Sidebar Demo Component                                              */
+/* ------------------------------------------------------------------ */
+
+.app-sidebar {
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    overflow-y: auto;
+}
+
+.app-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.app-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.app-sidebar::-webkit-scrollbar-thumb {
+    background: var(--tulweb-border);
+    border-radius: 4px;
+}
+
+.app-sidebar h1 {
+    font-size: 20px;
+    color: var(--tulweb-accent);
+    margin: 0 0 5px 0;
+    font-weight: 500;
+    letter-spacing: -0.5px;
+}
+
+.app-sidebar h2 {
+    font-size: 11px;
+    color: var(--tulweb-text-secondary);
+    margin: 0 0 12px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ */
+/* Sidebar Drag Items                                                  */
+/* ------------------------------------------------------------------ */
+
+.sidebar-item {
+    background: var(--tulweb-bg-tab);
+    border: 1px solid var(--tulweb-border);
+    padding: 12px 14px;
+    border-radius: var(--tulweb-radius-inner);
+    color: var(--tulweb-text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: grab;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 2px 8px var(--tulweb-shadow-color);
+    /* Prevent browser scroll hijack during drag initiation */
+    min-height: 44px;
+    touch-action: none;
+}
+
+.sidebar-item:hover {
+    background: var(--tulweb-bg-tab-active);
+    border-color: var(--tulweb-accent);
+    color: var(--tulweb-text-primary);
+    transform: translateX(4px) translateY(-2px);
+    box-shadow: 0 8px 16px var(--tulweb-shadow-color);
+}
+
+/* ------------------------------------------------------------------ */
+/* Demo Buttons                                                        */
+/* ------------------------------------------------------------------ */
+
+.actions {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn {
+    background: var(--tulweb-accent);
+    color: var(--tulweb-bg-base);
+    font-weight: 600;
+    border: none;
+    padding: 12px;
+    border-radius: var(--tulweb-radius-inner);
+    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 12px var(--tulweb-shadow-glow);
+}
+
+.btn:hover {
+    background: var(--tulweb-accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px var(--tulweb-shadow-glow);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--tulweb-border);
+    color: var(--tulweb-text-primary);
+    font-weight: 500;
+    box-shadow: none;
+}
+
+.btn-outline:hover {
+    background: var(--tulweb-bg-tab-active);
+    border-color: var(--tulweb-border);
+    color: var(--tulweb-text-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--tulweb-shadow-color);
+}
+
+.btn-small {
+    padding: 8px;
+    font-size: 12px;
+    flex-grow: 1;
+}
+
+.btn-group {
+    display: flex;
+    gap: 8px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Theme Selector Widget                                               */
+/* ------------------------------------------------------------------ */
+
+.theme-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.theme-label {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--tulweb-bg-tab);
+    border: 1px solid var(--tulweb-border);
+    border-radius: var(--tulweb-radius-inner);
+    color: var(--tulweb-text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.theme-label:hover {
+    background: var(--tulweb-bg-tab-active);
+    color: var(--tulweb-text-primary);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.theme-radio {
+    display: none;
+}
+
+.theme-label:has(.theme-radio:checked) {
+    background: var(--tulweb-bg-tab-active);
+    color: var(--tulweb-text-primary);
+    border-color: var(--tulweb-accent);
+    box-shadow: 0 4px 12px var(--tulweb-shadow-color), inset 0 0 0 1px var(--tulweb-accent);
+}
+
+.theme-name {
+    display: flex;
+    align-items: center;
+}
+
+.theme-name::before {
+    content: '';
+    display: block;
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 2px solid var(--tulweb-text-secondary);
+    margin-right: 12px;
+    transition: all 0.2s;
+}
+
+.theme-label:has(.theme-radio:checked) .theme-name::before {
+    border-color: var(--tulweb-accent);
+    background: var(--tulweb-accent);
+    box-shadow: 0 0 8px var(--tulweb-accent);
+}

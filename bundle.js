@@ -1,25 +1,39 @@
 import fs from 'fs';
 import { execSync } from 'child_process';
 
-function bundlePage(sourceHtml, sourceJs, outputHtml, cssFile = 'tulweb.css') {
+function bundlePage(sourceHtml, sourceJs, outputHtml) {
     try {
         console.log(`Bundling ${sourceHtml}...`);
         
         // Read the source files
-        const html = fs.readFileSync(sourceHtml, 'utf8');
-        const css = fs.readFileSync(cssFile, 'utf8');
+        let html = fs.readFileSync(sourceHtml, 'utf8');
+
+        // Inline CSS
+        // Find all <link rel="stylesheet" href="..."> and replace with <style> content
+        const cssRegExp = /<link rel="stylesheet" href="([^"]+)">/g;
+        let match;
+        let bundledHtml = html;
+        
+        while ((match = cssRegExp.exec(html)) !== null) {
+            const fullTag = match[0];
+            const cssFileName = match[1];
+            
+            // Only handle local files
+            if (!cssFileName.startsWith('http') && fs.existsSync(cssFileName)) {
+                console.log(`  - Inlining ${cssFileName}...`);
+                const cssContent = fs.readFileSync(cssFileName, 'utf8');
+                bundledHtml = bundledHtml.replace(fullTag, `<style>\n${cssContent}\n</style>`);
+            }
+        }
 
         // Use esbuild to bundle JS and its dependencies
         console.log(`  - Bundling ${sourceJs} with esbuild...`);
         const bundledJs = execSync(`npx -y esbuild ${sourceJs} --bundle --minify --format=iife`).toString();
 
-        let bundledHtml = html;
-
-        // Inline CSS
-        bundledHtml = bundledHtml.replace(`<link rel="stylesheet" href="${cssFile}">`, `<style>\n${css}\n</style>`);
-
         // Replace JS tag - Note: we remove type="module" because it's now a bundled IIFE
-        bundledHtml = bundledHtml.replace(`<script type="module" src="${sourceJs}"></script>`, `<script>\n${bundledJs}\n</script>`);
+        // Use a more robust regex for the script tag
+        const scriptRegExp = new RegExp(`<script type="module" src="${sourceJs}"></script>`, 'g');
+        bundledHtml = bundledHtml.replace(scriptRegExp, `<script>\n${bundledJs}\n</script>`);
 
         fs.writeFileSync(outputHtml, bundledHtml);
         

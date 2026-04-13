@@ -9,6 +9,48 @@ document.addEventListener("DOMContentLoaded", function () {
         wrapper.style.display = "flex"
         wrapper.style.flexDirection = "column"
 
+        if (state.isLayoutEditor) {
+            const toolbar = document.createElement("div")
+            toolbar.style.padding = "8px 16px"
+            toolbar.style.background = "var(--tulweb-bg-tab)"
+            toolbar.style.borderBottom = "1px solid var(--tulweb-border)"
+            toolbar.style.display = "flex"
+            toolbar.style.justifyContent = "flex-end"
+            toolbar.style.alignItems = "center"
+            toolbar.style.gap = "8px"
+
+            const label = document.createElement("span")
+            label.textContent = "Live Layout Editor"
+            label.style.fontSize = "11px"
+            label.style.fontWeight = "600"
+            label.style.color = "var(--tulweb-text-secondary)"
+            label.style.textTransform = "uppercase"
+            label.style.letterSpacing = "0.5px"
+            label.style.marginRight = "auto"
+            toolbar.appendChild(label)
+
+            const btn = document.createElement("button")
+            btn.className = "btn btn-small"
+            btn.innerText = "Apply Changes"
+            btn.style.padding = "4px 12px"
+            btn.onclick = () => {
+                try {
+                    const newConfig = JSON.parse(textArea.value)
+                    if (container && container.layoutManager) {
+                        container.layoutManager.loadLayout(newConfig)
+                        window.tulWebLogger("Layout applied from editor", "#50fa7b")
+                    } else if (window.layout) {
+                        window.layout.loadLayout(newConfig)
+                        window.tulWebLogger("Layout applied from editor (global fallback)", "#50fa7b")
+                    }
+                } catch (e) {
+                    window.tulWebLogger("Invalid JSON: " + e.message, "#ff5555")
+                }
+            }
+            toolbar.appendChild(btn)
+            wrapper.appendChild(toolbar)
+        }
+
         const textArea = document.createElement("textarea")
         textArea.style.flexGrow = "1"
         textArea.style.width = "100%"
@@ -143,17 +185,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function GenericPanelFactory(state = {}, container = null) {
         const el = document.createElement("div");
-        el.style.padding = "20px";
+        el.style.padding = "24px";
         el.style.color = "var(--tulweb-text-secondary)";
+        el.style.overflow = "auto";
+        el.style.height = "100%";
 
         const content = document.createElement("div");
-        content.innerHTML = `<h3 style="color:var(--tulweb-text-primary); margin-top:0;">${state.name || 'Panel'}</h3><p>Use the toolbar to drag new components into the layout.</p>`;
+        if (state.explanation) {
+            content.innerHTML = `<h1 style="color:var(--tulweb-accent); margin-top:0; font-size: 24px; font-weight: 600;">${state.name || 'Panel'}</h1>${state.explanation}`;
+        } else {
+            content.innerHTML = `<h3 style="color:var(--tulweb-text-primary); margin-top:0;">${state.name || 'Panel'}</h3><p>Use the toolbar to drag new components into the layout.</p>`;
+        }
         el.appendChild(content);
 
         const dimensionsEl = document.createElement("div");
-        dimensionsEl.style.marginTop = "15px";
-        dimensionsEl.style.marginBottom = "15px";
+        dimensionsEl.style.marginTop = "20px";
+        dimensionsEl.style.paddingTop = "15px";
+        dimensionsEl.style.borderTop = "1px solid var(--tulweb-border)";
         dimensionsEl.style.fontFamily = "monospace";
+        dimensionsEl.style.fontSize = "12px";
         dimensionsEl.style.color = "var(--tulweb-accent)";
         el.appendChild(dimensionsEl);
 
@@ -312,6 +362,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 <button id="btn-load" class="btn btn-outline btn-small">Load</button>
             </div>
             <button id="btn-reset" class="btn btn-outline" style="font-size: 12px; padding: 8px;">Reset Default</button>
+            <button id="btn-install" class="btn btn-outline" style="display: none; width: 100%; margin-top: 8px; font-size: 12px; border-color: var(--tulweb-accent); color: var(--tulweb-accent); font-weight: 600;">
+                📥 Install Desktop App
+            </button>
         </div>
         `;
 
@@ -377,6 +430,29 @@ document.addEventListener("DOMContentLoaded", function () {
                     document.body.className = e.target.value;
                 }
             });
+
+            // PWA Install Logic
+            const installBtn = el.querySelector("#btn-install");
+            if (window.deferredPrompt) {
+                installBtn.style.display = 'block';
+            }
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                window.deferredPrompt = e;
+                installBtn.style.display = 'block';
+            });
+
+            installBtn.addEventListener('click', async () => {
+                if (window.deferredPrompt) {
+                    window.deferredPrompt.prompt();
+                    const { outcome } = await window.deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        installBtn.style.display = 'none';
+                    }
+                    window.deferredPrompt = null;
+                }
+            });
         }
 
         return el;
@@ -411,8 +487,72 @@ document.addEventListener("DOMContentLoaded", function () {
                                 displayCloseButton: false,
                                 displayMinimizeButton: false,
                                 content: [
+                                    { 
+                                        type: 'component', 
+                                        componentName: 'generic', 
+                                        title: 'How to use', 
+                                        componentState: { 
+                                            name: 'How to use the Demo', 
+                                            explanation: `
+                                                <div style="line-height: 1.6; font-family: 'Inter', sans-serif;">
+                                                    <p>Welcome to the <strong>TulWEB</strong> interactive demo. This toolkit allows you to create complex, responsive layouts with ease.</p>
+                                                    
+                                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
+                                                        <div style="background: var(--tulweb-bg-tab); padding: 12px; border-radius: 8px; border: 1px solid var(--tulweb-border);">
+                                                            <h4 style="margin: 0 0 8px 0; color: var(--tulweb-accent); display: flex; align-items: center; gap: 8px;">
+                                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                                                                Layout Control
+                                                            </h4>
+                                                            <ul style="padding-left: 18px; font-size: 12px; margin: 0;">
+                                                                <li><strong>Drag Tabs:</strong> Move tabs between stacks or create new rows/cols.</li>
+                                                                <li><strong>Resize:</strong> Drag the splitters between panels to adjust sizes.</li>
+                                                                <li><strong>Maximize:</strong> Use the ⛶ icon to focus on a single stack.</li>
+                                                            </ul>
+                                                        </div>
+                                                        <div style="background: var(--tulweb-bg-tab); padding: 12px; border-radius: 8px; border: 1px solid var(--tulweb-border);">
+                                                            <h4 style="margin: 0 0 8px 0; color: var(--tulweb-accent); display: flex; align-items: center; gap: 8px;">
+                                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                                                                Components
+                                                            </h4>
+                                                            <ul style="padding-left: 18px; font-size: 12px; margin: 0;">
+                                                                <li><strong>Toolkit:</strong> Drag items from the left sidebar into the workspace.</li>
+                                                                <li><strong>Presets:</strong> Quickly switch layouts using the sidebar buttons.</li>
+                                                                <li><strong>Themes:</strong> Instantly switch between 4 professional themes.</li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+
+                                                    <div style="margin-top: 16px; background: var(--tulweb-bg-console); padding: 12px; border-radius: 8px; border-left: 4px solid var(--tulweb-accent);">
+                                                        <h4 style="margin: 0 0 4px 0; color: var(--tulweb-text-primary); font-size: 13px;">💡 Live Editing</h4>
+                                                        <p style="font-size: 12px; margin: 0;">Check the <code>layout.json</code> tab in this stack. Edit the JSON and click <strong>Apply Changes</strong> to see the layout engine update in real-time!</p>
+                                                    </div>
+                                                </div>
+                                            `
+                                        } 
+                                    },
+                                    { 
+                                        type: 'component', 
+                                        componentName: 'generic', 
+                                        title: 'README.md', 
+                                        componentState: { 
+                                            name: 'Welcome to TulWEB Demo', 
+                                            explanation: `
+                                                <div style="line-height: 1.6;">
+                                                    <p>This is a live demonstration of the <strong>TulWEB Layout Manager</strong>.</p>
+                                                    <p>TulWEB is designed for performance, modularity, and modern aesthetics. It supports:</p>
+                                                    <ul style="padding-left: 20px;">
+                                                        <li>Recursive row/column nesting</li>
+                                                        <li>Mixed CSS units (px, %, etc.)</li>
+                                                        <li>Full drag-and-drop lifecycle</li>
+                                                        <li>Custom component factories</li>
+                                                        <li>Deep state serialization</li>
+                                                    </ul>
+                                                </div>
+                                            `
+                                        } 
+                                    },
                                     { type: 'component', componentName: 'editor', title: 'main.js', componentState: { text: "console.log('IDE Mode');" } },
-                                    { type: 'component', componentName: 'editor', title: 'index.html' }
+                                    { type: 'component', componentName: 'editor', title: 'layout.json', componentState: { isLayoutEditor: true, text: "" } }
                                 ]
                             },
                             {
@@ -552,6 +692,11 @@ document.addEventListener("DOMContentLoaded", function () {
     window.layout = layout;
 
     // Listen to Global Events
+    layout.on('saveRequested', () => {
+        const config = layout.toConfig();
+        localStorage.setItem('tulweb_saved_state_v2', JSON.stringify(config));
+        if (window.tulWebLogger) window.tulWebLogger('Layout saved (Ctrl+S)', '#50fa7b');
+    });
     layout.on('stateChanged', () => {
         if (window.tulWebLogger) window.tulWebLogger('Event: stateChanged', '#8be9fd');
     });
@@ -576,6 +721,13 @@ document.addEventListener("DOMContentLoaded", function () {
     layout.registerComponent('image', ImageViewerFactory);
 
     // 3. Load Initial Layout
+    // Preload layout.json content for the IDE preset
+    const ideLayout = window.tulwebLayouts.ide;
+    const layoutEditorComp = ideLayout.content[0].content[1].content[0].content[3];
+    if (layoutEditorComp && layoutEditorComp.title === 'layout.json') {
+        layoutEditorComp.componentState.text = JSON.stringify(ideLayout, null, 2);
+    }
+
     layout.loadLayout(window.tulwebLayouts.ide);
 
 });

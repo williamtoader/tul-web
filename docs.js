@@ -342,6 +342,39 @@ layout.registerComponent(<span class="string">'angularPanel'</span>, AngularPane
                 </div>
             </div>
         `
+    },
+    testing: {
+        title: "Automated Testing",
+        content: `
+            <div class="markdown-body">
+                <h1>Automated Testing</h1>
+                <p>TulWEB is hardened with a multi-layered testing strategy to guarantee UI consistency and core logic integrity across releases.</p>
+
+                <h2>1. E2E Testing with Playwright</h2>
+                <p>We use Playwright to simulate real user interactions—dragging tabs, resizing panels, and switching themes—in Chromium, Firefox, and WebKit.</p>
+                <div class="code-block">
+<pre><span class="comment">// Run all E2E tests</span>
+npm test
+
+<span class="comment">// Run with UI for debugging</span>
+npm run test:ui</pre>
+                </div>
+
+                <h2>2. Unit Testing with Jest</h2>
+                <p>Core logic, such as configuration parsing, utility functions, and the <code>EventEmitter</code>, are tested using Jest in a JSDOM environment.</p>
+                <div class="code-block">
+<pre><span class="comment">// Run unit tests</span>
+npm run test:unit</pre>
+                </div>
+
+                <h2>Testing Philosophy</h2>
+                <ul>
+                    <li><strong>Visual Consistency:</strong> Playwright captures screenshots to detect regression in theme rendering.</li>
+                    <li><strong>State Integrity:</strong> Tests verify that <code>toConfig()</code> always produces a valid, resumable state.</li>
+                    <li><strong>Event Accuracy:</strong> Unit tests ensure that lifecycle events (<code>init</code>, <code>resize</code>, etc.) fire with precise timing.</li>
+                </ul>
+            </div>
+        `
     }
 };
 
@@ -594,6 +627,14 @@ document.addEventListener("DOMContentLoaded", function () {
                             <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                         </svg>
                         React & Angular
+                    </div>
+                    <div class="sidebar-item" data-topic="testing">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        Automated Testing
                     </div>
                 </div>
             </div>

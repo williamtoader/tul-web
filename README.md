@@ -12,15 +12,16 @@ TulWEB is a lightweight, zero-dependency windowing toolkit designed for building
 - **Multi-Directional Tabs**: Support for Top, Bottom, Left, and Right tab placements per stack.
 - **Stack Minimization**: Collapse stacks to their tab bars with an ultra-sleek hover-based component preview.
 - **Minimum Constraints**: Set `size`, `minWidth`, and `minHeight` using pixels or CSS units (e.g., `"300px"`, `"20%"`) to prevent panels from becoming unreadable during resize. Constraints are automatically bypassed during stack minimization.
+- **Automated Testing**: Comprehensive E2E testing with **Playwright** and unit testing with **Jest** to ensure layout stability across all browsers.
 - **Pure JavaScript**: No dependencies (no jQuery, no React/Angular required, but easily integrable).
 - **Flexible Layouts**: Nested rows and columns for complex interfaces.
 - **Tab Stacking**: Group components into stacks with efficient tab management and overflow support.
 - **Drag & Drop**: Native-feeling drag-and-drop experience for reordering tabs and splitting panels.
 - **Resizable Splitters**: Intuitive resizing with splitter constraints.
-- **Premium Themes**: Built-in themes including Industrial Graphite, Phosphor Terminal, Pro Light, and Retro 90s.
+- **Premium Themes**: Built-in themes including Industrial Graphite, Phosphor Terminal, Pro Light, and Retro 90s, featuring glassmorphism and micro-animations.
 - **State Management**: Save and restored entire layout configurations with a simple JSON format.
-- **Developer-Friendly API**: Event-based system for lifecycle management with support for both factory functions and ES6 classes.
-- **Internal OO Refactor**: Library internals now fully utilize ES6 classes for better maintainability and extensibility.
+- **Developer-Friendly API**: Event-based system for lifecycle management (`init`, `active`, `focus`, `resize`, etc.) with support for both factory functions and ES6 classes.
+- **Internal OO Refactor**: Library internals fully utilize ES6 classes for better maintainability and extensibility.
 
 ## Installation
 
@@ -55,7 +56,30 @@ To generate a single, self-contained HTML file of the documentation (inlining al
 npm run bundle-docs
 ```
 
-This will create `docs-bundle.html` in the root directory.
+This will create `docs-bundle.html` and `index-bundle.html` in the root directory.
+
+## Automated Testing
+
+TulWEB includes a comprehensive testing suite to ensure reliability and performance.
+
+### E2E Testing (Playwright)
+
+Run end-to-end tests in a real browser:
+```bash
+npm test
+```
+
+To open the interactive Playwright UI for debugging:
+```bash
+npm run test:ui
+```
+
+### Unit Testing (Jest)
+
+Run core logic unit tests:
+```bash
+npm run test:unit
+```
 
 ## Quick Start
 

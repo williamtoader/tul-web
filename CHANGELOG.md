@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [2.2.0] - 2026-04-13
+### Added
+- Comprehensive automated testing suite featuring Playwright (E2E) and Jest (Unit).
+- Enhanced programmatic API for dynamic layout manipulation (`addChild`, `removeChild`, `replaceChild`, etc.).
+- Granular component lifecycle events: `init`, `active`, `inactive`, `focus`, `defocus`, `move`, `resize`, `destroy`.
+- Modernized UI design system with glassmorphism, refined shadows, and smooth micro-animations.
+- New "How to use" interactive guide tab in the default layout.
+- Consolidated bundling script (`bundle.js`) for generating self-contained Documentation and Index pages.
+
+### Changed
+- Library internals fully refactored to ES6 classes for improved extensibility and maintainability.
+- Optimized focus management for complex nested layouts.
+
+## [2.1.0] - 2026-04-08
 ### Added
 - New stack configuration options: `displayMinimizeButton`, `displayMaximizeButton`, `displayCloseButton` to control visibility of stack header buttons.
 - New component configuration option: `closeable` (boolean) to toggle the close button on individual tabs and its associated context menu options.
@@ -82,7 +97,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UI dropdown accessibility issues with keyboard navigation.
 - Logic errors in tab stack decluttering when handling tab overflows.
 
-[Unreleased]: https://github.com/williamtoader/tul-web/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/williamtoader/tul-web/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/williamtoader/tul-web/compare/v2.1.0...v2.2.0
+[2.1.0]: https://github.com/williamtoader/tul-web/compare/v2.0.0...v2.1.0
+[2.0.0]: https://github.com/williamtoader/tul-web/compare/v1.1.0...v2.0.0
+[1.1.0]: https://github.com/williamtoader/tul-web/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/williamtoader/tul-web/compare/v0.6.0...v1.0.0
 [0.6.0]: https://github.com/williamtoader/tul-web/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/williamtoader/tul-web/compare/v0.4.0...v0.5.0

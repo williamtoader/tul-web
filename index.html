@@ -14,141 +14,28 @@
     <!-- Core Toolkit CSS -->
     <link rel="stylesheet" href="tulweb.css">
 
-    <!-- App Specific Demo CSS -->
-    <style>
-        body {
-            display: flex;
-            height: 100vh;
-        }
+    <!-- Demo App CSS -->
+    <link rel="stylesheet" href="app.css">
 
-        /* Sidebar demo styling */
-        .app-sidebar {
-            padding: 24px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            overflow-y: auto;
-        }
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f1115">
+    <link rel="apple-touch-icon" href="icon-512.png">
 
-        .app-sidebar::-webkit-scrollbar {
-            width: 6px;
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW Registered', reg))
+                    .catch(err => console.log('SW Registration Failed', err));
+            });
         }
+    </script>
 
-        .app-sidebar::-webkit-scrollbar-track {
-            background: transparent;
-        }
 
-        .app-sidebar::-webkit-scrollbar-thumb {
-            background: var(--tulweb-border);
-            border-radius: 4px;
-        }
-
-        .app-sidebar h1 {
-            font-size: 20px;
-            color: var(--tulweb-accent);
-            margin: 0 0 5px 0;
-            font-weight: 500;
-            letter-spacing: -0.5px;
-        }
-
-        .app-sidebar h2 {
-            font-size: 11px;
-            color: var(--tulweb-text-secondary);
-            margin: 0 0 12px 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
-
-        .sidebar-item {
-            background: var(--tulweb-bg-tab);
-            border: 1px solid var(--tulweb-border);
-            padding: 12px 14px;
-            border-radius: var(--tulweb-radius-inner);
-            color: var(--tulweb-text-secondary);
-            font-size: 13px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: grab;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 2px 8px var(--tulweb-shadow-color);
-        }
-
-        .sidebar-item:hover {
-            background: var(--tulweb-bg-tab-active);
-            border-color: var(--tulweb-accent);
-            color: var(--tulweb-text-primary);
-            transform: translateX(4px) translateY(-2px);
-            box-shadow: 0 8px 16px var(--tulweb-shadow-color);
-        }
-
-        .actions {
-            margin-top: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .btn {
-            background: var(--tulweb-accent);
-            color: var(--tulweb-bg-base);
-            font-weight: 600;
-            border: none;
-            padding: 12px;
-            border-radius: var(--tulweb-radius-inner);
-            cursor: pointer;
-            font-size: 14px;
-            font-family: inherit;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 4px 12px var(--tulweb-shadow-glow);
-        }
-
-        .btn:hover {
-            background: var(--tulweb-accent-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px var(--tulweb-shadow-glow);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--tulweb-border);
-            color: var(--tulweb-text-primary);
-            font-weight: 500;
-            box-shadow: none;
-        }
-
-        .btn-outline:hover {
-            background: var(--tulweb-bg-tab-active);
-            border-color: var(--tulweb-border);
-            color: var(--tulweb-text-primary);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px var(--tulweb-shadow-color);
-        }
-
-        .btn-small {
-            padding: 8px;
-            font-size: 12px;
-            flex-grow: 1;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 8px;
-        }
-
-        /* Container for Layout Manager */
-        #layout-container {
-            flex-grow: 1;
-            position: relative;
-            padding: 12px;
-            background: transparent;
-            min-width: 0;
-            min-height: 0;
-        }
-    </style>
 </head>
+
+<body class="theme-nordic">
 
 <!-- Main Workspace Area -->
 <div id="layout-container" style="width: 100vw; height: 100vh;"></div>
