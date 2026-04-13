@@ -50,26 +50,26 @@ class Utils {
 
 // --- Drag & Drop Manager Singleton ---
 // --- Drag & Drop Manager ---
-class DragManagerClass {
-    constructor() {
+class DragManager {
+    constructor(layoutManager) {
         this.isDragging = false
-        this.dragItem = null // The config or tab being dragged
+        this.dragItem = null 
         this.proxy = null
         this.indicator = null
-        this.layoutManager = null // Set during init
-        this.sourceType = null // 'tab' or 'external'
-        this.sourceStack = null // If 'tab', the stack it came from
+        this.layoutManager = layoutManager
+        this.sourceType = null 
+        this.sourceStack = null 
 
         this.isPendingDrag = false
         this.pendingStartPos = null
         this.pendingArgs = null
 
-        this.currentDropZone = null // { targetItem, edge: 'top'|'bottom'|'left'|'right'|'center' }
+        this.currentDropZone = null
+
+        this.init()
     }
 
-    init(layoutManager) {
-        if (this.layoutManager) return; // Prevent double init
-        this.layoutManager = layoutManager
+    init() {
         this.handleMouseMove = this.handleMouseMove.bind(this)
         this.handleMouseUp = this.handleMouseUp.bind(this)
         this.handlePendingMove = this.handlePendingMove.bind(this)
@@ -84,10 +84,14 @@ class DragManagerClass {
         // Create indicator element
         this.indicator = Utils.createElement('div', 'tulweb-drop-indicator', document.body)
         this.indicator.style.display = 'none'
+        this.indicator.setAttribute('role', 'status')
+        this.indicator.setAttribute('aria-live', 'polite')
 
         // Create tab drop indicator element
         this.tabIndicator = Utils.createElement('div', 'tulweb-tab-drop-indicator', document.body)
         this.tabIndicator.style.display = 'none'
+        this.tabIndicator.setAttribute('role', 'status')
+        this.tabIndicator.setAttribute('aria-live', 'polite')
     }
 
     destroy() {
@@ -552,9 +556,7 @@ class DragManagerClass {
     }
 }
 
-// Note: In a true multi-instance environment, you might want to 
-// create a new DragManager per LayoutManager instance.
-const DragManager = new DragManagerClass()
+// DragManager is now instantiated per LayoutManager.
 
 
 // --- Drag Source ---
@@ -568,7 +570,7 @@ class DragSource {
         const startHandler = (e) => {
             // Clone config so we don't mutate original
             const configCopy = JSON.parse(JSON.stringify(this.itemConfig))
-            DragManager.pendDrag(e, configCopy, 'external', null, this.itemConfig.title)
+            this.layoutManager.dragManager.pendDrag(e, configCopy, 'external', null, this.itemConfig.title)
         }
 
         this.element.addEventListener('mousedown', startHandler)
@@ -596,6 +598,63 @@ class Splitter {
         this.element.addEventListener('mousedown', this._onMouseDown)
         this.element.addEventListener('touchstart', this._onMouseDown, { passive: false })
         this.element.addEventListener('dblclick', this._onDblClick)
+
+        // Accessibility for splitters
+        this.element.setAttribute('role', 'separator')
+        this.element.setAttribute('tabindex', '0')
+        this.element.setAttribute('aria-orientation', isVertical ? 'vertical' : 'horizontal')
+        this.element.addEventListener('keydown', (e) => {
+            const step = e.shiftKey ? 5 : 1
+            let diff = 0
+            if (isVertical) {
+                if (e.key === 'ArrowLeft') diff = -step
+                if (e.key === 'ArrowRight') diff = step
+            } else {
+                if (e.key === 'ArrowUp') diff = -step
+                if (e.key === 'ArrowDown') diff = step
+            }
+
+            if (diff !== 0) {
+                e.preventDefault()
+                this._moveSplitter(diff)
+            }
+        })
+    }
+
+    _moveSplitter(diffPx) {
+        const minPrevPx = this.isVertical ? (this.prevItem.getMinWidthPx() || 40) : (this.prevItem.getMinHeightPx() || 40)
+        const minNextPx = this.isVertical ? (this.nextItem.getMinWidthPx() || 40) : (this.nextItem.getMinHeightPx() || 40)
+
+        // Calculate weight ratio if needed
+        const parentRect = this.parentContainer.getBoundingClientRect()
+        const totalSizePx = this.isVertical ? parentRect.width : parentRect.height
+        const pixelsPerPercent = totalSizePx / 100
+
+        const startPrevSize = this.prevItem.size ?? 50
+        const startNextSize = this.nextItem.size ?? 50
+        const prevType = typeof startPrevSize === 'number' ? 'weight' : 'fixed'
+        const nextType = typeof startNextSize === 'number' ? 'weight' : 'fixed'
+
+        if (prevType === 'weight' && nextType === 'weight') {
+            const diffPct = diffPx / pixelsPerPercent
+            let newPrev = startPrevSize + diffPct
+            let newNext = startNextSize - diffPct
+            // Apply bounds (simplified for keyboard)
+            this.prevItem.size = newPrev
+            this.nextItem.size = newNext
+        } else {
+             // Simplified fixed resize for keyboard
+             if (prevType === 'fixed') {
+                 const parsed = Utils.parseSize(startPrevSize)
+                 this.prevItem.size = (parsed.value + diffPx) + parsed.unit
+             }
+             if (nextType === 'fixed') {
+                 const parsed = Utils.parseSize(startNextSize)
+                 this.nextItem.size = (parsed.value - diffPx) + parsed.unit
+             }
+        }
+        this.prevItem.updateFlex()
+        this.nextItem.updateFlex()
     }
 
     _onDblClick(e) {
@@ -754,9 +813,13 @@ class EventEmitter {
         this.on(event, wrapper)
     }
     emit(event, ...args) {
+        let result = true
         if (this._listeners[event]) {
-            this._listeners[event].forEach(cb => cb(...args))
+            for (const cb of this._listeners[event]) {
+                if (cb(...args) === false) result = false
+            }
         }
+        return result
     }
 }
 
@@ -802,11 +865,23 @@ class ContentItem extends EventEmitter {
     removeChild(child) {
         const index = this.children.indexOf(child)
         if (index > -1) {
+            // Check if closure is allowed
+            if (child.emit('beforeClose') === false) return false
+
             this.children.splice(index, 1)
             child.parent = null
-            this._removeDOMChild(child)
+            
+            // Perform actual destruction after removal from array
+            child.destroy()
+            
             this.updateLayout()
+            this.emit('stateChanged')
+            if (this.layoutManager) {
+                this.layoutManager.emit('stateChanged')
+            }
+            return true
         }
+        return false
     }
 
     replaceChild(oldChild, newChild, index) {
@@ -864,6 +939,8 @@ class ContentItem extends EventEmitter {
     }
 
     destroy() {
+        if (this.emit('beforeClose') === false) return false
+        
         if (this._isFocused) {
             this._isFocused = false
             this.emit('defocus')
@@ -874,7 +951,9 @@ class ContentItem extends EventEmitter {
         }
         this.emit('destroy')
         const kids = [...this.children]
-        kids.forEach(c => c.destroy())
+        for (const c of kids) {
+            if (c.destroy() === false) return false
+        }
 
         if (this.parent) {
             if (this.parent.children.length === 0 && this.parent.layoutManager) {
@@ -925,7 +1004,7 @@ class ComponentItem extends ContentItem {
             this.element.innerHTML = '' // Clear
             try {
                 const isClass = typeof ComponentClassOrFactory === 'function' && 
-                    (ComponentClassOrFactory.prototype && ComponentClassOrFactory.prototype.constructor.toString().startsWith('class'))
+                    (ComponentClassOrFactory.isClass || (ComponentClassOrFactory.prototype && ComponentClassOrFactory.prototype.constructor.toString().includes('class')))
 
                 let contentNode
                 if (isClass) {
@@ -967,6 +1046,14 @@ class ComponentItem extends ContentItem {
         if (this.config.closeable === false) res.closeable = false
         return res
     }
+
+    destroy() {
+        if (this.instance && typeof this.instance.destroy === 'function') {
+            this.instance.destroy()
+        }
+        this.instance = null
+        super.destroy()
+    }
 }
 
 
@@ -1007,6 +1094,8 @@ class StackItem extends ContentItem {
 
         this.headerEl = Utils.createElement('div', 'tulweb-header', this.element)
         this.tabsEl = Utils.createElement('div', 'tulweb-tabs', this.headerEl)
+        this.tabsEl.setAttribute('role', 'tablist')
+        this.tabsEl.setAttribute('aria-label', 'Layout Stacks')
 
         const showMin = this.displayMinimizeButton && this.layoutManager.settings.enableMinimize !== false
         const showMax = this.displayMaximizeButton
@@ -1045,6 +1134,8 @@ class StackItem extends ContentItem {
         }
 
         this.contentAreaEl = Utils.createElement('div', 'tulweb-content-area', this.element)
+        this.contentAreaEl.setAttribute('role', 'tabpanel')
+        this.contentAreaEl.id = 'panel-' + this.id
 
         if (this.layoutManager.settings.enablePreview) {
             this.element.addEventListener('mouseenter', () => {
@@ -1110,9 +1201,15 @@ class StackItem extends ContentItem {
                 close.textContent = '×'
                 close.addEventListener('click', (e) => {
                     e.stopPropagation()
-                    this.removeChild(child)
-                    if (this.children.length === 0) {
-                        this.layoutManager._cleanupEmptyStack(this)
+                    const wasActive = index === this.activeChildIndex
+                    if (this.removeChild(child)) {
+                        if (this.children.length === 0) {
+                            this.layoutManager._cleanupEmptyStack(this)
+                        } else if (wasActive) {
+                            // Focus the new active tab
+                            const tabs = this.tabsEl.querySelectorAll('.tulweb-tab')
+                            if (tabs[this.activeChildIndex]) tabs[this.activeChildIndex].focus()
+                        }
                     }
                 })
 
@@ -1121,6 +1218,39 @@ class StackItem extends ContentItem {
                     if (e.target === close) return // Handled by close listener
                 })
             }
+
+            tab.setAttribute('role', 'tab')
+            tab.setAttribute('aria-selected', index === this.activeChildIndex ? 'true' : 'false')
+            tab.setAttribute('aria-controls', 'panel-' + this.id)
+            tab.setAttribute('tabindex', index === this.activeChildIndex ? '0' : '-1')
+
+            // Keyboard navigation for tabs
+            tab.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                    e.preventDefault()
+                    this.setActive((index + 1) % this.children.length)
+                    this.tabsEl.querySelectorAll('.tulweb-tab')[this.activeChildIndex].focus()
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    e.preventDefault()
+                    this.setActive((index - 1 + this.children.length) % this.children.length)
+                    this.tabsEl.querySelectorAll('.tulweb-tab')[this.activeChildIndex].focus()
+                } else if (e.key === 'Home') {
+                    e.preventDefault()
+                    this.setActive(0)
+                    this.tabsEl.querySelectorAll('.tulweb-tab')[0].focus()
+                } else if (e.key === 'End') {
+                    e.preventDefault()
+                    this.setActive(this.children.length - 1)
+                    this.tabsEl.querySelectorAll('.tulweb-tab')[this.children.length - 1].focus()
+                } else if (e.key === 'Delete' && isCloseable) {
+                    e.preventDefault()
+                    this.removeChild(child)
+                }
+                if (e.key === 'Enter' || e.key === ' ') {
+                    this.setActive(index)
+                    e.preventDefault()
+                }
+            })
 
             // Tab click
             tab.addEventListener('mousedown', (e) => {
@@ -1146,7 +1276,7 @@ class StackItem extends ContentItem {
             // Tab drag
             const startDragHandler = (e) => {
                 if (e.target !== close && this.children.length > 0 && (e.type === 'touchstart' || e.button === 0)) {
-                    DragManager.pendDrag(e, child.config, 'tab', this, child.config.title)
+                    this.layoutManager.dragManager.pendDrag(e, child.config, 'tab', this, child.config.title)
                 }
             }
 
@@ -1268,12 +1398,23 @@ class StackItem extends ContentItem {
     }
 
     setActive(index) {
+        const hadFocus = document.activeElement && this.tabsEl && this.tabsEl.contains(document.activeElement)
+        const oldIndex = this.activeChildIndex
         this.activeChildIndex = index
+        
         if (this.isMinimized) {
             this.toggleMinimize()
         } else {
             this.renderTabs()
             this.showActiveChild()
+            
+            if (hadFocus || oldIndex !== index) {
+                // If we switched tabs via keyboard, or had focus in the tab bar, ensure new tab is focused
+                setTimeout(() => {
+                    const tabs = this.tabsEl.querySelectorAll('.tulweb-tab')
+                    if (tabs[this.activeChildIndex]) tabs[this.activeChildIndex].focus()
+                }, 0)
+            }
         }
     }
 
@@ -1534,7 +1675,7 @@ class ContextMenu {
             }
         })
 
-        setTimeout(() => document.addEventListener('mousedown', this._closeHandler), 0)
+        document.addEventListener('mousedown', this._closeHandler)
     }
 
     addOption(text, onClick) {
@@ -1555,10 +1696,13 @@ class ContextMenu {
     }
 
     destroy() {
+        if (this._pendingListener) {
+            clearTimeout(this._pendingListener)
+        }
+        document.removeEventListener('mousedown', this._closeHandler)
         if (this.element && this.element.parentElement) {
             this.element.parentElement.removeChild(this.element)
         }
-        document.removeEventListener('mousedown', this._closeHandler)
         if (this.layoutManager.contextMenu === this) {
             this.layoutManager.contextMenu = null
         }
@@ -1588,7 +1732,7 @@ class LayoutManager extends EventEmitter {
 
         this.activeStack = null
 
-        DragManager.init(this)
+        this.dragManager = new DragManager(this)
 
         if (config) {
             this.loadLayout(config)
@@ -1620,7 +1764,12 @@ class LayoutManager extends EventEmitter {
         if (this.toastContainer && this.toastContainer.parentElement) {
             this.toastContainer.parentElement.removeChild(this.toastContainer)
         }
-        DragManager.destroy()
+        if (this.dragManager) {
+            this.dragManager.destroy()
+        }
+        if (this.contextMenu) {
+            this.contextMenu.destroy()
+        }
     }
 
     registerComponent(name, factoryMethod) {
@@ -1633,6 +1782,12 @@ class LayoutManager extends EventEmitter {
 
     loadLayout(config) {
         if (!config) throw new Error("Layout config is required")
+        
+        // Basic Validation (Tier 3)
+        if (config.content && !Array.isArray(config.content)) {
+            throw new Error("Invalid config: 'content' must be an array")
+        }
+
         this.rootElement.innerHTML = ''
         if (config.settings) {
             this.settings = Object.assign(this.settings, config.settings)

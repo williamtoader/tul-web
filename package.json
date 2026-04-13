@@ -1,6 +1,6 @@
 {
   "name": "tulweb",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Pure JS Windowing Toolkit",
   "main": "tulweb.js",
   "type": "module",

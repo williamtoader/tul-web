@@ -371,6 +371,19 @@ body.theme-retro {
   box-shadow: inset 0 2px 0 var(--tulweb-accent);
 }
 
+.tulweb-tab:focus {
+  outline: none;
+}
+
+.tulweb-tab:focus-visible {
+  box-shadow: 0 0 0 2px var(--tulweb-accent);
+  z-index: 10;
+}
+
+.tulweb-tab.active:focus-visible {
+  box-shadow: inset 0 2px 0 var(--tulweb-accent), 0 0 0 2px var(--tulweb-accent);
+}
+
 body.theme-cyber .tulweb-tab.active {
   color: var(--tulweb-accent);
   text-shadow: 0 0 8px var(--tulweb-accent);

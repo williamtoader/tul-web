@@ -233,6 +233,7 @@ layout.createDragSource(btn, config);</pre>
                 <p>Bind directly to the <code>ComponentItem</code> instance (passed as 'container' to your factory) to react to visibility and focus state changes:</p>
                 <ul>
                     <li><code>init</code>: Fired immediately after the factory logic completes and the DOM is initially rendered.</li>
+                    <li><code>beforeClose</code>: <strong>(Cancelable)</strong> Fired before the component is destroyed. If a listener returns <code>false</code>, the destruction is aborted.</li>
                     <li><code>active</code>: Fired when the component becomes the current visible tab in its stack.</li>
                     <li><code>inactive</code>: Fired when the component is hidden because another tab in the same stack became active.</li>
                     <li><code>focus</code>: Fired when the component is active AND its parent stack becomes focused by the user.</li>
@@ -373,6 +374,27 @@ npm run test:unit</pre>
                     <li><strong>State Integrity:</strong> Tests verify that <code>toConfig()</code> always produces a valid, resumable state.</li>
                     <li><strong>Event Accuracy:</strong> Unit tests ensure that lifecycle events (<code>init</code>, <code>resize</code>, etc.) fire with precise timing.</li>
                 </ul>
+            </div>
+        `
+    },
+    production: {
+        title: "Production Readiness",
+        content: `
+            <div class="markdown-body">
+                <h1>Production Readiness</h1>
+                <p>TulWEB v2.3.0 introduced critical features to transform the toolkit from a prototype into a production-grade library.</p>
+                
+                <h2>1. Memory Management</h2>
+                <p>The <code>LayoutManager</code> and its children now implement a strict <code>destroy()</code> lifecycle. This ensures that in Single Page Applications (SPAs), navigating away from a layout view completely cleans up global event listeners, ResizeObservers, and DOM elements.</p>
+                
+                <h2>2. Isolation & Multi-Instance</h2>
+                <p>The drag-and-drop orchestration has been refactored from a global singleton into a per-instance <code>DragManager</code>. This allows you to host multiple <code>LayoutManager</code> instances on the same page (e.g., in a dashboard with separate floating docks) without state interference.</p>
+
+                <h2>3. Configuration Validation</h2>
+                <p>The <code>loadLayout()</code> method now performs basic validation of the input configuration, catching structural errors before they cause deep runtime failures.</p>
+                
+                <h2>4. Full Accessibility (a11y)</h2>
+                <p>TulWEB is now fully navigable via keyboard. Tabs and splitters support standard ARIA patterns, allowing users with visual or motor impairments to effectively manage complex layouts.</p>
             </div>
         `
     }
@@ -570,6 +592,13 @@ document.addEventListener("DOMContentLoaded", function () {
                             <path d="M16 12l-4-4-4 4M12 8v8"></path>
                         </svg>
                         Drag & Drop
+                    </div>
+                    <div class="sidebar-item" data-topic="production">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                        Production Readiness
                     </div>
                 </div>
             </div>

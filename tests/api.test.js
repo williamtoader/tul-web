@@ -115,15 +115,48 @@ test.describe('LayoutManager API', () => {
     const changed = await page.evaluate(() => {
       return new Promise(resolve => {
         window.layout.once('stateChanged', () => resolve(true));
-        // Close a tab
-        const stacks = window.layout.getAllStacks();
-        const closeable = stacks.flatMap(s => s.children).find(c => c.isCloseable);
-        if (closeable) closeable.destroy();
-        // If no closeable tab, still resolve
+        // Find a stack with children and remove one
+        const stack = window.layout.getAllStacks().find(s => s.children.length > 0);
+        if (stack && stack.children[0]) {
+            stack.removeChild(stack.children[0]);
+        } else {
+            resolve(false);
+        }
+        // Timeout if no event fired
         setTimeout(() => resolve(false), 1000);
       });
     });
-    // It may or may not fire depending on the layout state, but shouldn't throw
-    expect(typeof changed).toBe('boolean');
+    expect(changed).toBe(true);
+  });
+
+  test('beforeClose hook can cancel tab closure', async ({ page }) => {
+    const initialCount = await page.locator('.tulweb-tab').count();
+
+    await page.evaluate(() => {
+      const stacks = window.layout.getAllStacks();
+      const tab = stacks[0].children[0];
+      tab.on('beforeClose', () => {
+        return false; // Cancel closure
+      });
+    });
+
+    // Try to click the close btn
+    const closeBtn = page.locator('.tulweb-tab-close').first();
+    await closeBtn.click();
+
+    // Still there
+    await expect(page.locator('.tulweb-tab')).toHaveCount(initialCount);
+  });
+
+  test('loadLayout() validates that content is an array', async ({ page }) => {
+    const error = await page.evaluate(() => {
+      try {
+        window.layout.loadLayout({ content: {} });
+        return null;
+      } catch (e) {
+        return e.message;
+      }
+    });
+    expect(error).toContain('content');
   });
 });

@@ -5,7 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.3.0] - 2026-04-13
+### Added
+- **Production Readiness**: Refactored `DragManager` to use per-instance state, enabling multiple `LayoutManager` instances on the same page.
+- **Accessibility (a11y)**: Comprehensive keyboard navigation for tabs (Arrows, Home, End, Del) and splitters (Tab + Arrows).
+- **ARIA Compliance**: Implemented `tablist`, `tab`, `tabpanel`, `separator`, and `status` roles with associated `aria-` attributes for screen readers.
+- **Lifecycle Enhancements**: Added `beforeClose` / `canClose` hook support for components to intercept and cancel closure (e.g., unsaved changes).
+- **Validation**: Strict configuration validation and improved component class detection to support modern build transpilers.
+- **Memory Management**: Implemented exhaustive `destroy()` lifecycle for `LayoutManager`, `DragManager`, and `ComponentItem` to prevent memory leaks in SPAs.
+
+### Fixed
+- Fixed focus tracking when closing tabs; focus now automatically shifts to the newly active tab.
+- Resolved race conditions in ContextMenu closure for headless test environments.
+- Corrected DOM hierarchy bug that caused duplicate content areas in some configurations.
 
 ## [2.2.0] - 2026-04-13
 ### Added

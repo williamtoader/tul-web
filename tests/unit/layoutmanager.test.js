@@ -62,4 +62,16 @@ describe('LayoutManager', () => {
         expect(config).toHaveProperty('settings');
         expect(config).toHaveProperty('content');
     });
+
+    test('each LayoutManager has its own DragManager instance', () => {
+        const layout1 = new LayoutManager(null, container);
+        const layout2 = new LayoutManager(null, document.createElement('div'));
+        expect(layout1.dragManager).not.toBe(layout2.dragManager);
+    });
+
+    test('destroy() cleans up the root element', () => {
+        const layout = new LayoutManager(null, container);
+        layout.destroy();
+        expect(container.innerHTML).toBe('');
+    });
 });

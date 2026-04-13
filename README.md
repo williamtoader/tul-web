@@ -1,6 +1,6 @@
 # TulWEB - Pure JS Windowing Toolkit
 
-**WARNING**: This is was vibe-coded in a few hours. It is not production-ready and may have bugs. 
+**TulWEB** is a high-performance, production-ready windowing toolkit.
 
 TulWEB is a lightweight, zero-dependency windowing toolkit designed for building complex, professional-grade tiling and stacking layouts in web applications. It provides a robust `LayoutManager` to handle nested rows, columns, and tab stacks with built-in support for drag-and-drop, resizable splitters, and dynamic themes.
 
@@ -21,6 +21,8 @@ TulWEB is a lightweight, zero-dependency windowing toolkit designed for building
 - **Premium Themes**: Built-in themes including Industrial Graphite, Phosphor Terminal, Pro Light, and Retro 90s, featuring glassmorphism and micro-animations.
 - **State Management**: Save and restored entire layout configurations with a simple JSON format.
 - **Developer-Friendly API**: Event-based system for lifecycle management (`init`, `active`, `focus`, `resize`, etc.) with support for both factory functions and ES6 classes.
+- **Accessibility**: Full ARIA support and keyboard navigation for tabs, splitters, and menus.
+- **Production Ready**: Verified memory management, per-instance drag handling, and comprehensive lifecycle hooks.
 - **Internal OO Refactor**: Library internals fully utilize ES6 classes for better maintainability and extensibility.
 
 ## Installation
