@@ -243,8 +243,9 @@ export class LayoutManager extends EventEmitter {
 
         const parent = stackItem.parent
         if (!parent) {
-            // It's the root. If it's a stack and empty, clear root
-            if (stackItem.children.length === 0) {
+            // It's the root (or a detached popout). 
+            // Only clear the root if this item IS the root of this LayoutManager.
+            if (stackItem === this.root && stackItem.children.length === 0) {
                 this.rootElement.innerHTML = ''
                 this.root = null
                 this.renderEmptyState()
