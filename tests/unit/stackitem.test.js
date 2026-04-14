@@ -149,5 +149,31 @@ describe('StackItem', () => {
             behavior: 'smooth'
         }));
     });
+
+    test('headless stack skips tab rendering and overflow updates', () => {
+        const stack = new StackItem({ type: 'stack', tabPosition: 'headless' }, layoutManager);
+        stack.addChild(new ComponentItem({ type: 'component', title: 'T1' }, layoutManager));
+        
+        stack.renderTabs();
+        expect(stack.tabsEl.innerHTML).toBe(''); // Should return early and not render
+        
+        stack.updateOverflow();
+        expect(stack.overflowBtn).toBeUndefined(); // Should return early and not create button
+    });
+
+    test('headless stack setActive skips tab-related operations', () => {
+        const stack = new StackItem({ type: 'stack', tabPosition: 'headless' }, layoutManager);
+        stack.addChild(new ComponentItem({ type: 'component', title: 'T1' }, layoutManager));
+        stack.addChild(new ComponentItem({ type: 'component', title: 'T2' }, layoutManager));
+        
+        const renderTabsSpy = jest.spyOn(stack, 'renderTabs');
+        const scrollTabIntoViewSpy = jest.spyOn(stack, 'scrollTabIntoView');
+        
+        stack.setActive(1);
+        
+        expect(stack.activeChildIndex).toBe(1);
+        expect(renderTabsSpy).not.toHaveBeenCalled();
+        expect(scrollTabIntoViewSpy).not.toHaveBeenCalled();
+    });
 });
 

@@ -315,6 +315,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     </svg>
                     Bottom Stack
                 </div>
+                <div class="sidebar-item" data-type="stackH">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    </svg>
+                    Headless Stack
+                </div>
             </div>
         </div>
 
@@ -381,6 +387,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 else if (type === 'stackL') config = { type: 'component', componentName: 'generic', title: 'Left Stack', componentState: { name: 'New Panel' }, tabPosition: 'left' };
                 else if (type === 'stackR') config = { type: 'component', componentName: 'generic', title: 'Right Stack', componentState: { name: 'New Panel' }, tabPosition: 'right' };
                 else if (type === 'stackB') config = { type: 'component', componentName: 'generic', title: 'Bottom Stack', componentState: { name: 'New Panel' }, tabPosition: 'bottom' };
+                else if (type === 'stackH') config = { type: 'component', componentName: 'generic', title: 'Headless Stack', componentState: { name: 'Headless Panel' }, tabPosition: 'headless' };
                 else config = { type: 'component', componentName: 'generic', title: 'Generic Panel', componentState: { name: 'New Panel' } };
 
 
@@ -661,7 +668,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                     {
                                         type: 'column', size: 33.33,
                                         content: [
-                                            { type: 'stack', size: 50, content: [{ type: 'component', componentName: 'generic', title: 'Panel 1' }] },
+                                            { type: 'stack', size: 50, tabPosition: 'headless', content: [{ type: 'component', componentName: 'generic', title: 'Headless Panel', componentState: { explanation: '<p>This stack is <b>headless</b>. It has no tab bar or controls. Use the API to manage its content.</p>' } }] },
                                             { type: 'stack', size: 50, content: [{ type: 'component', componentName: 'image', title: 'Panel 2' }] }
                                         ]
                                     },

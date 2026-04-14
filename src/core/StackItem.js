@@ -184,6 +184,7 @@ export class StackItem extends ContentItem {
     }
 
     renderTabs() {
+        if (this.tabPosition === 'headless') return
         this.tabsEl.innerHTML = ''
         this.children.forEach((child, index) => {
             const tab = Utils.createElement('div', 'tulweb-tab', this.tabsEl)
@@ -276,7 +277,7 @@ export class StackItem extends ContentItem {
     }
 
     updateOverflow() {
-        if (!this.tabsEl) return
+        if (!this.tabsEl || this.tabPosition === 'headless') return
 
         const isVertical = this.tabPosition === 'left' || this.tabPosition === 'right'
         let hasOverflow = false
@@ -385,10 +386,12 @@ export class StackItem extends ContentItem {
         if (this.isMinimized) {
             this.toggleMinimize()
         } else {
-            this.renderTabs()
+            if (this.tabPosition !== 'headless') {
+                this.renderTabs()
+            }
             this.showActiveChild()
 
-            if (hadFocus || oldIndex !== index) {
+            if ((hadFocus || oldIndex !== index) && this.tabPosition !== 'headless') {
                 setTimeout(() => {
                     const tabs = this.tabsEl.querySelectorAll('.tulweb-tab')
                     if (tabs[this.activeChildIndex]) {
@@ -397,9 +400,11 @@ export class StackItem extends ContentItem {
                 }, 0)
             }
             // Ensure we scroll only after the browser has laid out the new content
-            setTimeout(() => {
-                this.scrollTabIntoView(index)
-            }, 50)
+            if (this.tabPosition !== 'headless') {
+                setTimeout(() => {
+                    this.scrollTabIntoView(index)
+                }, 50)
+            }
         }
 
         this.layoutManager.emit('stackChanged', this)

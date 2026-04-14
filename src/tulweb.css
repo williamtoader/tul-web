@@ -903,6 +903,10 @@ body.theme-retro .tab-right .tulweb-tab.active {
   flex-direction: row-reverse;
 }
 
+.tulweb-stack.tab-headless .tulweb-header {
+  display: none;
+}
+
 /* Vertical Headers */
 .tulweb-stack.tab-left .tulweb-header,
 .tulweb-stack.tab-right .tulweb-header {

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.5.0] - 2026-04-14
 ### Added
 - **Popout Stack System**: Tab stacks can now be popped out into standalone native browser windows via a dedicated "⬡" button in the stack header or a "Popout Stack" context-menu option. Enable with `{ enablePopout: true }` on `LayoutManager`.
+- **Headless Tab Position**: Added a new `"headless"` tab position that completely hides the stack header and all associated controls (close, minimize, maximize, popout). Headless stacks are designed to be controlled exclusively through the programmatic API.
 - **DOM Adoption Transfer**: Popped-out stacks are transferred using `document.adoptNode()`, preserving all internal state, event listeners, and closure-captured variables across window boundaries.
 - **Pre-Popout State Preservation**: The stack's minimized/maximized state is saved before popping out and fully restored when the window closes, so stacks return to exactly the layout state they left.
 - **Force-Maximized in Popout**: Stacks are always displayed maximized inside a popout window regardless of their prior state, ensuring full use of the new window's canvas.

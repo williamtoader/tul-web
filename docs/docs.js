@@ -65,7 +65,7 @@ const docsTopics = {
                 <p>Pass an optional third <code>options</code> argument (or nest inside a <code>settings</code> property on a layout JSON object) to customize engine behavior:</p>
                 <ul>
                     <li><code>onlyResizeActiveTabs</code> (default: <code>true</code>): When enabled, resize events cascade strictly to the visible tab in a stack, saving performance. Background tabs skip geometry processing until they are clicked, at which point an artificial resize event is fired to synchronize them.</li>
-                    <li><code>tabPosition</code> (default: <code>'top'</code>): Sets global tab position for all stacks if not overridden in item config. Supports <code>'top'</code>, <code>'bottom'</code>, <code>'left'</code>, <code>'right'</code>.</li>
+                    <li><code>tabPosition</code> (default: <code>'top'</code>): Sets global tab position for all stacks if not overridden in item config. Supports <code>'top'</code>, <code>'bottom'</code>, <code>'left'</code>, <code>'right'</code>, <code>'headless'</code>.</li>
                 </ul>
                 
                 <h2>Public Methods</h2>
@@ -111,7 +111,7 @@ const docsTopics = {
                         <tr><td><code>size</code></td><td>Flex weight (number) or CSS unit (e.g., <code>"300px"</code>, <code>"25%"</code>). Numbers distribute space proportionally among siblings, while CSS units fix the item size.</td></tr>
                         <tr><td><code>minWidth</code></td><td>Minimum width. Supports numbers (pixels) or CSS units (e.g., <code>"300px"</code>, <code>"20%"</code>). Automatically bypassed when stack is minimized.</td></tr>
                         <tr><td><code>minHeight</code></td><td>Minimum height. Supports numbers (pixels) or CSS units (e.g., <code>"300px"</code>, <code>"20%"</code>). Automatically bypassed when stack is minimized.</td></tr>
-                        <tr><td><code>tabPosition</code></td><td>Override global tab orientation for a specific stack (<code>top</code>, <code>bottom</code>, <code>left</code>, <code>right</code>).</td></tr>
+                        <tr><td><code>tabPosition</code></td><td>Override global tab orientation for a specific stack (<code>top</code>, <code>bottom</code>, <code>left</code>, <code>right</code>, or <code>headless</code>). In <code>headless</code> mode, the entire tab bar and header controls are hidden.</td></tr>
                         <tr><td><code>minimized</code></td><td>Boolean. If true, the stack starts in a collapsed state.</td></tr>
                         <tr><td><code>displayMinimizeButton</code></td><td>Boolean (default: <code>true</code>). Shows/hides the minimize button in the stack header.</td></tr>
                         <tr><td><code>displayMaximizeButton</code></td><td>Boolean (default: <code>true</code>). Shows/hides the maximize button in the stack header.</td></tr>
