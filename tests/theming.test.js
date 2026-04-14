@@ -8,6 +8,19 @@ test.describe('Theming', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/demo/');
     await waitForLayout(page);
+
+    // Load a layout that contains the sidebar directly
+    await page.evaluate(() => {
+        if (!window.layout) return;
+        window.layout.loadLayout({
+            content: [{
+                type: 'stack',
+                content: [{ type: 'component', componentName: 'sidebar', title: 'Toolkit' }]
+            }]
+        });
+    });
+    // Ensure sidebar is rendered
+    await expect(page.locator('.app-sidebar')).toBeVisible({ timeout: 5000 });
   });
 
   const themes = ['theme-nordic', 'theme-cyber', 'theme-light', 'theme-retro'];
@@ -21,11 +34,13 @@ test.describe('Theming', () => {
   }
 
   test('theme radio buttons in sidebar apply correct class', async ({ page }) => {
-    // Click the Phosphor Terminal radio button
+    // Click the Phosphor Terminal radio (use evaluate because it's display:none)
     const radio = page.locator('input.theme-radio[value="theme-cyber"]');
-    if (!(await radio.isVisible())) test.skip();
-
-    await radio.click({ force: true });
+    await radio.evaluate(el => el.click());
+    
+    // Give it a moment to propagate
+    await page.waitForTimeout(500);
+    
     const bodyClass = await page.evaluate(() => document.body.className);
     expect(bodyClass).toBe('theme-cyber');
   });

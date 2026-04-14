@@ -8,6 +8,24 @@ test.describe('Tab Interactions', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/demo/');
     await waitForLayout(page);
+
+    // Load a layout that is guaranteed to have what we need for tests
+    await page.evaluate(() => {
+        if (!window.layout) return;
+        window.layout.loadLayout({
+            content: [{
+                type: 'stack',
+                id: 'main-stack',
+                content: [
+                    { type: 'component', componentName: 'generic', title: 'Tab 1', closeable: true },
+                    { type: 'component', componentName: 'generic', title: 'Tab 2', closeable: true },
+                    { type: 'component', componentName: 'generic', title: 'Tab 3', closeable: true }
+                ]
+            }]
+        });
+    });
+    // Wait for the specific tab to appear
+    await expect(page.getByRole('tab', { name: 'Tab 1' })).toBeVisible({ timeout: 5000 });
   });
 
   test('clicking a second tab makes it active', async ({ page }) => {
