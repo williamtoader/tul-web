@@ -99,7 +99,7 @@ test.describe('Tab Interactions', () => {
 
     const menu = page.locator('.tulweb-context-menu');
     await expect(menu).toBeVisible();
-    await expect(menu.locator('.tulweb-context-item')).toHaveCount(3); // Close, Close Others, Close All
+    await expect(menu.locator('.tulweb-context-item')).toHaveCount(4); // Close, Close Others, Close All, Popout Stack
   });
 
   test('double-clicking tab toggles maximize', async ({ page }) => {

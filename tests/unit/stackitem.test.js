@@ -133,8 +133,8 @@ describe('StackItem', () => {
         stack.addChild(new ComponentItem({ type: 'component', title: 'T2' }, layoutManager));
         stack.renderTabs();
 
-        const scrollToMock = jest.fn();
-        stack.tabsEl.scrollTo = scrollToMock;
+        const scrollByMock = jest.fn();
+        stack.tabsEl.scrollBy = scrollByMock;
 
         // Mock tab positions
         const tabs = stack.tabsEl.querySelectorAll('.tulweb-tab');
@@ -144,7 +144,7 @@ describe('StackItem', () => {
         Object.defineProperty(stack.tabsEl, 'scrollLeft', { value: 0 });
 
         stack.scrollTabIntoView(1);
-        expect(scrollToMock).toHaveBeenCalledWith(expect.objectContaining({
+        expect(scrollByMock).toHaveBeenCalledWith(expect.objectContaining({
             left: expect.any(Number),
             behavior: 'smooth'
         }));

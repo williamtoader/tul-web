@@ -11,16 +11,11 @@ test.describe('Stack Controls', () => {
   });
 
   test('maximize button expands the stack', async ({ page }) => {
-    const maxBtn = page.locator('.tulweb-control').filter({ hasText: '' }).nth(1);
-    // Find a stack with a maximize button more reliably via the stack's controls
-    const stack = page.locator('.tulweb-stack').filter({ has: page.locator('.tulweb-header-controls') }).first();
-    const controls = stack.locator('.tulweb-control');
+    // Find a stack with a maximize button more reliably using the explicit class
+    const stack = page.locator('.tulweb-stack').filter({ has: page.locator('.tulweb-max-btn') }).first();
+    const maxBtn = stack.locator('.tulweb-max-btn');
     
-    // Click maximize (second control button: min, max, close)
-    const controlCount = await controls.count();
-    if (controlCount < 2) test.skip();
-
-    await controls.nth(1).click();
+    await maxBtn.click();
     await expect(stack).toHaveClass(/maximized/);
   });
 
@@ -46,27 +41,24 @@ test.describe('Stack Controls', () => {
   });
 
   test('minimize button collapses the stack', async ({ page }) => {
-    const stack = page.locator('.tulweb-stack').filter({
-      has: page.locator('.tulweb-header-controls')
-    }).first();
+    const stack = page.locator('.tulweb-stack').filter({ has: page.locator('.tulweb-min-btn') }).first();
 
-    const minBtn = stack.locator('.tulweb-control').first();
+    const minBtn = stack.locator('.tulweb-min-btn');
     await minBtn.click();
 
     await expect(stack).toHaveClass(/minimized/);
   });
 
   test('clicking minimized stack header restores it', async ({ page }) => {
-    const stack = page.locator('.tulweb-stack').filter({
-      has: page.locator('.tulweb-header-controls')
-    }).first();
+    const stack = page.locator('.tulweb-stack').filter({ has: page.locator('.tulweb-min-btn') }).first();
+    const minBtn = stack.locator('.tulweb-min-btn');
 
     // Minimize
-    await stack.locator('.tulweb-control').first().click();
+    await minBtn.click();
     await expect(stack).toHaveClass(/minimized/);
 
     // Click minimize button again to toggle
-    await stack.locator('.tulweb-control').first().click();
+    await minBtn.click();
     await expect(stack).not.toHaveClass(/minimized/);
   });
 });

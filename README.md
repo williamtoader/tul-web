@@ -1,6 +1,6 @@
 # TulWEB - Pure JS Windowing Toolkit
 
-**TulWEB** is a high-performance, production-ready windowing toolkit.
+**WARNING**: This is was vibe-coded in a few hours. It is not production-ready and may have bugs. 
 
 TulWEB is a lightweight, zero-dependency windowing toolkit designed for building complex, professional-grade tiling and stacking layouts in web applications. It provides a robust `LayoutManager` to handle nested rows, columns, and tab stacks with built-in support for drag-and-drop, resizable splitters, and dynamic themes.
 

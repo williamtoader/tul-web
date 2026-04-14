@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2026-04-14
+### Added
+- **Popout Stack System**: Tab stacks can now be popped out into standalone native browser windows via a dedicated "⬡" button in the stack header or a "Popout Stack" context-menu option. Enable with `{ enablePopout: true }` on `LayoutManager`.
+- **DOM Adoption Transfer**: Popped-out stacks are transferred using `document.adoptNode()`, preserving all internal state, event listeners, and closure-captured variables across window boundaries.
+- **Pre-Popout State Preservation**: The stack's minimized/maximized state is saved before popping out and fully restored when the window closes, so stacks return to exactly the layout state they left.
+- **Force-Maximized in Popout**: Stacks are always displayed maximized inside a popout window regardless of their prior state, ensuring full use of the new window's canvas.
+- **Controls Hidden in Popout**: All stack header controls (minimize, maximize, close, popout) are hidden inside popped-out windows via a scoped `display: none !important` rule injected into the popout shell.
+- **Robust Popout Recovery**: The parent listens for `beforeunload`, `pagehide`, and `unload` events on the child window in addition to a fallback `setInterval` poll, guaranteeing the stack DOM is adopted back before the browser destroys the execution context.
+- **Popout Re-integration**: When the popout window closes, the stack is re-inserted into its exact original position in the layout tree (same parent, same index). If the original parent is gone, it falls back gracefully to the current root.
+- **Theme Sync**: The popout window's `<body>` class mirrors the parent's theme and stays in sync when the parent theme changes.
+
+### Fixed
+- **Popout button re-enables after close**: The popout button event listener is now correctly preserved across the `adoptNode` boundary, so the button works repeatedly without page reload.
+- **Minimized-then-popped stacks**: Previously minimized stacks were incorrectly displayed as minimized inside the popout window; they now expand to fill the window fully.
+
 ## [2.4.0] - 2026-04-13
 ### Added
 - **Project Reorganization**: Standardized directory structure into `src`, `demo`, `docs`, and `assets` for improved maintainability.

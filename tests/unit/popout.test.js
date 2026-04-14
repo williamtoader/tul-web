@@ -15,13 +15,18 @@ describe('PopoutManager Unit Tests', () => {
             close() {}
         };
         
-        // Mock window.open
         window.open = jest.fn().mockReturnValue({
             document: {
                 open: jest.fn(),
                 write: jest.fn(),
-                close: jest.fn()
+                close: jest.fn(),
+                adoptNode: jest.fn((node) => node),
+                getElementById: jest.fn(() => document.createElement('div')),
+                body: { className: '' }
             },
+            addEventListener: jest.fn((event, cb) => {
+                if (event === 'load') cb();
+            }),
             closed: false,
             focus: jest.fn(),
             close: jest.fn(),
@@ -88,7 +93,7 @@ describe('PopoutManager Unit Tests', () => {
         const entry = layout.popoutManager.openPopouts.get(popoutId);
         
         // Manually trigger the "closed" handler logic
-        layout.popoutManager._handlePopoutClosed(popoutId, entry.stackConfig);
+        layout.popoutManager._handlePopoutClosed(popoutId);
         
         const restored = layout.getStackById('pop-me');
         expect(restored).not.toBeNull();
@@ -114,9 +119,115 @@ describe('PopoutManager Unit Tests', () => {
         // Layout is now empty
         expect(layout.root).toBeNull();
         
-        layout.popoutManager._handlePopoutClosed(popoutId, entry.stackConfig);
+        layout.popoutManager._handlePopoutClosed(popoutId);
         
         expect(layout.root).not.toBeNull();
         expect(layout.getStackById('only-stack')).not.toBeNull();
+    });
+
+    test('popout saves prePopoutMinimized and prePopoutMaximized on entry', () => {
+        layout.loadLayout({
+            content: [{
+                type: 'row',
+                id: 'row',
+                content: [
+                    { type: 'stack', id: 's1', content: [{ type: 'component', title: 'A' }] }
+                ]
+            }]
+        });
+
+        const target = layout.getStackById('s1');
+        const popoutId = layout.popoutStack(target);
+        const entry = layout.popoutManager.openPopouts.get(popoutId);
+
+        // Both booleans must be stored on the entry
+        expect(entry).toHaveProperty('prePopoutMinimized');
+        expect(entry).toHaveProperty('prePopoutMaximized');
+    });
+
+    test('popped-out stack is always maximized even when previously minimized', () => {
+        layout.loadLayout({
+            content: [{
+                type: 'row',
+                id: 'row',
+                content: [
+                    { type: 'stack', id: 'mini-stack', content: [{ type: 'component', title: 'M' }] }
+                ]
+            }]
+        });
+
+        const target = layout.getStackById('mini-stack');
+        // Minimise before popping out
+        target.toggleMinimize();
+        expect(target.isMinimized).toBe(true);
+
+        const popoutId = layout.popoutStack(target);
+        const entry = layout.popoutManager.openPopouts.get(popoutId);
+
+        // The entry should record it was minimized before
+        expect(entry.prePopoutMinimized).toBe(true);
+        // The stack itself must be maximized (not minimized) in the popout
+        expect(target.isMinimized).toBe(false);
+        expect(target.isMaximized).toBe(true);
+        expect(target.element.classList.contains('minimized')).toBe(false);
+        expect(target.element.classList.contains('maximized')).toBe(true);
+    });
+
+    test('state restores correctly after popout closes (was minimized)', () => {
+        layout.loadLayout({
+            content: [{
+                type: 'row',
+                id: 'row',
+                content: [
+                    { type: 'stack', id: 'restore-stack', content: [{ type: 'component', title: 'R' }] }
+                ]
+            }]
+        });
+
+        const target = layout.getStackById('restore-stack');
+        target.toggleMinimize();
+        expect(target.isMinimized).toBe(true);
+
+        const popoutId = layout.popoutStack(target);
+        // Stack is now maximized inside popout
+        expect(target.isMaximized).toBe(true);
+
+        // Close the popout
+        layout.popoutManager._handlePopoutClosed(popoutId);
+
+        const restored = layout.getStackById('restore-stack');
+        expect(restored).not.toBeNull();
+        // Should be minimized again, not maximized
+        expect(restored.isMinimized).toBe(true);
+        expect(restored.isMaximized).toBe(false);
+        expect(restored.element.classList.contains('minimized')).toBe(true);
+        expect(restored.element.classList.contains('maximized')).toBe(false);
+    });
+
+    test('state restores correctly after popout closes (was normal)', () => {
+        layout.loadLayout({
+            content: [{
+                type: 'row',
+                id: 'row',
+                content: [
+                    { type: 'stack', id: 'norm-stack', content: [{ type: 'component', title: 'N' }] }
+                ]
+            }]
+        });
+
+        const target = layout.getStackById('norm-stack');
+        // Normal state: not minimized, not maximized
+        expect(target.isMinimized).toBe(false);
+        expect(target.isMaximized).toBe(false);
+
+        const popoutId = layout.popoutStack(target);
+        expect(target.isMaximized).toBe(true);
+
+        layout.popoutManager._handlePopoutClosed(popoutId);
+
+        const restored = layout.getStackById('norm-stack');
+        expect(restored.isMinimized).toBe(false);
+        expect(restored.isMaximized).toBe(false);
+        expect(restored.element.classList.contains('maximized')).toBe(false);
     });
 });
