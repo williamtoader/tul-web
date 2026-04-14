@@ -463,18 +463,25 @@ body.theme-retro .tulweb-stack {
 body.theme-retro .active-stack .tulweb-header {
   background: var(--tulweb-accent);
   color: #ffffff;
-  font-weight: bold;
 }
 
-/* Fix for top tabs in retro theme: lift tabs to top and adjust padding/border when active */
-body.theme-retro .active-stack:not(.tab-left):not(.tab-right):not(.tab-bottom) .tulweb-header {
+body.theme-retro .tulweb-tab {
+  font-weight: 500;
+}
+
+/* Stabilization for retro theme: keep padding and tabs position constant across focus states to prevent overflow jumps */
+body.theme-retro .tulweb-stack:not(.tab-left):not(.tab-right):not(.tab-bottom) .tulweb-header {
   padding: 2px 2px 0 2px;
   border-bottom: none;
 }
 
-body.theme-retro .active-stack:not(.tab-left):not(.tab-right):not(.tab-bottom) .tulweb-tabs {
+body.theme-retro .tulweb-stack:not(.tab-left):not(.tab-right):not(.tab-bottom) .tulweb-tabs {
   padding-top: 0;
   padding-left: 6px;
+}
+
+body.theme-retro .tulweb-stack:not(.tab-left):not(.tab-right):not(.tab-bottom) .tulweb-header-controls {
+  padding-right: 6px;
 }
 
 .tulweb-header {

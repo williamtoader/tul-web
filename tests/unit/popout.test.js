@@ -230,4 +230,21 @@ describe('PopoutManager Unit Tests', () => {
         expect(restored.isMaximized).toBe(false);
         expect(restored.element.classList.contains('maximized')).toBe(false);
     });
+
+    test('re-integration triggers cancelDrag on DragManager', () => {
+        const cancelSpy = jest.spyOn(layout.dragManager, 'cancelDrag');
+        
+        layout.loadLayout({
+            content: [{
+                type: 'stack', id: 'cancel-stack', content: [{ type: 'component', title: 'C' }] }
+            ]
+        });
+
+        const target = layout.getStackById('cancel-stack');
+        const popoutId = layout.popoutStack(target);
+        
+        layout.popoutManager._handlePopoutClosed(popoutId);
+        
+        expect(cancelSpy).toHaveBeenCalled();
+    });
 });

@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - **Popout button re-enables after close**: The popout button event listener is now correctly preserved across the `adoptNode` boundary, so the button works repeatedly without page reload.
 - **Minimized-then-popped stacks**: Previously minimized stacks were incorrectly displayed as minimized inside the popout window; they now expand to fill the window fully.
+- **Popout-to-workspace drag leak**: Fixed a bug where clicking a tab in a popout window and then closing it would leave a "ghost" drag state in the main window. Added window-awareness to `DragManager` and a `cancelDrag` lifecycle to ensure clean state transitions.
 
 ## [2.4.0] - 2026-04-13
 ### Added

@@ -24,10 +24,14 @@ test.describe('Visual Regression', () => {
             // Give animations a moment to settle
             await page.waitForTimeout(500);
 
-            // Take a full page screenshot
+            // Clear hover states
+            await page.mouse.move(0, 0);
+
+            // Take a full page screenshot, masking dynamic console content
             await expect(page).toHaveScreenshot(`${theme.name}.png`, {
                 fullPage: true,
-                animations: 'disabled'
+                animations: 'disabled',
+                mask: [page.locator('[data-component="console"]')]
             });
         });
     }
@@ -37,10 +41,10 @@ test.describe('Visual Regression', () => {
         await tab.dispatchEvent('dblclick');
         
         await page.waitForSelector('.tulweb-stack.maximized');
-        await page.waitForTimeout(300);
-
+        await page.mouse.move(0, 0);
         await expect(page).toHaveScreenshot('maximized-stack.png', {
-            animations: 'disabled'
+            animations: 'disabled',
+            mask: [page.locator('[data-component="console"]')]
         });
     });
 
@@ -49,10 +53,10 @@ test.describe('Visual Regression', () => {
         await minBtn.click();
         
         await page.waitForSelector('.tulweb-stack.minimized');
-        await page.waitForTimeout(300);
-
+        await page.mouse.move(0, 0);
         await expect(page).toHaveScreenshot('minimized-stack.png', {
-            animations: 'disabled'
+            animations: 'disabled',
+            mask: [page.locator('[data-component="console"]')]
         });
     });
 });

@@ -131,6 +131,118 @@ const docsTopics = {
             </div>
         `
     },
+    popout: {
+        title: "Popout Manager",
+        content: `
+            <div class="markdown-body">
+                <h1>Popout Manager</h1>
+                <p>The <code>PopoutManager</code> is an optional subsystem that allows any <code>StackItem</code> to be detached from the main layout and rendered in a standalone native browser window. It is activated by passing <code>{ enablePopout: true }</code> to the <code>LayoutManager</code> constructor.</p>
+
+                <h2>Enabling Popout</h2>
+                <div class="code-block">
+<pre><span class="keyword">import</span> { LayoutManager } <span class="keyword">from</span> <span class="string">'../src/tulweb.js'</span>;
+
+<span class="keyword">const</span> layout = <span class="keyword">new</span> LayoutManager(<span class="keyword">null</span>, document.getElementById(<span class="string">'app'</span>), {
+    <span class="property">enablePopout</span>: <span class="keyword">true</span>
+});</pre>
+                </div>
+                <p>When enabled, a popout button (↗) appears in every stack header alongside the minimize, maximize, and close controls. Users can also trigger a popout via the right-click <strong>"Popout Stack"</strong> context menu option on any tab.</p>
+
+                <h2>How It Works</h2>
+                <p>The transfer mechanism uses the native <code>document.adoptNode()</code> API — the stack's DOM subtree is physically moved between documents rather than re-created. This means:</p>
+                <ul>
+                    <li>All <strong>event listeners</strong> attached to the stack and its children are preserved.</li>
+                    <li>All <strong>internal component state</strong> (scroll position, form values, canvas content) survives the transfer.</li>
+                    <li>All <strong>closure-captured variables</strong> in component factories remain intact.</li>
+                    <li>No serialization or re-instantiation of components occurs.</li>
+                </ul>
+
+                <div class="alert info">
+                    <strong>Note:</strong> The popout window is a "thin shell" — it receives the live DOM node from the parent. It does not run a second <code>LayoutManager</code> instance, minimizing memory overhead.
+                </div>
+
+                <h2>Popout Lifecycle</h2>
+                <table class="api-table">
+                    <thead><tr><th>Stage</th><th>What Happens</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Open</strong></td>
+                            <td>The stack's minimized/maximized state is saved. The stack is force-maximized, detached from the layout tree non-destructively (no <code>destroy()</code>), adopted into the child window's document, and appended to a full-screen container.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>In Popout</strong></td>
+                            <td>The stack fills the full child window. All header controls (minimize, maximize, close, popout button) are hidden via a scoped CSS rule injected into the child window's <code>&lt;head&gt;</code>. The child window's <code>&lt;body&gt;</code> class mirrors the parent theme and stays in sync.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Close</strong></td>
+                            <td>The parent listens for <code>beforeunload</code>, <code>pagehide</code>, and <code>unload</code> events on the child window, plus a fallback <code>setInterval</code> poll (300ms). The stack DOM is adopted back into the parent document before the browser tears down the child context, preserving all event listeners. The stack is then re-inserted at its exact original position in the layout tree.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>State Restore</strong></td>
+                            <td>The stack's pre-popout minimized/maximized state is fully restored. A previously minimized stack returns minimized; a normal stack returns without any maximize class.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Programmatic API</h2>
+                <div class="code-block">
+<pre><span class="comment">// Pop out a stack programmatically</span>
+<span class="keyword">const</span> stack = layout.getStackById(<span class="string">'my-stack'</span>);
+layout.popoutStack(stack); <span class="comment">// returns a popoutId string</span>
+
+<span class="comment">// Inspect open popouts</span>
+layout.popoutManager.openPopouts; <span class="comment">// Map&lt;popoutId, entry&gt;</span>
+
+<span class="comment">// Manually trigger re-integration (close a specific popout from code)</span>
+layout.popoutManager._handlePopoutClosed(popoutId);</pre>
+                </div>
+
+                <h2>LayoutManager Events</h2>
+                <table class="api-table">
+                    <thead><tr><th>Event</th><th>Payload</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><code>popoutCreated</code></td>
+                            <td><code>{ popoutId }</code></td>
+                            <td>Fired immediately after the child window opens and the stack is detached from the layout tree.</td>
+                        </tr>
+                        <tr>
+                            <td><code>popoutReady</code></td>
+                            <td><code>{ popoutId }</code></td>
+                            <td>Fired after the child window's <code>load</code> event, once the stack has been appended to the popout DOM and is fully visible.</td>
+                        </tr>
+                        <tr>
+                            <td><code>popoutClosed</code></td>
+                            <td><code>{ popoutId }</code></td>
+                            <td>Fired after the stack has been adopted back and re-integrated into the parent layout tree.</td>
+                        </tr>
+                        <tr>
+                            <td><code>stateChanged</code></td>
+                            <td>—</td>
+                            <td>Also emitted on both open and close so consumers can persist the layout state.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Per-Stack Configuration</h2>
+                <p>The popout button visibility follows the standard stack config flags. Use <code>displayPopoutButton: false</code> on any individual stack to suppress the button for that stack only:</p>
+                <div class="code-block">
+<pre>{
+    <span class="property">type</span>: <span class="string">'stack'</span>,
+    <span class="property">displayPopoutButton</span>: <span class="keyword">false</span>,  <span class="comment">// hide popout button for this stack</span>
+    <span class="property">content</span>: [ ... ]
+}</pre>
+                </div>
+
+                <h2>Theme Synchronization</h2>
+                <p>The <code>PopoutManager</code> observes <code>MutationObserver</code> changes on the parent <code>&lt;body&gt;</code> className and replicates them to the child window's <code>&lt;body&gt;</code> instantly, keeping all CSS custom properties in sync without any manual wiring.</p>
+
+                <div class="alert warning">
+                    <strong>Browser Requirement:</strong> Popout requires <code>window.open()</code> to succeed. Pop-up blockers may prevent the window from opening. The manager does not fall back silently — the call to <code>popoutStack()</code> will return <code>null</code> if the window could not be opened.
+                </div>
+            </div>
+        `
+    },
     components: {
         title: "Components",
         content: `
@@ -615,6 +727,15 @@ document.addEventListener("DOMContentLoaded", function () {
                         </svg>
                         LayoutManager
                     </div>
+                    <div class="sidebar-item" data-topic="popout">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        Popout Manager
+                    </div>
                     <div class="sidebar-item" data-topic="components">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
@@ -763,6 +884,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             size: 50,
                             content: [
                                 { type: 'component', componentName: 'docViewer', title: docsTopics.layoutManager.title, componentState: { topic: 'layoutManager' } },
+                                { type: 'component', componentName: 'docViewer', title: docsTopics.popout.title, componentState: { topic: 'popout' } },
                                 { type: 'component', componentName: 'docViewer', title: docsTopics.components.title, componentState: { topic: 'components' } }
                             ]
                         },

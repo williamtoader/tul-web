@@ -19,7 +19,7 @@ test.describe('Popout Feature E2E', () => {
     const initialStacks = await page.locator('.tulweb-stack').count();
 
     const [popup] = await Promise.all([
-      context.waitForEvent('popup'),
+      page.waitForEvent('popup'),
       popoutBtn.click(),
     ]);
 
@@ -41,7 +41,7 @@ test.describe('Popout Feature E2E', () => {
     const popoutBtn = page.locator('.tulweb-popout-btn').first();
 
     const [popup] = await Promise.all([
-      context.waitForEvent('popup'),
+      page.waitForEvent('popup'),
       popoutBtn.click(),
     ]);
 
@@ -59,7 +59,7 @@ test.describe('Popout Feature E2E', () => {
     const popoutBtn = page.locator('.tulweb-popout-btn').first();
 
     const [popup] = await Promise.all([
-      context.waitForEvent('popup'),
+      page.waitForEvent('popup'),
       popoutBtn.click(),
     ]);
 
@@ -86,7 +86,7 @@ test.describe('Popout Feature E2E', () => {
     const initialStacks = await page.locator('.tulweb-stack').count();
 
     const [popup] = await Promise.all([
-      context.waitForEvent('popup'),
+      page.waitForEvent('popup'),
       popoutOption.click(),
     ]);
 
@@ -98,8 +98,8 @@ test.describe('Popout Feature E2E', () => {
 
   test('theme synchronization between parent and popout', async ({ page, context }) => {
     const [popup] = await Promise.all([
-      context.waitForEvent('popup'),
-      page.locator('.tulweb-popout-btn').first().click(),
+      page.waitForEvent('popup'),
+      page.locator('.tulweb-popout-btn').nth(1).click(),
     ]);
 
     await popup.waitForLoadState();
@@ -110,7 +110,7 @@ test.describe('Popout Feature E2E', () => {
     expect(initialChildTheme).toBe(initialParentTheme);
 
     // Change theme in parent
-    await page.locator('input[type="radio"][value="theme-cyber"]').click();
+    await page.locator('.theme-label', { hasText: 'Phosphor Terminal' }).click();
 
     // Wait for sync
     await page.waitForTimeout(500);
@@ -126,7 +126,7 @@ test.describe('Popout Feature E2E', () => {
 
     // First popout — open and close
     const [popup1] = await Promise.all([
-      context.waitForEvent('popup'),
+      page.waitForEvent('popup'),
       popoutBtn.click(),
     ]);
     await popup1.close();
@@ -136,7 +136,7 @@ test.describe('Popout Feature E2E', () => {
 
     // Second popout — must still work
     const [popup2] = await Promise.all([
-      context.waitForEvent('popup'),
+      page.waitForEvent('popup'),
       popoutBtn.click(),
     ]);
     await popup2.waitForLoadState();
