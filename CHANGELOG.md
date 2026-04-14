@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.5.1] - 2026-04-14
 ### Performance
+- **ContainerItem DOM diffing**: `updateLayout()` on Row/Column containers now diffs the child list against the previous render. When children haven't changed (window resize, flex recalc), all DOM manipulation is skipped entirely. When the child set does change, a `DocumentFragment` batches all insertions into a single DOM write, and Splitter instances whose adjacent-pair hasn't changed are reused rather than destroyed and recreated.
 - **Tab switching no longer rebuilds DOM**: `setActive()` now toggles CSS classes and ARIA attributes on existing tab elements instead of destroying and recreating all tabs with their event listeners.
 - **Splitter drag uses requestAnimationFrame**: Resize operations during splitter drag are now throttled via `requestAnimationFrame`, cutting synchronous reflows by ~50%.
 - **EventEmitter iterates a snapshot**: `emit()` now copies the listener array before iterating, preventing bugs when `once()` or `off()` modifies the array mid-emission.
@@ -18,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Scoped keyboard shortcuts**: Keyboard event handlers are now bound to the `rootElement` (with `tabindex="-1"`) instead of `document`, enabling multiple TulWEB instances on the same page and preventing conflicts with React/Angular keyboard handling.
 - **Robust class detection**: Replaced the fragile `constructor.toString().includes('class')` check with `Reflect.construct()`-based detection that survives minification, TypeScript transpilation, and Babel transforms.
 - **Component move lifecycle events**: Added `willMove` and `didMove` events emitted during tab drag-and-drop operations, enabling framework wrappers (React portals, Angular `ViewContainerRef`) to properly handle component relocation.
+- **TypeScript Definitions**: Added official `.d.ts` declaration file providing full type coverage, autocomplete, and documentation for the public API, simplifying integration with React, Angular, and TypeScript-based projects.
+- **Library Build Pipeline**: Implemented a production build strategy using `esbuild`. The library now generates bundled and minified ESM, IIFE, and CSS assets in the `dist/` directory, optimized for direct browser use and CDNs.
+- **Enhanced NPM Publication**: Updated `package.json` with a `files` manifest, `exports` mapping, and `prepublishOnly` lifecycle hooks to ensure only necessary, pre-tested, and freshly built assets are published to npm.
 
 ### Fixed
 - **Splitter destroy leak**: Splitters destroyed while actively being dragged now properly clean up their `document`-level `mousemove`/`mouseup` listeners.

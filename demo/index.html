@@ -26,8 +26,21 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('SW Registered', reg))
+                    .then(reg => {
+                        console.log('SW Registered', reg);
+                        // Check for updates every time the page is loaded
+                        reg.update();
+                    })
                     .catch(err => console.log('SW Registration Failed', err));
+            });
+
+            // Listen for the new service worker taking control
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (refreshing) return;
+                refreshing = true;
+                console.log('SW: New version activated, reloading page...');
+                window.location.reload();
             });
         }
     </script>

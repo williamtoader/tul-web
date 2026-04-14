@@ -46,10 +46,23 @@ export class Splitter {
         const minPrevPx = this.isVertical ? (this.prevItem.getMinWidthPx() || 40) : (this.prevItem.getMinHeightPx() || 40)
         const minNextPx = this.isVertical ? (this.nextItem.getMinWidthPx() || 40) : (this.nextItem.getMinHeightPx() || 40)
 
-        // Calculate weight ratio if needed
         const parentRect = this.parentContainer.getBoundingClientRect()
-        const totalSizePx = this.isVertical ? parentRect.width : parentRect.height
-        const pixelsPerPercent = totalSizePx / 100
+        const totalSize = this.isVertical ? parentRect.width : parentRect.height
+        
+        const siblings = this.prevItem.parent.children
+        let fixedSpace = 0
+        let totalWeight = 0
+        
+        siblings.forEach(item => {
+            if (typeof item.size === 'number') {
+                totalWeight += item.size
+            } else {
+                fixedSpace += this.isVertical ? item.element.offsetWidth : item.element.offsetHeight
+            }
+        })
+
+        const availableSpace = Math.max(0, totalSize - fixedSpace)
+        const pixelsPerPercent = totalWeight > 0 ? (availableSpace / totalWeight) : 1
 
         const startPrevSize = this.prevItem.size ?? 50
         const startNextSize = this.nextItem.size ?? 50
@@ -108,9 +121,24 @@ export class Splitter {
         this.prevType = typeof this.startPrevSize === 'number' ? 'weight' : 'fixed'
         this.nextType = typeof this.startNextSize === 'number' ? 'weight' : 'fixed'
 
-        // Get pixels to percentage ratio for weights
+        // Get pixels to percentage ratio for weights, accounting for fixed-size siblings
         const parentRect = this.parentContainer.getBoundingClientRect()
-        this.pixelsPerPercent = (this.isVertical ? parentRect.width : parentRect.height) / 100
+        const totalSize = this.isVertical ? parentRect.width : parentRect.height
+        
+        const siblings = this.prevItem.parent.children
+        let fixedSpace = 0
+        let totalWeight = 0
+        
+        siblings.forEach(item => {
+            if (typeof item.size === 'number') {
+                totalWeight += item.size
+            } else {
+                fixedSpace += this.isVertical ? item.element.offsetWidth : item.element.offsetHeight
+            }
+        })
+
+        const availableSpace = Math.max(0, totalSize - fixedSpace)
+        this.pixelsPerPercent = totalWeight > 0 ? (availableSpace / totalWeight) : 1
 
         document.addEventListener('mousemove', this._onMouseMove)
         document.addEventListener('mouseup', this._onMouseUp)
