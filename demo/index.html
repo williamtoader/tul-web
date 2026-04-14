@@ -38,6 +38,12 @@
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
                 if (refreshing) return;
+                // Don't reload automatically if we are in an automated test environment
+                // to prevent "Execution context was destroyed" errors.
+                if (navigator.webdriver) {
+                    console.log('SW: New version activated, skipping reload in test environment');
+                    return;
+                }
                 refreshing = true;
                 console.log('SW: New version activated, reloading page...');
                 window.location.reload();
