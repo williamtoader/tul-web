@@ -20,7 +20,8 @@ export class EventEmitter {
     emit(event, ...args) {
         let result = true
         if (this._listeners[event]) {
-            for (const cb of this._listeners[event]) {
+            const snapshot = [...this._listeners[event]]
+            for (const cb of snapshot) {
                 if (cb(...args) === false) result = false
             }
         }

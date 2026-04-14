@@ -119,7 +119,8 @@ export class DragManager {
 
     startDrag(evt, itemConfig, type, sourceStack, title) {
         this.isDragging = true
-        this.dragItem = itemConfig
+        // Deep-clone external configs to prevent mutating the original drag source
+        this.dragItem = type === 'external' ? structuredClone(itemConfig) : itemConfig
         this.sourceType = type
         this.sourceStack = sourceStack
 
@@ -419,6 +420,7 @@ export class DragManager {
         if (this.sourceType === 'tab') {
             const oldComp = this.sourceStack.children.find(c => c.config === newItemConfig)
             if (oldComp) {
+                oldComp.emit('willMove', { source: this.sourceStack, target: target })
                 const oldIndex = this.sourceStack.children.indexOf(oldComp)
                 if (this.sourceStack === target && edge === 'tab_insert' && oldIndex < this.currentDropZone.insertIndex) {
                     adjustIndex = true
@@ -520,6 +522,7 @@ export class DragManager {
         }
 
         if (this.sourceType === 'tab' && newComp) {
+            newComp.emit('didMove', { source: this.sourceStack, target: newComp.parent })
             newComp.emit('move')
         }
     }

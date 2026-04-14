@@ -4,7 +4,7 @@
 
 TulWEB is a lightweight, zero-dependency windowing toolkit designed for building complex, professional-grade tiling and stacking layouts in web applications. It provides a robust `LayoutManager` to handle nested rows, columns, and tab stacks with built-in support for drag-and-drop, resizable splitters, and dynamic themes.
 
-![TulWEB Screenshot](./demo_ui.png) 
+![TulWEB Screenshot](./assets/demo_ui.png) 
 
 
 ## Key Features

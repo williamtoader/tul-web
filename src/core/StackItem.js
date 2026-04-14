@@ -183,6 +183,16 @@ export class StackItem extends ContentItem {
         this.updateOverflow()
     }
 
+    _updateTabActiveState() {
+        if (this.tabPosition === 'headless' || !this.tabsEl) return
+        const tabs = this.tabsEl.querySelectorAll('.tulweb-tab')
+        tabs.forEach((tab, i) => {
+            tab.classList.toggle('active', i === this.activeChildIndex)
+            tab.setAttribute('aria-selected', i === this.activeChildIndex ? 'true' : 'false')
+            tab.setAttribute('tabindex', i === this.activeChildIndex ? '0' : '-1')
+        })
+    }
+
     renderTabs() {
         if (this.tabPosition === 'headless') return
         this.tabsEl.innerHTML = ''
@@ -315,8 +325,22 @@ export class StackItem extends ContentItem {
             if (this.dropdownEl) this.dropdownEl.style.display = 'none'
         }
 
-        // Keep all tabs in dropdown for convenience jumping
-        this.hiddenTabs = this.children
+        // Determine actually hidden tabs for the dropdown
+        const tabs = this.tabsEl.querySelectorAll('.tulweb-tab')
+        if (hasOverflow && tabs.length > 0) {
+            const containerRect = this.tabsEl.getBoundingClientRect()
+            this.hiddenTabs = this.children.filter((child, i) => {
+                const tab = tabs[i]
+                if (!tab) return true
+                const rect = tab.getBoundingClientRect()
+                if (isVertical) {
+                    return rect.bottom > containerRect.bottom || rect.top < containerRect.top
+                }
+                return rect.right > containerRect.right || rect.left < containerRect.left
+            })
+        } else {
+            this.hiddenTabs = []
+        }
     }
 
 
@@ -387,7 +411,7 @@ export class StackItem extends ContentItem {
             this.toggleMinimize()
         } else {
             if (this.tabPosition !== 'headless') {
-                this.renderTabs()
+                this._updateTabActiveState()
             }
             this.showActiveChild()
 

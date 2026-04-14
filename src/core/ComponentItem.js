@@ -24,9 +24,11 @@ export class ComponentItem extends ContentItem {
         if (factory) {
             this.element.innerHTML = '' // Clear initial state
             try {
-                // Determine if it's a class or a simple factory function
+                // Use Reflect.construct to reliably detect classes (survives minification/transpilation)
                 const isClass = typeof factory === 'function' &&
-                    (factory.isClass || (factory.prototype && factory.prototype.constructor.toString().includes('class')))
+                    (factory.isClass || (() => {
+                        try { Reflect.construct(String, [], factory); return true } catch { return false }
+                    })())
 
                 let contentNode
                 if (isClass) {

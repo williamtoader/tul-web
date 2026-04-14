@@ -1,12 +1,13 @@
-const CACHE_NAME = 'tulweb-v2';
+const CACHE_NAME = 'tulweb-v3';
 const ASSETS = [
     './',
     './index.html',
     './app.js',
-    './tulweb.js',
-    './tulweb.css',
-    './icon-512.png',
-    './manifest.json'
+    './app.css',
+    './manifest.json',
+    '../src/tulweb.css',
+    '../src/tulweb.js',
+    '../assets/icon-512.png'
 ];
 
 self.addEventListener('install', event => {

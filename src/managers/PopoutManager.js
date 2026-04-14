@@ -162,6 +162,7 @@ export class PopoutManager {
         }
 
         this.layoutManager.emit('popoutCreated', { popoutId })
+        this.layoutManager.emit('popout', stack)
         this.layoutManager.emit('stateChanged')
 
         // Monitor child window closure: fallback polling just in case beforeunload is missed
@@ -320,6 +321,7 @@ export class PopoutManager {
         }
 
         this.layoutManager.emit('popoutClosed', { popoutId })
+        this.layoutManager.emit('popout-restore', stack)
         this.layoutManager.emit('stateChanged')
     }
 

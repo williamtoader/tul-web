@@ -6,9 +6,8 @@ export class DragSource {
         this.element.classList.add('tulweb-drag-source')
 
         const startHandler = (e) => {
-            // Clone config so we don't mutate original
-            const configCopy = JSON.parse(JSON.stringify(this.itemConfig))
-            this.layoutManager.dragManager.pendDrag(e, configCopy, 'external', null, this.itemConfig.title)
+            // Config is cloned later in startDrag() only if the drag threshold is met
+            this.layoutManager.dragManager.pendDrag(e, this.itemConfig, 'external', null, this.itemConfig.title)
         }
 
         this.element.addEventListener('mousedown', startHandler)

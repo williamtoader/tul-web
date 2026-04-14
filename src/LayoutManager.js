@@ -49,15 +49,19 @@ export class LayoutManager extends EventEmitter {
         }
         window.addEventListener('resize', this._onWindowResize)
 
+        // Scope keyboard handling to root element for multi-instance support
+        this.rootElement.setAttribute('tabindex', '-1')
         this._onKeyDown = (e) => {
             this.handleGlobalKeydown(e)
         }
-        document.addEventListener('keydown', this._onKeyDown)
+        this.rootElement.addEventListener('keydown', this._onKeyDown)
     }
 
     destroy() {
         window.removeEventListener('resize', this._onWindowResize)
-        document.removeEventListener('keydown', this._onKeyDown)
+        if (this.rootElement) {
+            this.rootElement.removeEventListener('keydown', this._onKeyDown)
+        }
         if (this.popoutManager) {
             this.popoutManager.destroy()
         }
@@ -152,9 +156,8 @@ export class LayoutManager extends EventEmitter {
             if (e.key.toLowerCase() === 'w') {
                 let active = this.activeStack
                 if (!active) {
-                    const stacks = Array.from(this.rootElement.querySelectorAll('.tulweb-stack'))
-                        .map(el => el.tulwebItem)
-                        .filter(s => s && s instanceof StackItem && s.children.length > 0)
+                    const stacks = this.getAllStacks()
+                        .filter(s => s.children.length > 0)
                     if (stacks.length > 0) active = stacks[0]
                 }
                 if (active && active.children.length > 0) {
@@ -179,9 +182,7 @@ export class LayoutManager extends EventEmitter {
 
     navigateFocus(key) {
         if (!this.activeStack || !this.activeStack.element) return
-        const stacks = Array.from(this.rootElement.querySelectorAll('.tulweb-stack'))
-            .map(el => el.tulwebItem)
-            .filter(s => s && s instanceof StackItem)
+        const stacks = this.getAllStacks()
 
         const currentRect = this.activeStack.element.getBoundingClientRect()
         const cx = currentRect.left + currentRect.width / 2

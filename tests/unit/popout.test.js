@@ -247,4 +247,27 @@ describe('PopoutManager Unit Tests', () => {
         
         expect(cancelSpy).toHaveBeenCalled();
     });
+
+    test('emits popout and popout-restore events', () => {
+        const popoutSpy = jest.fn();
+        const restoreSpy = jest.fn();
+        
+        layout.on('popout', popoutSpy);
+        layout.on('popout-restore', restoreSpy);
+
+        layout.loadLayout({
+            content: [{
+                type: 'stack', id: 'event-stack', content: [{ type: 'component', title: 'E' }] }
+            ]
+        });
+
+        const target = layout.getStackById('event-stack');
+        const popoutId = layout.popoutStack(target);
+        
+        expect(popoutSpy).toHaveBeenCalledWith(target);
+        
+        layout.popoutManager._handlePopoutClosed(popoutId);
+        
+        expect(restoreSpy).toHaveBeenCalledWith(target);
+    });
 });

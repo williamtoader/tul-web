@@ -724,6 +724,12 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Popout lifecycle events
+    layout.on('popout', (stack) => {
+        if (window.tulWebLogger) window.tulWebLogger(`API Event: popout (Stack: ${stack.id})`, '#bd93f9');
+    });
+    layout.on('popout-restore', (stack) => {
+        if (window.tulWebLogger) window.tulWebLogger(`API Event: popout-restore (Stack: ${stack.id})`, '#50fa7b');
+    });
     layout.on('popoutCreated', (data) => {
         if (window.tulWebLogger) window.tulWebLogger(`Popout created: ${data.popoutId}`, '#ff79c6');
     });
@@ -734,7 +740,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (window.tulWebLogger) window.tulWebLogger(`Popout state changed: ${data.popoutId}`, '#8be9fd');
     });
     layout.on('popoutClosed', (data) => {
-        if (window.tulWebLogger) window.tulWebLogger(`Popout closed & restored: ${data.popoutId}`, '#f1fa8c');
+        if (window.tulWebLogger) window.tulWebLogger(`Popout closed: ${data.popoutId}`, '#f1fa8c');
     });
 
     // 2. Register Components

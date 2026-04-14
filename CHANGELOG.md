@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.1] - 2026-04-14
+### Performance
+- **Tab switching no longer rebuilds DOM**: `setActive()` now toggles CSS classes and ARIA attributes on existing tab elements instead of destroying and recreating all tabs with their event listeners.
+- **Splitter drag uses requestAnimationFrame**: Resize operations during splitter drag are now throttled via `requestAnimationFrame`, cutting synchronous reflows by ~50%.
+- **EventEmitter iterates a snapshot**: `emit()` now copies the listener array before iterating, preventing bugs when `once()` or `off()` modifies the array mid-emission.
+- **DragSource defers config cloning**: The expensive `JSON.parse(JSON.stringify())` deep clone is now deferred to `startDrag()` (using `structuredClone`) and only runs when the drag threshold is actually exceeded, not on every `mousedown`.
+- **Overflow dropdown shows only hidden tabs**: `updateOverflow()` now filters to genuinely overflowed tabs instead of always listing every tab.
+- **navigateFocus uses tree traversal**: Replaced DOM `querySelectorAll` in keyboard navigation with the existing `getAllStacks()` tree traversal, avoiding unnecessary DOM queries.
+
+### Framework Integration
+- **Scoped keyboard shortcuts**: Keyboard event handlers are now bound to the `rootElement` (with `tabindex="-1"`) instead of `document`, enabling multiple TulWEB instances on the same page and preventing conflicts with React/Angular keyboard handling.
+- **Robust class detection**: Replaced the fragile `constructor.toString().includes('class')` check with `Reflect.construct()`-based detection that survives minification, TypeScript transpilation, and Babel transforms.
+- **Component move lifecycle events**: Added `willMove` and `didMove` events emitted during tab drag-and-drop operations, enabling framework wrappers (React portals, Angular `ViewContainerRef`) to properly handle component relocation.
+
+### Fixed
+- **Splitter destroy leak**: Splitters destroyed while actively being dragged now properly clean up their `document`-level `mousemove`/`mouseup` listeners.
+
 ## [2.5.0] - 2026-04-14
 ### Added
 - **Popout Stack System**: Tab stacks can now be popped out into standalone native browser windows via a dedicated "⬡" button in the stack header or a "Popout Stack" context-menu option. Enable with `{ enablePopout: true }` on `LayoutManager`.
@@ -16,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Robust Popout Recovery**: The parent listens for `beforeunload`, `pagehide`, and `unload` events on the child window in addition to a fallback `setInterval` poll, guaranteeing the stack DOM is adopted back before the browser destroys the execution context.
 - **Popout Re-integration**: When the popout window closes, the stack is re-inserted into its exact original position in the layout tree (same parent, same index). If the original parent is gone, it falls back gracefully to the current root.
 - **Theme Sync**: The popout window's `<body>` class mirrors the parent's theme and stays in sync when the parent theme changes.
+- **Popout API Events**: Introduced `popout` and `popout-restore` events on `LayoutManager`. `popout` is emitted with the stack instance when a stack is detached; `popout-restore` is emitted when the stack is returned to the workspace after the popout window closes.
 
 ### Fixed
 - **Popout button re-enables after close**: The popout button event listener is now correctly preserved across the `adoptNode` boundary, so the button works repeatedly without page reload.

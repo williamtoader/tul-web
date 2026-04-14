@@ -120,6 +120,20 @@ export class Splitter {
 
     _onMouseMove(e) {
         if (!this.isDragging) return
+        if (this._rafPending) {
+            this._lastMoveEvent = e
+            return
+        }
+        this._rafPending = true
+        this._lastMoveEvent = e
+        requestAnimationFrame(() => {
+            this._rafPending = false
+            this._applyResize(this._lastMoveEvent)
+        })
+    }
+
+    _applyResize(e) {
+        if (!this.isDragging) return
         const isTouch = e.touches && e.touches.length > 0
         const clientX = isTouch ? e.touches[0].clientX : e.clientX
         const clientY = isTouch ? e.touches[0].clientY : e.clientY
@@ -205,6 +219,9 @@ export class Splitter {
     }
 
     destroy() {
+        if (this.isDragging) {
+            this._onMouseUp()
+        }
         this.element.removeEventListener('mousedown', this._onMouseDown)
         this.element.removeEventListener('dblclick', this._onDblClick)
         if (this.element.parentElement) {
