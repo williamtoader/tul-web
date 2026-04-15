@@ -86,9 +86,21 @@ describe('StackItem', () => {
     stack.addChild(child3)
 
     stack.activeChildIndex = 2 // child3
-
     stack.removeChild(child3)
-    expect(stack.activeChildIndex).toBe(1) // Should move to previous child
+    expect(stack.activeChildIndex).toBe(1) // Removed last, should move to previous
+
+    // Reset and test middle removal
+    stack.addChild(child3)
+    stack.activeChildIndex = 1 // child2
+    stack.removeChild(child2)
+    expect(stack.activeChildIndex).toBe(0) // Should favor previous (child1) over next (child3)
+
+    // Reset and test first removal
+    const child4 = new ComponentItem({ type: 'component' }, layoutManager)
+    stack.addChild(child4) // [child1, child3, child4]
+    stack.activeChildIndex = 0 // child1
+    stack.removeChild(child1)
+    expect(stack.activeChildIndex).toBe(0) // No previous, should move to next (child3)
   })
 
   test('renderTabs generates tab elements', () => {

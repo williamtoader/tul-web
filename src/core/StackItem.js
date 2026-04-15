@@ -124,11 +124,12 @@ export class StackItem extends ContentItem {
       } else if (index < this.activeChildIndex) {
         this.activeChildIndex--
       } else if (index === this.activeChildIndex) {
-        this.activeChildIndex = Math.min(this.activeChildIndex, this.children.length - 1)
+        // Activate the tab before the one that was moved.
+        // If there were no tabs before (index 0), activate the tab that was after (new index 0).
+        this.activeChildIndex = Math.max(0, index - 1)
       }
 
-      // Re-render is handled by ContentItem calling updateLayout()
-      // which is overridden in StackItem to call renderTabs()
+      this.updateLayout()
       return true
     }
     return false
