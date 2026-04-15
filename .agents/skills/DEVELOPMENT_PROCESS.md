@@ -1,0 +1,1 @@
+In the development process stick to clear consise phrases and sentences, bare minimum. Avoid flowery polite language and unnecessary words. Considering you have to re-read your own thoughts and plans it will save you time and make it easier to understand what you are doing.
