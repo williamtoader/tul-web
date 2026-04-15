@@ -12,6 +12,8 @@
     "test": "npx playwright test",
     "test:ui": "npx playwright test --ui",
     "test:unit": "jest",
+    "lint": "eslint src --ext .js",
+    "test:mutation": "stryker run",
     "build:lib": "npx esbuild src/tulweb.js --bundle --minify --format=esm --outfile=dist/tulweb.min.js && npx esbuild src/tulweb.js --bundle --format=esm --outfile=dist/tulweb.js && npx esbuild src/tulweb.js --bundle --minify --format=iife --global-name=TulWEB --outfile=dist/tulweb.iife.js && npx esbuild src/tulweb.css --bundle --minify --outfile=dist/tulweb.min.css && npx esbuild src/tulweb.css --bundle --outfile=dist/tulweb.css",
     "build": "node bundle.js && npm run build:lib",
     "prepublishOnly": "npm run test:unit && npm run build"
@@ -40,10 +42,18 @@
   "author": "williamtoader",
   "license": "MIT",
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.1",
     "@babel/preset-env": "^7.29.2",
     "@playwright/test": "^1.59.1",
+    "@stryker-mutator/core": "^8.2.0",
+    "@stryker-mutator/jest-runner": "^8.2.0",
     "babel-jest": "^29.7.0",
     "esbuild": "^0.25.0",
+    "eslint": "^8.57.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-promise": "^6.1.1",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0"
   }

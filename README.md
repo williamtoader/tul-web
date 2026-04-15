@@ -1,29 +1,30 @@
 # TulWEB - Pure JS Windowing Toolkit
 
-**WARNING**: This is was vibe-coded in a few hours. It is not production-ready and may have bugs. 
+> [!IMPORTANT]
+> This project is currently in an experimental phase. It is not recommended for production environments and may contain architectural inconsistencies.
 
-TulWEB is a lightweight, zero-dependency windowing toolkit designed for building complex, professional-grade tiling and stacking layouts in web applications. It provides a robust `LayoutManager` to handle nested rows, columns, and tab stacks with built-in support for drag-and-drop, resizable splitters, and dynamic themes.
+TulWEB is a modular windowing toolkit implemented in vanilla JavaScript, designed for constructing complex tiling and stacking layouts in web applications. It provides a core `LayoutManager` for managing nested rows, columns, and tab stacks with support for interface interactions, resizable splitters, and theme synchronization.
 
 ![TulWEB Screenshot](./assets/demo_ui.png) 
 
 
-## Key Features
+## Core Capabilities
 
-- **Multi-Directional Tabs**: Support for Top, Bottom, Left, and Right tab placements per stack.
-- **Stack Minimization**: Collapse stacks to their tab bars with an ultra-sleek hover-based component preview.
-- **Minimum Constraints**: Set `size`, `minWidth`, and `minHeight` using pixels or CSS units (e.g., `"300px"`, `"20%"`) to prevent panels from becoming unreadable during resize. Constraints are automatically bypassed during stack minimization.
-- **Automated Testing**: Comprehensive E2E testing with **Playwright** and unit testing with **Jest** to ensure layout stability across all browsers.
-- **Pure JavaScript**: No dependencies (no jQuery, no React/Angular required, but easily integrable).
-- **Flexible Layouts**: Nested rows and columns for complex interfaces.
-- **Tab Stacking**: Group components into stacks with efficient tab management and overflow support.
-- **Drag & Drop**: Native-feeling drag-and-drop experience for reordering tabs and splitting panels.
-- **Resizable Splitters**: Intuitive resizing with splitter constraints.
-- **Premium Themes**: Built-in themes including Industrial Graphite, Phosphor Terminal, Pro Light, and Retro 90s, featuring glassmorphism and micro-animations.
-- **State Management**: Save and restored entire layout configurations with a simple JSON format.
-- **Developer-Friendly API**: Event-based system for lifecycle management (`init`, `active`, `focus`, `resize`, etc.) with support for both factory functions and ES6 classes.
-- **Accessibility**: Full ARIA support and keyboard navigation for tabs, splitters, and menus.
-- **Production Ready**: Verified memory management, per-instance drag handling, and comprehensive lifecycle hooks.
-- **Internal OO Refactor**: Library internals fully utilize ES6 classes for better maintainability and extensibility.
+- **Configurable Tab Orientation**: Support for Top, Bottom, Left, and Right tab placements per stack.
+- **Stack Minimization**: Capability to collapse stacks to their tab headers with asynchronous component previews.
+- **Geometric Constraints**: Support for `size`, `minWidth`, and `minHeight` using CSS units (e.g., `"300px"`, `"20%"`) to maintain layout usability. Constraints are dynamically bypassed during stack minimization.
+- **Automated Verification**: Integrated E2E testing using Playwright and unit testing via Jest to ensure stability across browser environments.
+- **Zero Dependencies**: Core implementation relies exclusively on native JavaScript APIs.
+- **Nested Layout Architectures**: Support for recursive row and column nesting for complex interface requirements.
+- **Component Stacking**: Logical grouping of components into stacks with overflow management.
+- **Interactive Drag & Drop**: Native-aligned interaction model for tab reordering and panel splitting.
+- **Proportional Resizing**: Flexbox-based layout engine with resizable splitters.
+- **Theme System**: Pre-configured design systems including Industrial Graphite, Phosphor Terminal, Pro Light, and Retro 90s, utilizing modern CSS properties for interface depth.
+- **State Persistence**: Full layout state serialization and restoration via JSON schema.
+- **Exposed Event API**: Internal `EventEmitter` system for lifecycle hook integration (`init`, `active`, `focus`, `resize`, etc.).
+- **Accessibility Compliance**: ARIA role implementation and keyboard navigation support.
+- **Memory Management**: Optimized garbage collection and per-instance interaction handling.
+- **ES6 Architecture**: Internal implementation utilizing ES6 classes for modularity.
 
 ## Installation
 
@@ -185,4 +186,4 @@ TulWEB is licensed under the [MIT License](LICENSE).
 
 ---
 
-Created with focus on aesthetics and performance.
+Developed with a focus on high-performance windowing logic and interface responsiveness.

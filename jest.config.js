@@ -1,6 +1,11 @@
 export default {
     testEnvironment: 'jsdom',
-    testMatch: ['**/tests/unit/**/*.test.js'],
+    testMatch: ['**/src/**/*.test.js'],
+    collectCoverageFrom: [
+        'src/**/*.js',
+        '!src/**/*.test.js',
+        '!src/tulweb.js'
+    ],
     transform: {
         '^.+\\.jsx?$': 'babel-jest',
     },

@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.0] - 2026-04-15
+### Testing & CI
+- **E2E Suite Stabilization**: Resolved environment-specific timing issues in Playwright tests by standardizing layout configurations during initialization. Eliminated intermittent test skips across browser runners.
+- **Service Worker Caching**: Optimized caching strategies in `sw.js` to prioritize network freshness for mutable assets while retaining offline support for core library components.
+
+### Layout Management
+- **State Synchronization**: Enhanced synchronization of theme and layout state across popout window boundaries, ensuring consistent rendering after document adoption.
+
+## [2.6.0] - 2026-04-15
+### Framework Integration
+- **React Component Bridge**: Implemented a reusable mounting adapter for React components, facilitating state preservation and lifecycle cleanup when integrated into TulWEB panels.
+- **Lifecycle Hook Refinement**: Standardized `init` and `destroy` events to better align with framework-specific unmounting protocols.
+
+### Documentation
+- **Architecture Guides**: Integrated advanced methodologies for frontend code quality and comprehensive test suite architectures into the project documentation.
+
 ## [2.5.1] - 2026-04-14
 ### Performance
 - **ContainerItem DOM diffing**: `updateLayout()` on Row/Column containers now diffs the child list against the previous render. When children haven't changed (window resize, flex recalc), all DOM manipulation is skipped entirely. When the child set does change, a `DocumentFragment` batches all insertions into a single DOM write, and Splitter instances whose adjacent-pair hasn't changed are reused rather than destroyed and recreated.
@@ -31,10 +47,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Popout Stack System**: Tab stacks can now be popped out into standalone native browser windows via a dedicated "⬡" button in the stack header or a "Popout Stack" context-menu option. Enable with `{ enablePopout: true }` on `LayoutManager`.
 - **Headless Tab Position**: Added a new `"headless"` tab position that completely hides the stack header and all associated controls (close, minimize, maximize, popout). Headless stacks are designed to be controlled exclusively through the programmatic API.
 - **DOM Adoption Transfer**: Popped-out stacks are transferred using `document.adoptNode()`, preserving all internal state, event listeners, and closure-captured variables across window boundaries.
-- **Pre-Popout State Preservation**: The stack's minimized/maximized state is saved before popping out and fully restored when the window closes, so stacks return to exactly the layout state they left.
+- **Popout State Preservation**: The stack's minimized/maximized state is saved before popping out and fully restored when the window closes, so stacks return to exactly the layout state they left.
 - **Force-Maximized in Popout**: Stacks are always displayed maximized inside a popout window regardless of their prior state, ensuring full use of the new window's canvas.
 - **Controls Hidden in Popout**: All stack header controls (minimize, maximize, close, popout) are hidden inside popped-out windows via a scoped `display: none !important` rule injected into the popout shell.
-- **Robust Popout Recovery**: The parent listens for `beforeunload`, `pagehide`, and `unload` events on the child window in addition to a fallback `setInterval` poll, guaranteeing the stack DOM is adopted back before the browser destroys the execution context.
+- **Popout Recovery Mechanism**: The parent listens for `beforeunload`, `pagehide`, and `unload` events on the child window in addition to a fallback `setInterval` poll, ensuring the stack DOM is adopted back before the browser destroys the execution context.
 - **Popout Re-integration**: When the popout window closes, the stack is re-inserted into its exact original position in the layout tree (same parent, same index). If the original parent is gone, it falls back gracefully to the current root.
 - **Theme Sync**: The popout window's `<body>` class mirrors the parent's theme and stays in sync when the parent theme changes.
 - **Popout API Events**: Introduced `popout` and `popout-restore` events on `LayoutManager`. `popout` is emitted with the stack instance when a stack is detached; `popout-restore` is emitted when the stack is returned to the workspace after the popout window closes.
@@ -47,8 +63,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.4.0] - 2026-04-13
 ### Added
 - **Project Reorganization**: Standardized directory structure into `src`, `demo`, `docs`, and `assets` for improved maintainability.
-- **Root Portal**: Professional landing page at the project root with high-aesthetic design and quick links to the demo and documentation.
-- **Enhanced Bundler**: Refactored `bundle.js` with relative path mapping, enabling seamless self-contained builds from nested source directories.
+- **Project Root Interface**: Implemented a landing page at the project root with links to demonstration and documentation assets.
+- **Enhanced Bundler**: Refactored `bundle.js` with relative path mapping, enabling self-contained builds from nested source directories.
 
 ### Changed
 - Moved core library files to `src/` and application/documentation files to their respective `demo/` and `docs/` folders.
@@ -77,10 +93,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Comprehensive automated testing suite featuring Playwright (E2E) and Jest (Unit).
 - Enhanced programmatic API for dynamic layout manipulation (`addChild`, `removeChild`, `replaceChild`, etc.).
-- Granular component lifecycle events: `init`, `active`, `inactive`, `focus`, `defocus`, `move`, `resize`, `destroy`.
-- Modernized UI design system with glassmorphism, refined shadows, and smooth micro-animations.
-- New "How to use" interactive guide tab in the default layout.
-- Consolidated bundling script (`bundle.js`) for generating self-contained Documentation and Index pages.
+- Component Lifecycle Events: Implementation of `init`, `active`, `inactive`, `focus`, `defocus`, `move`, `resize`, `destroy`.
+- UI Design System: Updated interface components with modern visual depth and transition states.
+- Interactive Guide: Integrated functional documentation tab into the default layout.
+- Bundling Automation: Consolidated bundling script (`bundle.js`) for generating self-contained Documentation and Index pages.
 
 ### Changed
 - Library internals fully refactored to ES6 classes for improved extensibility and maintainability.

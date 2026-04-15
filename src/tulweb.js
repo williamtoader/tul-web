@@ -8,13 +8,13 @@ import { RowItem, ColumnItem } from './core/ContainerItem.js'
 import { ComponentItem } from './core/ComponentItem.js'
 
 export {
-    LayoutManager,
-    PopoutManager,
-    DragSource,
-    utils,
-    ContentItem,
-    StackItem,
-    RowItem,
-    ColumnItem,
-    ComponentItem
+  LayoutManager,
+  PopoutManager,
+  DragSource,
+  utils,
+  ContentItem,
+  StackItem,
+  RowItem,
+  ColumnItem,
+  ComponentItem
 }

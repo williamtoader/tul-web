@@ -31,11 +31,25 @@ test.describe('Drag and Drop', () => {
     await page.mouse.up();
   });
 
-  test('dragging from external sidebar creates a drag source element', async ({ page }) => {
-    // The sidebar items should have the drag source class applied
-    const dragSources = page.locator('.tulweb-drag-source');
-    const count = await dragSources.count();
-    expect(count).toBeGreaterThan(0);
+  test('dragging from external sidebar into a stack adds a new tab', async ({ page }) => {
+    const sidebarItem = page.locator('.tulweb-drag-source').first();
+    const targetStack = page.locator('.tulweb-stack').first();
+    
+    const startBox = await sidebarItem.boundingBox();
+    const endBox = await targetStack.boundingBox();
+    
+    if (!startBox || !endBox) test.skip();
+
+    const initialTabs = await targetStack.locator('.tulweb-tab').count();
+
+    // Drag from sidebar to stack
+    await page.mouse.move(startBox.x + startBox.width / 2, startBox.y + startBox.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(endBox.x + endBox.width / 2, endBox.y + endBox.height / 2, { steps: 20 });
+    await page.mouse.up();
+
+    // Verify a new tab was added
+    await expect(targetStack.locator('.tulweb-tab')).toHaveCount(initialTabs + 1);
   });
 
   test('dragging a tab does not break the layout', async ({ page }) => {

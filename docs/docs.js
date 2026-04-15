@@ -3,10 +3,10 @@ const docsTopics = {
         title: "Introduction",
         content: `
             <div class="markdown-body">
-                <h1>Welcome to TulWEB</h1>
-                <p><strong>TulWEB</strong> (Tul Windowing Manager) is a comprehensive, pure-JavaScript windowing and layout toolkit. Unlike heavy DOM frameworks, TulWEB is built to provide advanced, dockable, resizable workspaces with zero external dependencies.</p>
+                <h1>Introduction</h1>
+                <p><strong>TulWEB</strong> is a modular windowing and layout toolkit implemented in pure JavaScript. It is designed to provide advanced, dockable, and resizable interface structures with zero external dependencies.</p>
                 
-                <p>Designed for web-based IDEs, trading terminals, and massive dashboards, it handles deeply nested row/column grids and tabbed stacks seamlessly.</p>
+                <p>Engineered for technical environments such as web-based IDEs, trading terminals, and high-density dashboards, TulWEB manages complex, deeply nested row/column grids and tabbed stacks with high performance.</p>
                 
                 <h2>Getting Started</h2>
                 <p>Installation is straightforward. Simply drop the core CSS and JS files into your project head:</p>
@@ -301,11 +301,11 @@ layout.registerComponent(<span class="string">'modernWidget'</span>, MyModernWid
         title: "Drag & Drop API",
         content: `
             <div class="markdown-body">
-                <h1>Drag & Drop Workflows</h1>
-                <p>TulWEB comes packed with a sophisticated, absolute-pixel drag-and-drop system designed to prevent iframe blocking and text-selection glitches.</p>
+                <h1>Drag & Drop Operations</h1>
+                <p>TulWEB implements a precision, absolute-pixel drag-and-drop system designed to maintain interface stability and prevent interaction conflicts with nested elements or iframes.</p>
 
-                <h2>Internal Dragging</h2>
-                <p>Users can instinctively drag tabs from headers and drop them onto the center of another window (to dock into the stack), or onto the edges (top, right, bottom, left) to execute a quadrant split. The system automatically recalculates parent boundaries.</p>
+                <h2>Integrated Interaction Model</h2>
+                <p>The toolkit supports standard drag-and-drop interactions for tab reordering and panel splitting. Tabs can be repositioned within their current stack or moved to initiate a split (top, right, bottom, left) within the layout hierarchy. The system automatically recalculates parent container boundaries upon operation completion.</p>
 
                 <h2>External Dragging</h2>
                 <p>You can create external catalog lists (like in this very demo) to let users drag new tools directly into the workspace.</p>
@@ -371,8 +371,8 @@ layout.createDragSource(btn, config);</pre>
         title: "Theming",
         content: `
             <div class="markdown-body">
-                <h1>Theming Engine</h1>
-                <p>Forget !important overrides. TulWEB utilizes native CSS Custom Properties for immediate repaints and seamless glassmorphism support.</p>
+                <h1>Theming System</h1>
+                <p>TulWEB utilizes native CSS Custom Properties for immediate interface updates and integrated support for translucent UI elements.</p>
                 
                 <h2>Extending Properties</h2>
                 <p>All core color logic maps to base variables. Overwrite them at the <code>body</code> or container level:</p>
@@ -388,10 +388,10 @@ layout.createDragSource(btn, config);</pre>
 
                 <h2>Included Themes</h2>
                 <ul>
-                    <li><code>theme-nordic</code>: The default sleek, dark bluish-grey.</li>
-                    <li><code>theme-cyber</code>: A retro crt-terminal vibe with amber phosphors.</li>
-                    <li><code>theme-light</code>: Maximum contrast for well-lit environments and data density.</li>
-                    <li><code>theme-retro</code>: A 90's workstation OS (IRIX/CDE) theme with bevels and high-contrast navy.</li>
+                    <li><code>theme-nordic</code>: Industrial Graphite – High-performance dark interface with neutral tones.</li>
+                    <li><code>theme-cyber</code>: Phosphor Terminal – High-contrast amber display optimized for low-light environments.</li>
+                    <li><code>theme-light</code>: Pro Light – Maximum contrast and data density for bright environments.</li>
+                    <li><code>theme-retro</code>: Retro 90s – Aesthetic based on legacy workstation environments with distinct beveling and high-contrast color palettes.</li>
                 </ul>
             </div>
         `

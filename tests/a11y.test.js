@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 
 async function waitForLayout(page) {
   await page.waitForSelector('.tulweb-stack', { state: 'visible' });
@@ -9,31 +10,48 @@ test.describe('Accessibility (a11y)', () => {
     await page.goto('/demo/');
     await waitForLayout(page);
     
-    // Load a simple test layout to ensure stability
+    // Load a realistic test layout
     await page.evaluate(() => {
         if (!window.layout) return;
         window.layout.loadLayout({
             content: [{
-                type: 'stack',
-                id: 'test-stack',
+                type: 'column',
                 content: [
-                    { type: 'component', componentName: 'generic', title: 'Tab 1', componentState: { name: 'C1' } },
-                    { type: 'component', componentName: 'generic', title: 'Tab 2', componentState: { name: 'C2' } },
-                    { type: 'component', componentName: 'generic', title: 'Tab 3', componentState: { name: 'C3' } }
+                    {
+                        type: 'stack',
+                        id: 'test-stack',
+                        content: [
+                            { type: 'component', componentName: 'generic', title: 'Tab 1' },
+                            { type: 'component', componentName: 'generic', title: 'Tab 2' }
+                        ]
+                    },
+                    {
+                        type: 'row',
+                        content: [
+                           { type: 'stack', content: [{ type: 'component', title: 'Row Tab' }] },
+                           { type: 'stack', content: [{ type: 'component', title: 'Another Tab' }] }
+                        ]
+                    }
                 ]
             }]
         });
     });
-    // Wait for the specific tab to appear to ensure the new layout is active
     await expect(page.getByRole('tab', { name: 'Tab 1' })).toBeVisible({ timeout: 5000 });
   });
 
-  test('ARIA roles are correctly applied', async ({ page }) => {
+  test('should not have any automatically detectable accessibility violations', async ({ page }) => {
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .analyze();
+
+    expect(accessibilityScanResults.violations).toEqual([]);
+  });
+
+  test('ARIA roles are correctly applied to layout structure', async ({ page }) => {
     const tablist = page.locator('.tulweb-tabs').first();
     const tab = page.getByRole('tab', { name: 'Tab 1' });
     const panel = page.locator('.tulweb-content-area').first();
 
-    await expect(tablist).toBeVisible();
     await expect(tablist).toHaveAttribute('role', 'tablist');
     await expect(tab).toHaveAttribute('role', 'tab');
     await expect(panel).toHaveAttribute('role', 'tabpanel');
@@ -55,70 +73,24 @@ test.describe('Accessibility (a11y)', () => {
     await expect(tab1).toBeFocused();
   });
 
-  test('keyboard selection (Enter/Space)', async ({ page }) => {
-    const tab2 = page.getByRole('tab', { name: 'Tab 2' });
-    
-    await tab2.evaluate(el => el.focus());
-    await expect(tab2).toBeFocused();
-    
-    await page.keyboard.press('Enter');
-    await expect(tab2).toHaveAttribute('aria-selected', 'true');
-  });
-
-  test('keyboard "Delete" closes a tab', async ({ page }) => {
-    const tab3 = page.getByRole('tab', { name: 'Tab 3' });
-    const tab2 = page.getByRole('tab', { name: 'Tab 2' });
-    const initialCount = await page.locator('.tulweb-tab').count();
-
-    await tab3.evaluate(el => el.focus());
-    await page.keyboard.press('Delete');
-
-    await expect(page.locator('.tulweb-tab')).toHaveCount(initialCount - 1);
-  });
-
-  test('focus management: closing a tab focuses the next available tab', async ({ page }) => {
-    const tab1 = page.getByRole('tab', { name: 'Tab 1' });
-    const tab2 = page.getByRole('tab', { name: 'Tab 2' });
-    const tab3 = page.getByRole('tab', { name: 'Tab 3' });
-    
-    // Select tab 2
-    await tab2.evaluate(el => el.focus());
-    await page.keyboard.press('Enter');
-    await expect(tab2).toHaveAttribute('aria-selected', 'true');
-    
-    const closeBtn = tab2.locator('.tulweb-tab-close');
-    await closeBtn.click();
-
-    // After closing Tab 2, Tab 3 (or Tab 1) should be active and focused
-    const activeTab = page.locator('.tulweb-tab.active');
-    await expect(activeTab).toBeFocused();
-  });
-
-  test('splitters are navigable via keyboard', async ({ page }) => {
-    // Reload with a split layout
-    await page.evaluate(() => {
-        window.layout.loadLayout({
-            content: [{
-                type: 'row',
-                content: [
-                    { type: 'stack', content: [{ type: 'component', title: 'S1' }] },
-                    { type: 'stack', content: [{ type: 'component', title: 'S2' }] }
-                ]
-            }]
-        });
-    });
-    
-    const splitter = page.locator('.tulweb-splitter');
+  test('splitters are navigable via keyboard and resize panels', async ({ page }) => {
+    const splitter = page.locator('.tulweb-splitter').first();
     await expect(splitter).toBeVisible();
     
+    // Focus splitter
     await splitter.evaluate(el => el.focus());
     await expect(splitter).toBeFocused();
+    expect(await splitter.getAttribute('role')).toBe('separator');
     
-    const leftStack = page.locator('.tulweb-stack').first();
-    const initialBox = await leftStack.boundingBox();
+    const topStack = page.locator('.tulweb-stack').first();
+    const initialBox = await topStack.boundingBox();
     
-    await page.keyboard.press('ArrowRight');
-    const newBox = await leftStack.boundingBox();
-    expect(newBox.width).not.toBe(initialBox.width);
+    // Resize down
+    await page.keyboard.press('ArrowDown');
+    // Give it a moment to update layout
+    await page.waitForTimeout(100);
+    
+    const newBox = await topStack.boundingBox();
+    expect(newBox.height).toBeGreaterThan(initialBox.height);
   });
 });

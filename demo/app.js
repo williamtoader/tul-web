@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
         el.style.overflowY = "auto";
 
         const lines = [
-            "TulWEB v1.0 initialized.",
+            "TulWEB v2.7.0 initialized.",
             "Loading modules...",
             "[OK] Layout Manager Events",
             "[OK] Drag & Drop System",
