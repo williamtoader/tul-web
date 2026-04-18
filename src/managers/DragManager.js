@@ -4,7 +4,7 @@ import { ComponentItem } from '../core/ComponentItem.js'
 import { RowItem, ColumnItem } from '../core/ContainerItem.js'
 
 export class DragManager {
-  constructor(layoutManager) {
+  constructor (layoutManager) {
     this.isDragging = false
     this.dragItem = null
     this.proxy = null
@@ -23,7 +23,7 @@ export class DragManager {
     this.init()
   }
 
-  init() {
+  init () {
     this.handleMouseMove = this.handleMouseMove.bind(this)
     this.handleMouseUp = this.handleMouseUp.bind(this)
     this.handlePendingMove = this.handlePendingMove.bind(this)
@@ -48,7 +48,7 @@ export class DragManager {
     this.tabIndicator.setAttribute('aria-live', 'polite')
   }
 
-  destroy() {
+  destroy () {
     if (this.indicator && this.indicator.parentElement) {
       this.indicator.parentElement.removeChild(this.indicator)
     }
@@ -58,7 +58,7 @@ export class DragManager {
     this.layoutManager = null
   }
 
-  pendDrag(evt, itemConfig, type, sourceStack, title) {
+  pendDrag (evt, itemConfig, type, sourceStack, title) {
     this.isPendingDrag = true
     this._dragDoc = evt.target ? (evt.target.ownerDocument || document) : document
 
@@ -86,7 +86,7 @@ export class DragManager {
     }
   }
 
-  cancelDrag() {
+  cancelDrag () {
     if (this.isPendingDrag) {
       this.handlePendingUp()
     }
@@ -97,7 +97,7 @@ export class DragManager {
     this.isDragging = false
   }
 
-  handlePendingMove(evt) {
+  handlePendingMove (evt) {
     if (!this.isPendingDrag) return
     const isTouch = evt.touches && evt.touches.length > 0
     const clientX = isTouch ? evt.touches[0].clientX : evt.clientX
@@ -117,7 +117,7 @@ export class DragManager {
     }
   }
 
-  handlePendingUp(evt) {
+  handlePendingUp (evt) {
     this.isPendingDrag = false
     this._dragDoc.removeEventListener('mousemove', this.handlePendingMove)
     this._dragDoc.removeEventListener('mouseup', this.handlePendingUp)
@@ -125,7 +125,7 @@ export class DragManager {
     this._dragDoc.removeEventListener('touchend', this.handlePendingTouchEnd)
   }
 
-  startDrag(evt, itemConfig, type, sourceStack, title) {
+  startDrag (evt, itemConfig, type, sourceStack, title) {
     this.isDragging = true
     // Deep-clone external configs to prevent mutating the original drag source
     this.dragItem = type === 'external' ? structuredClone(itemConfig) : itemConfig
@@ -136,7 +136,7 @@ export class DragManager {
     this.proxy = Utils.createElement('div', 'tulweb-drag-proxy', this._dragDoc.body)
     this.proxy.textContent = title || itemConfig.title || 'Component'
     this.updateProxyPos(evt)
-    
+
     // Ensure indicators are in the same document as the drag source
     if (this.indicator && this.indicator.ownerDocument !== this._dragDoc) {
       this._dragDoc.body.appendChild(this.indicator)
@@ -159,7 +159,7 @@ export class DragManager {
     }
   }
 
-  updateProxyPos(evt) {
+  updateProxyPos (evt) {
     if (this.proxy) {
       const isTouch = evt.touches && evt.touches.length > 0
       const clientX = isTouch ? evt.touches[0].clientX : evt.clientX
@@ -169,7 +169,7 @@ export class DragManager {
     }
   }
 
-  handleMouseMove(evt) {
+  handleMouseMove (evt) {
     if (!this.isDragging) return
     if (this._rafPending) {
       this._lastMoveEvent = evt
@@ -188,7 +188,7 @@ export class DragManager {
     })
   }
 
-  handleMouseUp(evt) {
+  handleMouseUp (evt) {
     if (!this.isDragging) return
     this.isDragging = false
 
@@ -225,7 +225,7 @@ export class DragManager {
     this.sourceStack = null
   }
 
-  findDropZone(evt) {
+  findDropZone (evt) {
     const isTouch = evt.touches && evt.touches.length > 0
     const clientX = isTouch ? evt.touches[0].clientX : evt.clientX
     const clientY = isTouch ? evt.touches[0].clientY : evt.clientY
@@ -397,7 +397,7 @@ export class DragManager {
     this.showIndicator(targetItem.element, edge)
   }
 
-  showTabIndicator(l, t, w, h) {
+  showTabIndicator (l, t, w, h) {
     this.indicator.style.display = 'none'
     this.indicator.classList.remove('visible')
 
@@ -406,11 +406,10 @@ export class DragManager {
     this.tabIndicator.style.width = w + 'px'
     this.tabIndicator.style.height = h + 'px'
     this.tabIndicator.style.display = 'block'
-
-    setTimeout(() => this.tabIndicator.classList.add('visible'), 10)
+    this.tabIndicator.classList.add('visible')
   }
 
-  showIndicator(element, edge) {
+  showIndicator (element, edge) {
     if (this.tabIndicator) {
       this.tabIndicator.style.display = 'none'
       this.tabIndicator.classList.remove('visible')
@@ -429,12 +428,10 @@ export class DragManager {
     this.indicator.style.width = w + 'px'
     this.indicator.style.height = h + 'px'
     this.indicator.style.display = 'block'
-
-    // Small delay for CSS transition
-    setTimeout(() => this.indicator.classList.add('visible'), 10)
+    this.indicator.classList.add('visible')
   }
 
-  hideIndicator() {
+  hideIndicator () {
     this.indicator.style.display = 'none'
     this.indicator.classList.remove('visible')
     if (this.tabIndicator) {
@@ -444,7 +441,7 @@ export class DragManager {
     this.currentDropZone = null
   }
 
-  executeDrop() {
+  executeDrop () {
     const { target, edge } = this.currentDropZone
     const newItemConfig = this.dragItem
 

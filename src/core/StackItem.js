@@ -104,7 +104,6 @@ export class StackItem extends ContentItem {
     this.contentAreaEl.setAttribute('role', 'tabpanel')
     this.contentAreaEl.id = 'panel-' + this.id
 
-
     if (window.ResizeObserver) {
       this.resizeObserver = new ResizeObserver(() => {
         requestAnimationFrame(() => {
@@ -295,12 +294,12 @@ export class StackItem extends ContentItem {
 
     // Check if DOM child order matches this.children
     const currentTabElements = Array.from(this.tabsEl.children)
-    
+
     this.children.forEach((child, index) => {
       if (!child._tabEl) {
         child._tabEl = this._createTabElement(child, index)
       }
-      
+
       // Update title if it changed in config
       const titleEl = child._tabEl.querySelector('.tulweb-tab-title')
       const expectedTitle = child.config.title || child.config.componentName || 'Tab'
