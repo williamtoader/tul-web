@@ -45,4 +45,13 @@ export class Utils {
     if (parsed.unit === 'weight') return (parsed.value / 100) * totalPixels // Optional but consistent
     return parsed.value
   }
+
+  static debounce (func, wait) {
+    let timeout
+    return function (...args) {
+      const context = this
+      clearTimeout(timeout)
+      timeout = setTimeout(() => func.apply(context, args), wait)
+    }
+  }
 }

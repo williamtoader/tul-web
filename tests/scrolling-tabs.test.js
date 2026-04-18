@@ -120,5 +120,51 @@ test.describe('Scrolling Tabs Feature', () => {
     const overflowBtn = verticalStack.locator('.tulweb-tab-overflow');
     await expect(overflowBtn).toBeVisible();
   });
+
+  test('overflow menu re-evaluates options on tab strip scroll', async ({ page }) => {
+    // Add many tabs
+    await page.evaluate(() => {
+      const stacks = window.layout.getAllStacks();
+      const stack = stacks.find(s => s.tabPosition === 'top') || stacks[0];
+      for (let i = 0; i < 30; i++) {
+        const newComp = window.layout._buildObjectTree({
+          type: 'component', 
+          componentName: 'generic', 
+          title: 'Scroll Item ' + i
+        });
+        stack.addChild(newComp);
+      }
+    });
+
+    const editorStack = page.locator('.tulweb-stack').filter({ hasText: 'Scroll Item 0' }).first();
+    const tabsContainer = editorStack.locator('.tulweb-tabs');
+    const overflowBtn = editorStack.locator('.tulweb-tab-overflow');
+
+    // Scroll to the beginning
+    await tabsContainer.evaluate(el => el.scrollLeft = 0);
+    
+    // Open dropdown
+    await overflowBtn.click();
+    const dropdown = page.locator('.tulweb-dropdown');
+    await expect(dropdown).toBeVisible();
+
+    // Capture initial items
+    const initialItems = await dropdown.locator('.tulweb-dropdown-item').allTextContents();
+    
+    // Scroll to the end
+    await tabsContainer.evaluate(el => el.scrollLeft = el.scrollWidth);
+    
+    // Wait for debounce (100ms) + some buffer
+    await page.waitForTimeout(300);
+
+    // Capture items again
+    const updatedItems = await dropdown.locator('.tulweb-dropdown-item').allTextContents();
+    
+    // The lists should be different because scrolling should hide/show different tabs
+    expect(updatedItems).not.toEqual(initialItems);
+    
+    // Check if "Scroll Item 0" is now in the dropdown (it should be as it's scrolled out)
+    expect(updatedItems).toContain('Scroll Item 0');
+  });
 });
 

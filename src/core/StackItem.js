@@ -44,6 +44,14 @@ export class StackItem extends ContentItem {
     this.tabsEl.setAttribute('role', 'tablist')
     this.tabsEl.setAttribute('aria-label', 'Layout Stacks')
 
+    this._onTabsScroll = Utils.debounce(() => {
+      this.updateOverflow()
+      if (this.dropdownEl && this.dropdownEl.style.display !== 'none') {
+        this.renderDropdown()
+      }
+    }, 100)
+    this.tabsEl.addEventListener('scroll', this._onTabsScroll)
+
     const isPopout = !!this.config.isPopoutChild
     const showMin = this.displayMinimizeButton && this.layoutManager.settings.enableMinimize !== false && !isPopout
     const showMax = this.displayMaximizeButton && !isPopout
@@ -110,6 +118,9 @@ export class StackItem extends ContentItem {
   destroy () {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect()
+    }
+    if (this._onTabsScroll) {
+      this.tabsEl.removeEventListener('scroll', this._onTabsScroll)
     }
     document.removeEventListener('mousedown', this._onDocumentClick)
     super.destroy()
