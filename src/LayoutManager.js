@@ -220,6 +220,14 @@ export class LayoutManager extends EventEmitter {
     if (this.root) {
       this.root.updateLayout()
     }
+    // Also update any stacks currently in popouts
+    if (this.popoutManager) {
+      this.popoutManager.openPopouts.forEach(entry => {
+        if (entry.originalStack) {
+          entry.originalStack.updateLayout()
+        }
+      })
+    }
     this.emit('stateChanged')
   }
 
@@ -242,9 +250,16 @@ export class LayoutManager extends EventEmitter {
 
     const parent = stackItem.parent
     if (!parent) {
-      // It's the root (or a detached popout).
-      // Only clear the root if this item IS the root of this LayoutManager.
-      if (stackItem === this.root && stackItem.children.length === 0) {
+      // It's the root or a detached popout.
+      if (stackItem.isPopoutChild && stackItem.children.length === 0) {
+        // Find the popout referencing this stack and close it
+        this.popoutManager.openPopouts.forEach((entry, popoutId) => {
+          if (entry.originalStack === stackItem) {
+            this.popoutManager.closePopout(popoutId, true)
+          }
+        })
+      } else if (stackItem === this.root && stackItem.children.length === 0) {
+        // It's the root of this LayoutManager
         this.rootElement.innerHTML = ''
         this.root = null
         this.renderEmptyState()

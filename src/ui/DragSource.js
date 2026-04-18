@@ -7,9 +7,15 @@ export class DragSource {
 
     const startHandler = (e) => {
       // Config is cloned later in startDrag() only if the drag threshold is met
-      this.layoutManager.dragManager.pendDrag(e, this.itemConfig, 'external', null, this.itemConfig.title)
+      if (e.type === 'dragstart') {
+        this.layoutManager.dragManager.startDrag(e, this.itemConfig, 'external', null, this.itemConfig.title)
+      } else {
+        this.layoutManager.dragManager.pendDrag(e, this.itemConfig, 'external', null, this.itemConfig.title)
+      }
     }
 
+    this.element.setAttribute('draggable', 'true')
+    this.element.addEventListener('dragstart', startHandler)
     this.element.addEventListener('mousedown', startHandler)
     this.element.addEventListener('touchstart', startHandler, { passive: true })
   }

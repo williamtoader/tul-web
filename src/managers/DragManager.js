@@ -46,6 +46,23 @@ export class DragManager {
     this.tabIndicator.style.display = 'none'
     this.tabIndicator.setAttribute('role', 'status')
     this.tabIndicator.setAttribute('aria-live', 'polite')
+
+    this.bindNativeEvents(window)
+  }
+
+  bindNativeEvents (win) {
+    if (!win || !win.document) return
+    const doc = win.document
+    if (typeof doc.addEventListener !== 'function') return
+
+    // Use named functions for easier removal if needed, but for now we just want to avoid double-binding
+    if (win._tulwebNativeBound) return
+    win._tulwebNativeBound = true
+
+    doc.addEventListener('dragover', (e) => this.handleNativeDragOver(e))
+    doc.addEventListener('drop', (e) => this.handleNativeDrop(e))
+    doc.addEventListener('dragend', (e) => this.handleNativeDragEnd(e))
+    doc.addEventListener('dragenter', (e) => e.preventDefault())
   }
 
   destroy () {
@@ -126,16 +143,32 @@ export class DragManager {
   }
 
   startDrag (evt, itemConfig, type, sourceStack, title) {
+    if (this.isDragging) return
     this.isDragging = true
+    this.isPendingDrag = false // Essential: prevent double start from pending move
+
     // Deep-clone external configs to prevent mutating the original drag source
     this.dragItem = type === 'external' ? structuredClone(itemConfig) : itemConfig
     this.sourceType = type
     this.sourceStack = sourceStack
 
+    // Support native D&D for cross-window
+    if (evt.dataTransfer) {
+      evt.dataTransfer.effectAllowed = 'move'
+      evt.dataTransfer.setData('application/tulweb-config', JSON.stringify(itemConfig))
+      // Use a blank image to avoid double ghosting (we use our own proxy)
+      const img = new Image()
+      img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+      evt.dataTransfer.setDragImage(img, 0, 0)
+    }
+
     // Create UI proxy in the document where the drag originated
     this.proxy = Utils.createElement('div', 'tulweb-drag-proxy', this._dragDoc.body)
     this.proxy.textContent = title || itemConfig.title || 'Component'
     this.updateProxyPos(evt)
+
+    // Force a layout update to hide the original tab if it's in a stack
+    this.layoutManager.updateLayout()
 
     // Ensure indicators are in the same document as the drag source
     if (this.indicator && this.indicator.ownerDocument !== this._dragDoc) {
@@ -159,13 +192,99 @@ export class DragManager {
     }
   }
 
-  updateProxyPos (evt) {
+  updateProxyPos (evt, posInfo) {
     if (this.proxy) {
-      const isTouch = evt.touches && evt.touches.length > 0
-      const clientX = isTouch ? evt.touches[0].clientX : evt.clientX
-      const clientY = isTouch ? evt.touches[0].clientY : evt.clientY
-      this.proxy.style.left = (clientX + 10) + 'px'
-      this.proxy.style.top = (clientY + 10) + 'px'
+      if (posInfo) {
+        if (this.proxy.ownerDocument !== posInfo.targetDoc) {
+          posInfo.targetDoc.body.appendChild(this.proxy)
+        }
+        this.proxy.style.left = (posInfo.clientX + 10) + 'px'
+        this.proxy.style.top = (posInfo.clientY + 10) + 'px'
+      } else {
+        const isTouch = evt.touches && evt.touches.length > 0
+        const clientX = isTouch ? evt.touches[0].clientX : evt.clientX
+        const clientY = isTouch ? evt.touches[0].clientY : evt.clientY
+        this.proxy.style.left = (clientX + 10) + 'px'
+        this.proxy.style.top = (clientY + 10) + 'px'
+      }
+    }
+  }
+
+  resolveCrossWindowPos (evt) {
+    const isTouch = evt.touches && evt.touches.length > 0
+    let clientX = isTouch ? evt.touches[0].clientX : evt.clientX
+    let clientY = isTouch ? evt.touches[0].clientY : evt.clientY
+
+    let targetDoc = evt.target ? (evt.target.ownerDocument || document) : document
+
+    // For native dragover events, we can just use the local clientX/Y directly!
+    // This is much more reliable than screen-based calculation.
+    if (evt.type === 'dragover' || evt.type === 'drop') {
+      return { evt, targetDoc, clientX, clientY }
+    }
+
+    if (this.layoutManager.popoutManager && this.layoutManager.popoutManager.openPopouts.size > 0) {
+      const screenX = isTouch ? evt.touches[0].screenX : evt.screenX
+      const screenY = isTouch ? evt.touches[0].screenY : evt.screenY
+
+      const allWindows = []
+      this.layoutManager.popoutManager.openPopouts.forEach(entry => {
+        if (entry.window && !entry.window.closed) {
+          allWindows.push(entry.window)
+          // Ensure native events are bound to new popouts too
+          if (!entry._nativeBound) {
+            this.bindNativeEvents(entry.window)
+            entry._nativeBound = true
+          }
+        }
+      })
+      allWindows.push(window)
+
+      for (const w of allWindows) {
+        if (w.closed) continue
+
+        // screenLeft/Top usually point to the content area in modern browsers (Chrome/Safari)
+        const winLeft = w.screenLeft ?? w.screenX ?? 0
+        const winTop = w.screenTop ?? w.screenY ?? 0
+        const winRight = winLeft + w.innerWidth
+        const winBottom = winTop + w.innerHeight
+
+        if (screenX >= winLeft && screenX <= winRight && screenY >= winTop && screenY <= winBottom) {
+          targetDoc = w.document
+          clientX = screenX - winLeft
+          clientY = screenY - winTop
+
+          if (targetDoc !== this._dragDoc) {
+            console.log(`[TulWEB] Dragging over popout. Local coords: ${Math.round(clientX)}, ${Math.round(clientY)}`)
+          }
+          break
+        }
+      }
+    }
+
+    return { evt, targetDoc, clientX, clientY }
+  }
+
+  handleNativeDragOver (evt) {
+    if (!this.isDragging) return
+    evt.preventDefault()
+    evt.dataTransfer.dropEffect = 'move'
+
+    const posInfo = this.resolveCrossWindowPos(evt)
+    this.updateProxyPos(evt, posInfo)
+    this.findDropZone(posInfo)
+  }
+
+  handleNativeDrop (evt) {
+    if (!this.isDragging) return
+    evt.preventDefault()
+    this.handleMouseUp(evt)
+  }
+
+  handleNativeDragEnd (evt) {
+    // If we're still dragging after dragend, something was missed (e.g. dropped outside or cancelled)
+    if (this.isDragging) {
+      this.handleMouseUp(evt)
     }
   }
 
@@ -183,8 +302,10 @@ export class DragManager {
       const event = this._lastMoveEvent
       // check if event has preventDefault
       if (typeof event.preventDefault === 'function') event.preventDefault()
-      this.updateProxyPos(event)
-      this.findDropZone(event)
+
+      const posInfo = this.resolveCrossWindowPos(event)
+      this.updateProxyPos(event, posInfo)
+      this.findDropZone(posInfo)
     })
   }
 
@@ -216,33 +337,38 @@ export class DragManager {
 
     if (this.currentDropZone) {
       this.executeDrop()
-    } else if (this.sourceType === 'tab' && this.sourceStack && this.dragItem) {
-      // Dragged outside, maybe remove or just cancel? Currently cancel.
     }
+
+    // Always restore visuals/sync across all windows at the end of drag
+    this.layoutManager.updateLayout()
 
     this.currentDropZone = null
     this.dragItem = null
     this.sourceStack = null
   }
 
-  findDropZone (evt) {
-    const isTouch = evt.touches && evt.touches.length > 0
-    const clientX = isTouch ? evt.touches[0].clientX : evt.clientX
-    const clientY = isTouch ? evt.touches[0].clientY : evt.clientY
+  findDropZone (posInfo) {
+    const { targetDoc, clientX, clientY, evt } = posInfo
 
-    // Find what we are over. The proxy has pointer-events: none, so this gets the actual element
-    const el = this._dragDoc.elementFromPoint(clientX, clientY)
+    const el = targetDoc.elementFromPoint(clientX, clientY)
     if (!el) return this.hideIndicator()
 
     // Find the closest Layout Item
     let targetItem = null
     let currentEl = el
-    while (currentEl && currentEl !== this._dragDoc.body) {
+    while (currentEl && currentEl !== targetDoc.body) {
       if (currentEl.tulwebItem) {
         targetItem = currentEl.tulwebItem
         break
       }
       currentEl = currentEl.parentElement
+    }
+
+    if (this.indicator && this.indicator.ownerDocument !== targetDoc) {
+      targetDoc.body.appendChild(this.indicator)
+    }
+    if (this.tabIndicator && this.tabIndicator.ownerDocument !== targetDoc) {
+      targetDoc.body.appendChild(this.tabIndicator)
     }
 
     if (!targetItem) {

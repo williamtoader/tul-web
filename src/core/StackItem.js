@@ -275,11 +275,19 @@ export class StackItem extends ContentItem {
 
     // Tab drag
     const startDragHandler = (e) => {
-      if (e.target !== close && this.children.length > 0 && (e.type === 'touchstart' || e.button === 0)) {
-        this.layoutManager.dragManager.pendDrag(e, child.config, 'tab', this, child.config.title)
+      if (e.target !== close && this.children.length > 0) {
+        if (e.type === 'dragstart') {
+          // Native D&D for cross-window support
+          this.layoutManager.dragManager.startDrag(e, child.config, 'tab', this, child.config.title)
+        } else if (e.button === 0 || e.type === 'touchstart') {
+          // Fallback / Pending drag for internal movement
+          this.layoutManager.dragManager.pendDrag(e, child.config, 'tab', this, child.config.title)
+        }
       }
     }
 
+    tab.setAttribute('draggable', 'true')
+    tab.addEventListener('dragstart', startDragHandler)
     tab.addEventListener('mousedown', startDragHandler)
     tab.addEventListener('touchstart', startDragHandler, { passive: true })
 
@@ -299,6 +307,11 @@ export class StackItem extends ContentItem {
       if (!child._tabEl) {
         child._tabEl = this._createTabElement(child, index)
       }
+
+      // Sync dragging state visually
+      const isDraggingNow = this.layoutManager.dragManager.isDragging &&
+                            this.layoutManager.dragManager.dragItem === child.config
+      child._tabEl.classList.toggle('is-dragging', isDraggingNow)
 
       // Update title if it changed in config
       const titleEl = child._tabEl.querySelector('.tulweb-tab-title')

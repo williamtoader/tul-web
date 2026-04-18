@@ -114,6 +114,9 @@ export class PopoutManager {
       // Append it to the new window's DOM
       destContainer.appendChild(stack.element)
 
+      // Bind native drag events for cross-window D&D support
+      this.layoutManager.dragManager.bindNativeEvents(childWindow)
+
       // Force a resize event on the children so they layout correctly in the new window size
       stack.children.forEach(child => child.emit('resize'))
       this.layoutManager.emit('popoutReady', { popoutId })
@@ -217,8 +220,11 @@ export class PopoutManager {
     this.openPopouts.delete(popoutId)
 
     const stack = entry.originalStack
+    const skipReintegration = entry.skipReintegration
 
-    if (stack && stack.element) {
+    if (skipReintegration) {
+      if (stack) stack.destroy()
+    } else if (stack && stack.element) {
       // Adopt it back to the parent document
       document.adoptNode(stack.element)
 
@@ -359,10 +365,13 @@ export class PopoutManager {
   /**
      * Close a specific popout
      */
-  closePopout (popoutId) {
+  closePopout (popoutId, skipReintegration = false) {
     const entry = this.openPopouts.get(popoutId)
-    if (entry && entry.window) {
-      try { entry.window.close() } catch (e) { /* cross-origin safety */ }
+    if (entry) {
+      if (skipReintegration) entry.skipReintegration = true
+      if (entry.window) {
+        try { entry.window.close() } catch (e) { /* cross-origin safety */ }
+      }
     }
   }
 
